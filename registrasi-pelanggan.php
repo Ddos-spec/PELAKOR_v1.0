@@ -2,7 +2,7 @@
 
     // koneksi ke db
     session_start();
-    include 'connect-db.php';
+include 'database/connect-db.php';
     include 'functions/functions.php';
 
     cekLogin();

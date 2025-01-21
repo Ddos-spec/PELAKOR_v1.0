@@ -2,7 +2,7 @@
 
 //session 
 session_start();
-include 'connect-db.php';
+include 'database/connect-db.php';
 
 // mengambil id agen dg method get
 $idAgen = $_GET["id"];
