@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-include '../database/connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 // sesuaikan dengan jenis login
 if((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))){

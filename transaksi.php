@@ -2,8 +2,8 @@
 
 // session
 session_start();
-include '../database/connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 cekBelumLogin();
 
@@ -39,11 +39,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "web/headtags.html"; ?>
+    <?php include "headtags.html"; ?>
     <title>Transasksi - <?= $login ?></title>
 </head>
 <body>
-<?php include 'web/header.php'; ?>
+<?php include 'header.php'; ?>
     <div class="row">
         <h3 class="header col s12 light center">Riwayat Transaksi Cucian</h3>
         <br>
@@ -239,7 +239,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php endif; ?>
     </div>
-    <?php include "web/footer.php"; ?>
+    <?php include "footer.php"; ?>
 </body>
 </html>
 

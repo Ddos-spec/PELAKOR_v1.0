@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-include '../database/connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 
 // harus agen yg kesini
@@ -30,7 +30,7 @@ $idAgen = $agen["id_agen"];
 <body>
 
     <!-- header -->
-include 'header.php'; // Corrected path
+    <?php include 'header.php'; ?>
     <!-- end header -->
 
     <!-- data agen -->

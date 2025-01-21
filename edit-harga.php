@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-include '../database/connect-db.php';
+include 'connect-db.php';
 include 'functions/functions.php';
 
 // cek apakah sudah login sebagai agen
