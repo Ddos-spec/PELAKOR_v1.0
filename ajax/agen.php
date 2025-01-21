@@ -1,6 +1,6 @@
 <?php
 
-include "../connect-db.php";
+include "../database/connect-db.php";
 
 $keyword = htmlspecialchars($_GET["keyword"]);
 

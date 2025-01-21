@@ -2,8 +2,8 @@
 
 // mulai session
 session_start();
-include 'database/connect-db.php';
-include 'functions/functions.php';
+include '../database/connect-db.php';
+include '../functions/functions.php';
 
 cekLogin();
 
