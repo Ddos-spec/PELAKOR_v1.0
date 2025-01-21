@@ -71,7 +71,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $temp = $transaksi["id_agen"];
                             $agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$temp'");
                             $agen = mysqli_fetch_assoc($agen);
-                            echo $agen["nama_laundry"];
+                            if ($agen) {
+                                echo $agen["nama_laundry"];
+                            } else {
+                                echo "Agen not found";
+                            }
                         ?>
                     </td>
                     <td>
@@ -79,7 +83,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $temp = $transaksi["id_pelanggan"];
                             $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan WHERE id_pelanggan = '$temp'");
                             $pelanggan = mysqli_fetch_assoc($pelanggan);
-                            echo $pelanggan["nama"];
+                            if ($pelanggan) {
+                                echo $pelanggan["nama"];
+                            } else {
+                                echo "Pelanggan not found";
+                            }
                         ?>
                     </td>
                     <td>
@@ -87,11 +95,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if ($cucian) {
+                                echo $cucian["total_item"];
+                            } else {
+                                echo "Cucian not found";
+                            }
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?></td>
-                    <td><?= $cucian["jenis"] ?></td>
+                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -99,7 +111,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <?php
                             $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                             $star = mysqli_fetch_assoc($star);
-                            $star = ceil($star["rating"]);
+                            if ($star) {
+                                $star = ceil($star["rating"]);
+                            } else {
+                                $star = 0; // Default rating if not found
+                            }
                         ?>
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
@@ -131,7 +147,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $temp = $transaksi["id_pelanggan"];
                             $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan WHERE id_pelanggan = '$temp'");
                             $pelanggan = mysqli_fetch_assoc($pelanggan);
-                            echo $pelanggan["nama"];
+                            if ($pelanggan) {
+                                echo $pelanggan["nama"];
+                            } else {
+                                echo "Pelanggan not found";
+                            }
                         ?>
                     </td>
                     <td>
@@ -139,11 +159,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if ($cucian) {
+                                echo $cucian["total_item"];
+                            } else {
+                                echo "Cucian not found";
+                            }
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?></td>
-                    <td><?= $cucian["jenis"] ?></td>
+                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -151,7 +175,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <?php
                             $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                             $star = mysqli_fetch_assoc($star);
-                            $star = ceil($star["rating"]);
+                            if ($star) {
+                                $star = ceil($star["rating"]);
+                            } else {
+                                $star = 0; // Default rating if not found
+                            }
                         ?>
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
@@ -183,7 +211,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $temp = $transaksi["id_agen"];
                             $agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$temp'");
                             $agen = mysqli_fetch_assoc($agen);
-                            echo $agen["nama_laundry"];
+                            if ($agen) {
+                                echo $agen["nama_laundry"];
+                            } else {
+                                echo "Agen not found";
+                            }
                         ?>
                     </td>
                     <td>
@@ -191,11 +223,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if ($cucian) {
+                                echo $cucian["total_item"];
+                            } else {
+                                echo "Cucian not found";
+                            }
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?></td>
-                    <td><?= $cucian["jenis"] ?></td>
+                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -217,7 +253,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             <?php
                                 $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                                 $star = mysqli_fetch_assoc($star);
-                                $star = ceil($star["rating"]);
+                                if ($star) {
+                                    $star = ceil($star["rating"]);
+                                } else {
+                                    $star = 0; // Default rating if not found
+                                }
                             ?>
                             <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                         <?php endif; ?>
