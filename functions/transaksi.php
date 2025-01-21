@@ -39,11 +39,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
+    <?php include "web/headtags.html"; ?>
     <title>Transasksi - <?= $login ?></title>
 </head>
 <body>
-<?php include 'header.php'; ?>
+<?php include 'web/header.php'; ?>
     <div class="row">
         <h3 class="header col s12 light center">Riwayat Transaksi Cucian</h3>
         <br>
@@ -239,7 +239,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php endif; ?>
     </div>
-    <?php include "footer.php"; ?>
+    <?php include "web/footer.php"; ?>
 </body>
 </html>
 
