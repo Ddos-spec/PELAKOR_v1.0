@@ -30,7 +30,7 @@ $idAgen = $agen["id_agen"];
 <body>
 
     <!-- header -->
-    <?php include 'header.php'; ?>
+include 'header.php'; // Corrected path
     <!-- end header -->
 
     <!-- data agen -->

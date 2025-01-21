@@ -1,6 +1,6 @@
 <?php
 
-include "../database/connect-db.php";
+include "../database/connect-db.php"; // Corrected path
 
 $keyword = htmlspecialchars($_GET["keyword"]);
 

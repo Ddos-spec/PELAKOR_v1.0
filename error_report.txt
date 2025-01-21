@@ -1,0 +1,35 @@
+File: ajax/agen.php
+Line: 1
+Path: include("../database/connect-db.php") -> Error: File not found
+
+File: web/admin.php
+Line: 1
+Path: include('../database/connect-db.php') -> Error: File not found
+Line: 2
+Path: include('../functions/functions.php') -> Error: File not found
+
+File: web/index.php
+Line: 1
+Path: include('../database/connect-db.php') -> Error: File not found
+
+File: web/detail-agen.php
+Line: 1
+Path: include('../database/connect-db.php') -> Error: File not found
+
+File: web/header.php
+Line: 1
+Path: include('header.php') -> Error: File not found
+
+File: web/footer.php
+Line: 1
+Path: include('footer.php') -> Error: File not found
+
+File: web/agen.php
+Line: 1
+Path: include('header.php') -> Error: File not found
+Line: 2
+Path: include('footer.php') -> Error: File not found
+
+File: web/js/scriptAjax.js
+Line: 7
+Path: xhr.open('GET', 'ajax/agen.php?keyword=' + keyword.value, true) -> Error: File not found

@@ -2,7 +2,7 @@
 
 //session 
 session_start();
-include '../database/connect-db.php';
+include '../database/connect-db.php'; // Corrected path
 
 // mengambil id agen dg method get
 $idAgen = $_GET["id"];

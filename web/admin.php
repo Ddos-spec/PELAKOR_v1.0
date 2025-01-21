@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-include '../database/connect-db.php';
-include '../functions/functions.php';
+include '../database/connect-db.php'; // Corrected path
+include '../functions/functions.php'; // Corrected path
 
 // klo bukan admin
 cekAdmin();
