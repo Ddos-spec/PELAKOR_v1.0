@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-include 'connect-db.php';
+include 'logic/connect-db.php';
 
 
 //konfirgurasi pagination
