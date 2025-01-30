@@ -1,12 +1,11 @@
-<br><br>
-<footer class="page-footer blue darken-2">
+<br>
+<footer class="page-footer blue" style="background-color: #2973B2;">
     <div class="container">
         <div class="row">
             <div class="col l6 s12">
             <h5 class="white-text">Company Bio</h5>
             <p class="grey-text text-lighten-4">
-                LaundryKu adalah sebuah projek yang ditujukan sebagai tugas akhir untuk mata kuliah "Basis Data Lanjut" pada Program Studi Informatika, Fakultas MIPA, Universitas Udayana.<br/>
-                Segala bentuk dukungan akan sangat membantu kami dalam menyelesaikan projek ini. Terima Kasih.
+                LaundryKu adalah sebuah projek yang ditujukan sebagai tugas akhir untuk UKOM di al-amanah.
             </p>
 
 
@@ -23,10 +22,9 @@
             <div class="col l3 s12">
             <h5 class="white-text">Developer</h5>
             <ul>
-                <li><a class="white-text" href="team.php">Nadya Okatviana</a></li>
-                <li><a class="white-text" href="team.php">Eka Nadya</a></li>
-                <li><a class="white-text" href="team.php">Hairul Lana</a></li>
-                <li><a class="white-text" href="team.php">Wina Artha Setiawan</a></li>
+                <li><a class="white-text" href="team.php">Fadjar aryo seto</a></li>
+                <li><a class="white-text" href="team.php">Dons pablos</a></li>
+
             </ul>
             </div>
         </div>
