@@ -16,7 +16,7 @@
                 <li><a class="white-text" href="index.php">Home</a></li>
                 <li><a class="white-text" href="term.php">Term and Condition</a></li>
                 <li><a class="white-text" href="registrasi.php">Registrasi</a></li>
-                <li><a class="white-text" href="login.php">Login</a></li>
+<li><a class="white-text" href="web/logic/login.php">Login</a></li>
             </ul>
             </div>
             <div class="col l3 s12">

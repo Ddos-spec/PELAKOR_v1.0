@@ -7,9 +7,17 @@ include 'connect-db.php';
 // mengambil id agen dg method get
 $idAgen = $_GET["id"];
 
-// ambil data agen
 $query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
 $agen = mysqli_fetch_assoc($query);
+
+// Check if agent exists
+if (!$agen) {
+    echo "<script>
+            alert('Agen tidak ditemukan.');
+            document.location.href = 'index.php'; // Redirect to homepage or error page
+          </script>";
+    exit;
+}
 
 
 ?>

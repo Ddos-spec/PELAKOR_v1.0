@@ -2,7 +2,7 @@
 
 session_start();
 include '../logic/connect-db.php';
-include '../functions/functions.php';
+include '../../functions/functions.php';
 
 // validasi login
 cekLogin();
@@ -72,7 +72,10 @@ if ( isset($_POST["login"]) ){
         validasiEmail($email);
 
         // cari data di db
-        $result = mysqli_query($connect, "SELECT * FROM agen WHERE email = '$email'");
+$stmt = $connect->prepare("SELECT * FROM agen WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
 
         // kalau ada email
         if(mysqli_num_rows($result) == 1){
@@ -110,7 +113,10 @@ if ( isset($_POST["login"]) ){
         validasiEmail($email);
 
         //cek apakah ada email atau tidak
-        $result = mysqli_query($connect, "SELECT * FROM pelanggan WHERE email = '$email'");
+$stmt = $connect->prepare("SELECT * FROM pelanggan WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
         
         //jika ada username
         if ( mysqli_num_rows($result) === 1 ){   //fungsi menghitung jumlah baris di db
@@ -151,7 +157,10 @@ if ( isset($_POST["login"]) ){
         validasiUsername($username);
     
         // cek di db
-        $data = mysqli_query($connect, "SELECT * FROM admin WHERE username = '$username'");
+$stmt = $connect->prepare("SELECT * FROM admin WHERE username = ?");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$data = $stmt->get_result();
     
         // jika email ada
         if ( mysqli_num_rows($data) === 1 ){

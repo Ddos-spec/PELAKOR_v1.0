@@ -26,7 +26,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 }else {
     echo "
         <script>
-            document.location.href = 'login.php';
+document.location.href = 'logic/login.php';
         </script>
     ";
 }

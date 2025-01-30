@@ -138,7 +138,10 @@ function registrasi($agen){
 
     //cek username apakah ada yg sama
     
-    $result = mysqli_query($connect, "SELECT email FROM agen WHERE email = '$email'");
+$stmt = $connect->prepare("SELECT email FROM agen WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
     if ( mysqli_fetch_assoc($result) ){ //jika ada ada
         echo "
             <script>
@@ -176,7 +179,9 @@ function registrasi($agen){
         '$password'
     )";
 
-    mysqli_query($connect, $query);
+$stmt = $connect->prepare("INSERT INTO agen VALUES (NULL, ?, ?, ?, ?, ?, ?, 'default.png', ?)");
+$stmt->bind_param("ssissss", $namaLaundry, $namaPemilik, $telp, $email, $kota, $alamat, $platDriver, $password);
+$stmt->execute();
 
     return mysqli_affected_rows($connect);
 }
