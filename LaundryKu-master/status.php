@@ -26,7 +26,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 }else {
     echo "
         <script>
-window.location = 'logic/login.php';
+            window.location = 'login.php';
         </script>
     ";
 }

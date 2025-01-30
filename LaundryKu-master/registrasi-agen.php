@@ -2,8 +2,8 @@
 
 // mulai session
 session_start();
-include '../logic/connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 // kalau sudah login
 cekLogin();
@@ -138,10 +138,7 @@ function registrasi($agen){
 
     //cek username apakah ada yg sama
     
-$stmt = $connect->prepare("SELECT email FROM agen WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+    $result = mysqli_query($connect, "SELECT email FROM agen WHERE email = '$email'");
     if ( mysqli_fetch_assoc($result) ){ //jika ada ada
         echo "
             <script>
@@ -179,9 +176,7 @@ $result = $stmt->get_result();
         '$password'
     )";
 
-$stmt = $connect->prepare("INSERT INTO agen VALUES (NULL, ?, ?, ?, ?, ?, ?, 'default.png', ?)");
-$stmt->bind_param("ssissss", $namaLaundry, $namaPemilik, $telp, $email, $kota, $alamat, $platDriver, $password);
-$stmt->execute();
+    mysqli_query($connect, $query);
 
     return mysqli_affected_rows($connect);
 }

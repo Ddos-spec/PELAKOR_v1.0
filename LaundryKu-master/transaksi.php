@@ -26,7 +26,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 }else {
     echo "
         <script>
-document.location.href = 'logic/login.php';
+            document.location.href = 'login.php';
         </script>
     ";
 }
@@ -71,11 +71,7 @@ document.location.href = 'logic/login.php';
                             $temp = $transaksi["id_agen"];
                             $agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$temp'");
                             $agen = mysqli_fetch_assoc($agen);
-                            if ($agen) {
-                                echo $agen["nama_laundry"];
-                            } else {
-                                echo "Agen not found";
-                            }
+                            echo $agen["nama_laundry"];
                         ?>
                     </td>
                     <td>
@@ -83,11 +79,7 @@ document.location.href = 'logic/login.php';
                             $temp = $transaksi["id_pelanggan"];
                             $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan WHERE id_pelanggan = '$temp'");
                             $pelanggan = mysqli_fetch_assoc($pelanggan);
-                            if ($pelanggan) {
-                                echo $pelanggan["nama"];
-                            } else {
-                                echo "Pelanggan not found";
-                            }
+                            echo $pelanggan["nama"];
                         ?>
                     </td>
                     <td>
@@ -95,15 +87,11 @@ document.location.href = 'logic/login.php';
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            if ($cucian) {
-                                echo $cucian["total_item"];
-                            } else {
-                                echo "Cucian not found";
-                            }
+                            echo $cucian["total_item"];
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
-                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["berat"] ?></td>
+                    <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -111,11 +99,7 @@ document.location.href = 'logic/login.php';
                         <?php
                             $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                             $star = mysqli_fetch_assoc($star);
-                            if ($star) {
-                                $star = ceil($star["rating"]);
-                            } else {
-                                $star = 0; // Default rating if not found
-                            }
+                            $star = ceil($star["rating"]);
                         ?>
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
@@ -147,11 +131,7 @@ document.location.href = 'logic/login.php';
                             $temp = $transaksi["id_pelanggan"];
                             $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan WHERE id_pelanggan = '$temp'");
                             $pelanggan = mysqli_fetch_assoc($pelanggan);
-                            if ($pelanggan) {
-                                echo $pelanggan["nama"];
-                            } else {
-                                echo "Pelanggan not found";
-                            }
+                            echo $pelanggan["nama"];
                         ?>
                     </td>
                     <td>
@@ -159,15 +139,11 @@ document.location.href = 'logic/login.php';
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            if ($cucian) {
-                                echo $cucian["total_item"];
-                            } else {
-                                echo "Cucian not found";
-                            }
+                            echo $cucian["total_item"];
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
-                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["berat"] ?></td>
+                    <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -175,11 +151,7 @@ document.location.href = 'logic/login.php';
                         <?php
                             $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                             $star = mysqli_fetch_assoc($star);
-                            if ($star) {
-                                $star = ceil($star["rating"]);
-                            } else {
-                                $star = 0; // Default rating if not found
-                            }
+                            $star = ceil($star["rating"]);
                         ?>
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
@@ -211,11 +183,7 @@ document.location.href = 'logic/login.php';
                             $temp = $transaksi["id_agen"];
                             $agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$temp'");
                             $agen = mysqli_fetch_assoc($agen);
-                            if ($agen) {
-                                echo $agen["nama_laundry"];
-                            } else {
-                                echo "Agen not found";
-                            }
+                            echo $agen["nama_laundry"];
                         ?>
                     </td>
                     <td>
@@ -223,15 +191,11 @@ document.location.href = 'logic/login.php';
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            if ($cucian) {
-                                echo $cucian["total_item"];
-                            } else {
-                                echo "Cucian not found";
-                            }
+                            echo $cucian["total_item"];
                         ?>
                     </td>
-                    <td><?= $cucian["berat"] ?? 'N/A' ?></td>
-                    <td><?= $cucian["jenis"] ?? 'N/A' ?></td>
+                    <td><?= $cucian["berat"] ?></td>
+                    <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
@@ -253,11 +217,7 @@ document.location.href = 'logic/login.php';
                             <?php
                                 $star = mysqli_query($connect,"SELECT * FROM transaksi WHERE kode_transaksi = $kodeTransaksi");
                                 $star = mysqli_fetch_assoc($star);
-                                if ($star) {
-                                    $star = ceil($star["rating"]);
-                                } else {
-                                    $star = 0; // Default rating if not found
-                                }
+                                $star = ceil($star["rating"]);
                             ?>
                             <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                         <?php endif; ?>

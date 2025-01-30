@@ -66,10 +66,7 @@ if (isset($_POST["gantiPassword"])){
 
     if ($login == 'Admin'){
         $idAdmin = $_SESSION["admin"];
-$stmt = $connect->prepare("SELECT * FROM admin WHERE id_admin = ?");
-$stmt->bind_param("i", $idAdmin);
-$stmt->execute();
-$data = $stmt->get_result();
+        $data = mysqli_query($connect, "SELECT * FROM admin WHERE id_admin = $idAdmin");
         $data = mysqli_fetch_assoc($data);
 
         if ($passwordLama != $data["password"]) {
@@ -109,10 +106,7 @@ $data = $stmt->get_result();
 
     }else if ($login == "Agen"){
         $idAgen = $_SESSION["agen"];
-$stmt = $connect->prepare("SELECT * FROM agen WHERE id_agen = ?");
-$stmt->bind_param("i", $idAgen);
-$stmt->execute();
-$data = $stmt->get_result();
+        $data = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = $idAgen");
         $data = mysqli_fetch_assoc($data);
 
         if (password_verify($passwordLama, $data["password"])) {
@@ -153,10 +147,7 @@ $data = $stmt->get_result();
         }
     }else if ($login = "Pelanggan"){
         $idPelanggan = $_SESSION["pelanggan"];
-$stmt = $connect->prepare("SELECT * FROM pelanggan WHERE id_pelanggan = ?");
-$stmt->bind_param("i", $idPelanggan);
-$stmt->execute();
-$data = $stmt->get_result();
+        $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
         $data = mysqli_fetch_assoc($data);
 
         // hash

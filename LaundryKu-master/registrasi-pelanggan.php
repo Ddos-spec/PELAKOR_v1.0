@@ -2,8 +2,8 @@
 
     // koneksi ke db
     session_start();
-include '../logic/connect-db.php';
-include '../functions/functions.php';
+    include 'connect-db.php';
+    include 'functions/functions.php';
 
     cekLogin();
 
@@ -111,10 +111,7 @@ function registrasi ($data) {
     $password2 = mysqli_real_escape_string($connect , $data["password2"]);
 
     //cek username apakah ada yg sama        
-$stmt = $connect->prepare("SELECT email FROM pelanggan WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+    $result = mysqli_query($connect, "SELECT email FROM pelanggan WHERE email = '$email'");
     if ( mysqli_fetch_assoc($result) ){ //jika ada (TRUE)
         echo "
             <script>
@@ -139,9 +136,7 @@ $result = $stmt->get_result();
     $password = password_hash($password, PASSWORD_DEFAULT);
 
     // masukkan data user ke db
-$stmt = $connect->prepare("INSERT INTO pelanggan VALUES (NULL, ?, ?, ?, ?, ?, 'default.png', ?)");
-$stmt->bind_param("ssisss", $nama, $email, $noTelp, $kota, $alamat, $password);
-$stmt->execute();
+    mysqli_query($connect, "INSERT INTO pelanggan VALUES ('','$nama','$email','$noTelp','$kota','$alamat','default.png','$password')");
 
     // RETURN TRUE
     return mysqli_affected_rows($connect);

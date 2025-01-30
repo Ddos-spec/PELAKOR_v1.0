@@ -50,11 +50,11 @@
                         echo "
                             <a href='logout.php'><b>Logout</b></a>
                         ";
-else {
-    echo "
-        <a href='logic/login.php'><b>Login</b></a>
-    ";
-}
+                    }else {
+                        echo "
+                            <a href='login.php'><b>Login</b></a>
+                        ";
+                    }
                 ?>                                      
                 </li>
             </ul>
@@ -68,7 +68,7 @@ else {
                             ";
                         }else {
                             echo "
-                                <a href='web/logic/login.php'><b>Login</b></a>
+                                <a href='login.php'><b>Login</b></a>
                             ";
                         }
                     ?>                                      

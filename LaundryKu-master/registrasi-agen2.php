@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-include '../logic/connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 cekAgen();
 

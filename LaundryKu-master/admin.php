@@ -9,11 +9,8 @@ cekAdmin();
 
 // ambil data admin
 $idAdmin = $_SESSION["admin"];
-$stmt = $connect->prepare("SELECT * FROM admin WHERE id_admin = ?");
-$stmt->bind_param("i", $idAdmin);
-$stmt->execute();
-$data = $stmt->get_result();
-$admin = $data->fetch_assoc();
+$data = mysqli_query($connect, "SELECT * FROM admin WHERE id_admin = '$idAdmin'");
+$admin = mysqli_fetch_assoc($data);
 
 
 
@@ -55,9 +52,7 @@ if ( isset($_POST["simpan"]) ){
     validasiUsername($username);
 
     // UBAH DATA
-$stmt = $connect->prepare("UPDATE admin SET username = ? WHERE id_admin = ?");
-$stmt->bind_param("si", $username, $idAdmin);
-$stmt->execute();
+    mysqli_query($connect, "UPDATE admin SET username = '$username' WHERE id_admin = '$idAdmin'");
 
     if ( mysqli_affected_rows($connect) > 0){
         echo "
