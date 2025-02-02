@@ -222,7 +222,26 @@ if ( isset($_POST["simpanStatus"]) ){
         $idCucian = $cucian["id_cucian"];
         $idPelanggan = $cucian["id_pelanggan"];
         // masukkan ke tabel transaksi
-        mysqli_query($connect,"INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
+mysqli_query($connect,"INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
+
+                            // Fetch agent details
+                            $agen_query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = $cucian[id_agen]");
+                            if (mysqli_num_rows($agen_query) > 0) {
+                                $agen = mysqli_fetch_assoc($agen_query);
+                                
+                                // Generate and download the invoice
+                                require('functions/invoice.php');
+                                $transaction_details = [
+                                    'Transaction ID' => $idCucian,
+                                    'Agent Name' => $agen['nama_laundry'],
+                                    'Customer Name' => $cucian['nama'],
+                                    'Total Amount' => $totalBayar,
+                                    'Date' => $tglSelesai
+                                ];
+                                generate_invoice($transaction_details);
+                            } else {
+                                echo "Agent not found.";
+                            }
         if (mysqli_affected_rows($connect) == 0){
             echo mysqli_error($connect);
         }

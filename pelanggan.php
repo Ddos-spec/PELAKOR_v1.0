@@ -8,8 +8,6 @@ include 'functions/functions.php';
 // validasi login
 cekPelanggan();
 
-
-
 // mengambil email di session
 $idPelanggan = $_SESSION["pelanggan"];
 
@@ -18,12 +16,6 @@ $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$i
 
 // jadikan array assoc
 $data = mysqli_fetch_assoc($data);
-
-//var_dump($idPelanggan);die;
-
-
-
-    
 
 ?>
 
@@ -44,11 +36,11 @@ $data = mysqli_fetch_assoc($data);
     <!-- body -->
     <div class="row">
         <div class="col s6 offset-s3">
-            <h3 class="header light center">DATA PENGGUNA</h3>
+            <h3 class="header light center">DATA PENGGUNA</h3> <!-- Positioned heading -->
             <form action="" method="post" enctype="multipart/form-data">
-                <div class="input-field inline">
+                <div class="input-field inline" style="margin-left: 50px;"> <!-- Adjusted margin here -->
                     <div class="center">
-                        <img src="img/pelanggan/<?= $data['foto'] ?>" class="circle responsive-img" width=25% alt="">
+                        <img src="img/pelanggan/<?= $data['foto'] ?>" class="circle" width="150" height="150" alt="">
                     </div>
                     <div class="file-field input-field">
                         <div class="btn blue darken-2">
@@ -70,7 +62,7 @@ $data = mysqli_fetch_assoc($data);
                         </li>
                         <li>
                             <label for="telp">No Telp</label>
-                            <input type="text" size=60 name="telp" name="telp" value="<?= $data['telp'] ?>">
+                            <input type="text" size=60 id="telp" name="telp" value="<?= $data['telp'] ?>">
                         </li>
                         <li>
                             <label for="kota">Kota / Kabupaten</label>
@@ -106,8 +98,6 @@ $data = mysqli_fetch_assoc($data);
 </html>
 
 <?php
-
-
 
 function uploadFoto(){
     //data foto
@@ -156,7 +146,6 @@ function uploadFoto(){
     return $namaFileBaru;
 }
 
-
 if ( isset($_POST["ubah-data"]) ){
 
     // mengambil pelanggan
@@ -178,7 +167,6 @@ if ( isset($_POST["ubah-data"]) ){
     validasiEmail($email);
     validasiTelp($telp);
     validasiNama($kota);
-
     
     $query = "UPDATE pelanggan SET
         nama = '$nama',
