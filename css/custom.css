@@ -50,3 +50,11 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+/* Circle Image Styles */
+.circle {
+    width: 150px; /* Set fixed width */
+    height: 150px; /* Set fixed height */
+    border-radius: 50%; /* Make it round */
+    object-fit: cover; /* Ensure the image covers the area */
+}
