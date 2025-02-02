@@ -25,7 +25,7 @@ include 'connect-db.php';
         <div class="col s6 offset-s3">
             <div class="card">
                 <div class="col center" style="margin:20px">
-                    <img src="img/baner.png" alt="laundryku" width=68%/><br><br>
+                    <img src="img/banner.png" alt="laundryku" width=100%/><br><br>
                     <span class="card-title black-text">Syarat dan Ketentuan :</span>
                 </div>
                 <div class="card-content">

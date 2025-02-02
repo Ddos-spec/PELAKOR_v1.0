@@ -16,20 +16,6 @@ cekLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
-    <style>
-        /* Ensure the body takes full height */
-        html, body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        /* Main content should grow to fill space */
-        .main-content {
-            flex: 1;
-        }
-    </style>
-    
     <title>Registrasi</title>
 </head>
 

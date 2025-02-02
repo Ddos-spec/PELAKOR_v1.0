@@ -76,7 +76,8 @@ if ( isset($_POST["cari"])) {
     <!-- end header -->
 
 
-    <h3 class="header light center">List Agen</h3>
+<h3 class="header light center">List Agen</h3>
+<!-- Removed the redundant reset button -->
     <br>
 
 
@@ -143,7 +144,10 @@ if ( isset($_POST["cari"])) {
                     <td><?= $dataAgen["plat_driver"] ?></td>
                     <td><?= $dataAgen["kota"] ?></td>
                     <td><?= $dataAgen["alamat"] ?></td>
-                    <td><a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a></td>
+<td>
+    <a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
+    <a class="btn yellow darken-2" href="reset-password.php?user_id=<?= $dataAgen['id_agen'] ?>"><i class="material-icons">lock_reset</i></a>
+</td>
                 </tr>
 
                 <?php endforeach ?>

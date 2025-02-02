@@ -73,7 +73,8 @@ if ( isset($_POST["cari"])) {
     <?php include 'header.php'; ?>
     <!-- end header -->
 
-    <h3 class="header light center">List Pelanggan</h3>
+<h3 class="header light center">List Pelanggan</h3>
+<!-- Removed the redundant reset button -->
     <br>
 
     <!-- searching -->
@@ -131,7 +132,10 @@ if ( isset($_POST["cari"])) {
                     <td><?= $dataPelanggan["email"] ?></td>
                     <td><?= $dataPelanggan["kota"] ?></td>
                     <td><?= $dataPelanggan["alamat"] ?></td>
-                    <td><a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a></td>
+<td>
+    <a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
+    <a class="btn yellow darken-2" href="reset-password.php?user_id=<?= $dataPelanggan['id_pelanggan'] ?>"><i class="material-icons">lock_reset</i></a>
+</td>
                 </tr>
 
                 <?php endforeach ?>

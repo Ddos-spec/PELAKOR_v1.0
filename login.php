@@ -64,15 +64,7 @@ cekLogin();
 
 if ( isset($_POST["login"]) ){
 
-if (!isset($_POST["akun"])) {
-    echo "
-        <script>
-            Swal.fire('Gagal Login','Pilih Jenis Akun Terlebih Dahulu','warning');
-        </script>
-    ";
-    exit; // Stop further execution if no account type is selected
-}
-if ($_POST["akun"] == 'agen') {
+    if ($_POST["akun"] == 'agen'){
         // masukkan ke var
         $email = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
