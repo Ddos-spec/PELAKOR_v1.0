@@ -4,7 +4,25 @@ $(document).ready(function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     var elems = document.querySelectorAll('.slider');
-    var instances = M.Slider.init(elems, options);
+    if (typeof M !== 'undefined' && M.Slider) {
+        var instances = M.Slider.init(elems);
+    } else {
+        console.error('M or M.Slider is not defined');
+    }
+
+    // Event listener for button clicks
+    const button = document.querySelector('button');
+    if (button) {
+        button.addEventListener('click', function() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert('Action completed!');
+            }, 2000);
+        });
+    } else {
+        console.error('Button element not found');
+    }
 });
 
 // Function to show loading feedback
@@ -29,20 +47,9 @@ function fetchData() {
     fetch('/api/data')
         .then(response => response.json())
         .then(data => {
-            // Process data
             console.log(data);
         })
         .finally(() => {
             hideLoading();
         });
 }
-
-// Event listener for button clicks
-document.querySelector('button').addEventListener('click', function() {
-    showLoading();
-    // Simulate an action
-    setTimeout(() => {
-        hideLoading();
-        alert('Action completed!');
-    }, 2000);
-});
