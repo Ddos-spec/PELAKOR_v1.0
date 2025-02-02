@@ -4,31 +4,20 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// sesuaikan dengan jenis login
-if((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))){
-
+// Sesuaikan dengan jenis login
+if ((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))) {
     $login = "Admin";
     $idAdmin = $_SESSION["admin"];
-
-}else if( (isset($_SESSION["login-agen"]) && isset($_SESSION["agen"]))){
-
+} elseif ((isset($_SESSION["login-agen"]) && isset($_SESSION["agen"]))) {
     $idAgen = $_SESSION["agen"];
     $login = "Agen";
-
-}else if ((isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"]))){
-
+} elseif ((isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"]))) {
     $idPelanggan = $_SESSION["pelanggan"];
     $login = "Pelanggan";
-
-}else {
-    echo "
-        <script>
-            document.location.href = 'index.php';
-        </script>
-    ";
+} else {
+    echo "<script>document.location.href = 'index.php';</script>";
+    exit;
 }
-
-
 
 ?>
 
@@ -54,142 +43,67 @@ if((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))){
     </form>
     <br>
     <?php include "footer.php"; ?>
-    </body>
+</body>
 </html>
 
 <?php
 
-// ubah sandi
-if (isset($_POST["gantiPassword"])){
+// Proses ubah sandi
+if (isset($_POST["gantiPassword"])) {
     $passwordLama = htmlspecialchars($_POST["passwordLama"]);
-    $password = htmlspecialchars($_POST["password"]);
+    $passwordBaru = htmlspecialchars($_POST["password"]);
     $repassword = htmlspecialchars($_POST["repassword"]);
 
-    if ($login == 'Admin'){
-        $idAdmin = $_SESSION["admin"];
+    if ($login == 'Admin') {
         $data = mysqli_query($connect, "SELECT * FROM admin WHERE id_admin = $idAdmin");
         $data = mysqli_fetch_assoc($data);
 
-        if ($passwordLama != $data["password"]) {
-            echo "
-                <script>   
-                    Swal.fire('Password Lama Salah','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
+        // Gunakan password_verify jika password disimpan dengan hash
+        if (!password_verify($passwordLama, $data["password"])) {
+            echo "<script>Swal.fire('Password Lama Salah','','error');</script>";
             exit;
         }
 
-        if ($password != $repassword) {
-            echo "
-                <script>   
-                    Swal.fire('Password Baru Tidak Sama','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-            exit;
-        }
-
-        $query = mysqli_query($connect, "UPDATE admin SET password = '$password' WHERE id_admin = $idAdmin");
-        
-        if (mysqli_affected_rows($connect) > 0) {
-            echo "
-                <script>   
-                    Swal.fire('Password Berhasil Diganti','','success').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-        }
-
-
-    }else if ($login == "Agen"){
-        $idAgen = $_SESSION["agen"];
+    } elseif ($login == "Agen") {
         $data = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = $idAgen");
         $data = mysqli_fetch_assoc($data);
 
-        if (password_verify($passwordLama, $data["password"])) {
-            echo "
-                <script>   
-                    Swal.fire('Password Lama Salah','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
+        if (!password_verify($passwordLama, $data["password"])) {
+            echo "<script>Swal.fire('Password Lama Salah','','error');</script>";
             exit;
         }
 
-        if ($password != $repassword) {
-            echo "
-                <script>   
-                    Swal.fire('Password Baru Tidak Sama','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-            exit;
-        }
-
-        //hash
-        $password = password_hash($password, PASSWORD_DEFAULT);
-
-        $query = mysqli_query($connect, "UPDATE agen SET password = '$password' WHERE id_agen = $idAgen");
-        
-        if (mysqli_affected_rows($connect) > 0) {
-            echo "
-                <script>   
-                    Swal.fire('Password Berhasil Diganti','','success').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-        }
-    }else if ($login = "Pelanggan"){
-        $idPelanggan = $_SESSION["pelanggan"];
+    } elseif ($login == "Pelanggan") {
         $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
         $data = mysqli_fetch_assoc($data);
 
-        // hash
-        $passwordLama = password_hash($passwordLama, PASSWORD_DEFAULT);
-
-        if (password_verify($passwordLama, $data["password"])) {
-            echo "
-                <script>   
-                    Swal.fire('Password Lama Salah','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
+        if (!password_verify($passwordLama, $data["password"])) {
+            echo "<script>Swal.fire('Password Lama Salah','','error');</script>";
             exit;
         }
+    }
 
-        if ($password != $repassword) {
-            echo "
-                <script>   
-                    Swal.fire('Password Baru Tidak Sama','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-            exit;
-        }
+    // Validasi password baru dan konfirmasi
+    if ($passwordBaru !== $repassword) {
+        echo "<script>Swal.fire('Password Baru Tidak Sama','','error');</script>";
+        exit;
+    }
 
-        // hash
-        $password = password_hash($password, PASSWORD_DEFAULT);
+    // Hash password baru sebelum menyimpan
+    $hashedPassword = password_hash($passwordBaru, PASSWORD_DEFAULT);
 
-        $query = mysqli_query($connect, "UPDATE pelanggan SET password = '$password' WHERE id_pelanggan = $idPelanggan");
-        
-        if (mysqli_affected_rows($connect) > 0) {
-            echo "
-                <script>   
-                    Swal.fire('Password Berhasil Diganti','','success').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-        }
+    // Update password sesuai role
+    if ($login == 'Admin') {
+        $query = mysqli_query($connect, "UPDATE admin SET password = '$hashedPassword' WHERE id_admin = $idAdmin");
+    } elseif ($login == "Agen") {
+        $query = mysqli_query($connect, "UPDATE agen SET password = '$hashedPassword' WHERE id_agen = $idAgen");
+    } elseif ($login == "Pelanggan") {
+        $query = mysqli_query($connect, "UPDATE pelanggan SET password = '$hashedPassword' WHERE id_pelanggan = $idPelanggan");
+    }
+
+    // Cek apakah password berhasil diubah
+    if (mysqli_affected_rows($connect) > 0) {
+        echo "<script>Swal.fire('Password Berhasil Diganti','','success');</script>";
     }
 }
 
