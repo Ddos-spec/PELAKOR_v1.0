@@ -38,6 +38,7 @@ if((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
+    <script src="js/script-debug-v4.js"></script>
     <title>Ganti Kata Sandi</title>
 </head>
 <body> 

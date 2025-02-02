@@ -1,4 +1,8 @@
+console.log('Script loaded'); // Debugging log
+
 const button = document.querySelector('button[name="gantiPassword"]'); // Use a more specific selector
+console.log('Button found:', button); // Debugging log
+
 if (button) {
     button.addEventListener('click', function() {
         showLoading();
@@ -34,6 +38,9 @@ function fetchData() {
         .then(response => response.json())
         .then(data => {
             console.log(data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
         })
         .finally(() => {
             hideLoading();
