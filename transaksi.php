@@ -104,6 +104,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
+<td>
+    <?php if ($transaksi["status"] == "Complete") : ?>
+        <a href="functions/invoice.php?order_id=<?= $kodeTransaksi ?>" class="waves-effect waves-light btn">Invoice</a>
+    <?php endif; ?>
+</td>
                 </tr>
                 <?php endwhile; ?>
             </table>
