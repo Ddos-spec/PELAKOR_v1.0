@@ -31,7 +31,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     ";
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -104,11 +103,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
-<td>
-    <?php if ($transaksi["status"] == "Complete") : ?>
-        <a href="functions/invoice.php?order_id=<?= $kodeTransaksi ?>" class="waves-effect waves-light btn">Invoice</a>
-    <?php endif; ?>
-</td>
+                    <td>
+                        <?php if ($transaksi["status"] == "Complete") : ?>
+                            <button type="button" id="finishButton" onclick="generateInvoice('<?= $kodeTransaksi ?>')">Finish</button>
+                        <?php endif; ?>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -252,7 +251,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 
 
 // jika pelanggan rating
-if ( isset($_POST["simpanRating"]) ){
+if ( isset($_POST["simpanRating"]) ) {
 
     $rating = $_POST["rating"];
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
@@ -267,7 +266,7 @@ if ( isset($_POST["simpanRating"]) ){
     ";
 }
 
-if ( isset($_POST["kirimKomentar"])){
+if ( isset($_POST["kirimKomentar"])) {
 
     $komentar = htmlspecialchars($_POST["komentar"]);
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
@@ -283,3 +282,21 @@ if ( isset($_POST["kirimKomentar"])){
 }
 
 ?>
+<environment_details>
+# VSCode Visible Files
+test.html
+
+# VSCode Open Tabs
+login.php
+index.php
+pelanggan.php
+agen.php
+functions/invoice.php
+package.json
+tailwind.config.js
+css/custom.css
+css/test.css
+postcss.config.js
+test.html
+status.php
+</environment_details>
