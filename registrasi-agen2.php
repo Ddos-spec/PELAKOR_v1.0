@@ -9,7 +9,11 @@ cekAgen();
 $idAgen = $_SESSION["agen"];
 
 // ambil data agen
-$query = "SELECT * FROM agen WHERE id_agen = '$idAgen'";
+$stmt = $connect->prepare("SELECT * FROM agen WHERE id_agen = ?");
+$stmt->bind_param("i", $idAgen);
+$stmt->execute();
+$result = $stmt->get_result();
+$agen = mysqli_fetch_assoc($result);
 $result = mysqli_query($connect, $query);
 $agen = mysqli_fetch_assoc($result);
 

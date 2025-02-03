@@ -8,7 +8,11 @@ cekPelanggan();
 
 // ambil data agen
 $idAgen = $_GET["id"];
-$query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
+$stmt = $connect->prepare("SELECT * FROM agen WHERE id_agen = ?");
+$stmt->bind_param("i", $idAgen);
+$stmt->execute();
+$result = $stmt->get_result();
+$agen = mysqli_fetch_assoc($result);
 $agen = mysqli_fetch_assoc($query);
 
 if (isset($_GET["jenis"])){

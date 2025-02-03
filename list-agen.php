@@ -9,7 +9,9 @@ cekAdmin();
 
 //konfirgurasi pagination
 $jumlahDataPerHalaman = 5;
-$query = mysqli_query($connect,"SELECT * FROM agen");
+$stmt = $connect->prepare("SELECT * FROM agen");
+$stmt->execute();
+$result = $stmt->get_result();
 $jumlahData = mysqli_num_rows($query);
 //ceil() = pembulatan ke atas
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);

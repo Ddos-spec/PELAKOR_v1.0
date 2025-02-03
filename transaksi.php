@@ -256,7 +256,9 @@ if ( isset($_POST["simpanRating"]) ) {
     $rating = $_POST["rating"];
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_query($connect, "UPDATE transaksi SET rating = $rating WHERE kode_transaksi = $kodeTransaksiRating");
+    $stmt = $connect->prepare("UPDATE transaksi SET rating = ? WHERE kode_transaksi = ?");
+    $stmt->bind_param("is", $rating, $kodeTransaksiRating);
+    $stmt->execute();
     echo "
         <script>
             Swal.fire('Penilaian Berhasil','Rating Berhasil Di Tambahkan','success').then(function() {
@@ -271,7 +273,9 @@ if ( isset($_POST["kirimKomentar"])) {
     $komentar = htmlspecialchars($_POST["komentar"]);
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_query($connect, "UPDATE transaksi SET komentar = '$komentar' WHERE kode_transaksi = $kodeTransaksiRating");
+    $stmt = $connect->prepare("UPDATE transaksi SET komentar = ? WHERE kode_transaksi = ?");
+    $stmt->bind_param("si", $komentar, $kodeTransaksiRating);
+    $stmt->execute();
     echo "
         <script>
             Swal.fire('Penilaian Berhasil','Feedback Berhasil Di Tambahkan','success').then(function() {

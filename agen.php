@@ -4,18 +4,23 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-
 // harus agen yg kesini
 cekAgen();
 
 // ambil data agen
 $idAgen = $_SESSION["agen"];
-$query = "SELECT * FROM agen WHERE id_agen = '$idAgen'";
+$stmt = $connect->prepare("SELECT * FROM agen WHERE id_agen = ?");
+$stmt->bind_param("i", $idAgen);
+$stmt->execute();
+$result = $stmt->get_result();
+$agen = mysqli_fetch_assoc($result);
 $result = mysqli_query($connect, $query);
+if (!$result) {
+    echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+    exit;
+}
 $agen = mysqli_fetch_assoc($result);
 $idAgen = $agen["id_agen"];
-
-
 
 ?>
 
@@ -40,7 +45,7 @@ $idAgen = $agen["id_agen"];
             <br><br>
             <form action="" method="post" enctype="multipart/form-data">
                 <div class="center">
-<img src="img/agen/<?= $agen['foto'] ?>" class="circle" width="150" height="150" alt="">
+                    <img src="img/agen/<?= $agen['foto'] ?>" class="circle" width="150" height="150" alt="">
                 </div>
                 <div class="file-field input-field">
                     <div class="btn blue darken-2">
@@ -82,131 +87,4 @@ $idAgen = $agen["id_agen"];
                             <textarea class="materialize-textarea" name="alamat"><?= $agen['alamat']?></textarea>
                         </li>
                         <li>
-                            <div class="center">
-                                <button class="btn-large blue darken-2" type="submit" name="simpan">Simpan Data</button>
-                            </div>
-                        </li>
-                        
-                    </ul>
-                </div>
-            </form>
-            <div class="center">
-                <a class="btn red darken-2" href="ganti-kata-sandi.php">Ganti Kata Sandi</a>
-                <a class="btn red darken-2" href="edit-harga.php">Ganti Data Harga</a>
-            </div>
-
-        </div>
-    </div>
-    <!-- end data agen -->
-
-    <!-- footer -->
-    <?php include "footer.php"; ?>
-    <!-- end footer -->
-</body>
-</html>
-
-
-<?php
-
-
-
-// klo ubah data agen
-if ( isset($_POST["simpan"]) ){
-
-    function uploadFoto(){
-        //data foto
-        $ukuranFile = $_FILES["foto"]["size"];
-        $temp = $_FILES["foto"]["tmp_name"];
-        $namaFile = $_FILES["foto"]["name"];
-        $error = $_FILES["foto"]["error"];
-
-        if ($namaFile == NULL){
-            return NULL;
-            exit;
-        }
-
-        //cek apakah file adalah gambar
-        $ekstensiGambarValid = ['jpg','jpeg','png'];
-        // explode = memecah string menjadi array (dg pemisah delimiter)
-        $ekstensiGambar = explode('.',$namaFile);
-        //mengambil ekstensi gambar yg paling belakang dg strltolower (mengecilkan semua huruf)
-        $ekstensiGambar = strtolower(end($ekstensiGambar));
-
-        //CEK $ekstensiGambar ada di array $ekstensiGambarValid
-        if ( !in_array($ekstensiGambar,$ekstensiGambarValid) ){
-            echo "
-                <script>
-                    Swal.fire('Masukkan Format Gambar','','warning');
-                </script>
-            ";
-            return false;
-            exit;
-        }
-
-        //CEK ukuran file
-        if ( $ukuranFile > 3000000 ) {
-            echo "
-                <script>
-                    Swal.fire('Ukuran Gambar Terlalu Besar','','warning');
-                </script>
-            ";
-            return false;
-            exit;
-        }
-
-        //LOLOS CEK BROOO
-        //generate nama baru random
-        $namaFileBaru = uniqid() . '.' . $ekstensiGambar;
-        move_uploaded_file($temp,'img/agen/'.$namaFileBaru);
-
-        return $namaFileBaru;
-    }
-
-    //ambil data
-    $namaLaundry = htmlspecialchars($_POST["namaLaundry"]);
-    $namaPemilik = htmlspecialchars($_POST["namaPemilik"]);
-    $email = htmlspecialchars($_POST["email"]);
-    $telp = htmlspecialchars($_POST["telp"]);
-    $platDriver = htmlspecialchars($_POST["platDriver"]);
-    $kota = htmlspecialchars($_POST["kota"]);
-    $alamat = htmlspecialchars($_POST["alamat"]);
-    $foto = uploadFoto();
-
-    if ($foto == NULL){
-        $foto = $agen["foto"];
-    }
-
-    // validasi
-    validasiNama($namaPemilik);
-    validasiEmail($email);
-    validasiTelp($telp);
-    validasiNama($kota);
-
-    
-    $query = "UPDATE agen SET
-        nama_laundry = '$namaLaundry',
-        nama_pemilik = '$namaPemilik',
-        email = '$email',
-        telp = '$telp',
-        kota = '$kota',
-        plat_driver = '$platDriver',
-        alamat = '$alamat',
-        foto = '$foto'
-        WHERE id_agen = $idAgen
-    ";
-
-    mysqli_query($connect,$query);
-
-    if ( mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Data Berhasil Di Update','','success').then(function() {
-                    window.location = 'agen.php';
-                });
-            </script>
-        ";
-    }
-}
-
-
-?>
+                            <

@@ -1,4 +1,4 @@
-<?php
+okay before you give me a reason why you seem to have trouble editing the appearance<?php
 
 session_start();
 include 'connect-db.php';
@@ -18,11 +18,13 @@ if ( isset($_GET["page"])){
     $halamanAktif = 1;
 }
 
-//data awal
-$awalData = ( $jumlahDataPerHalaman * $halamanAktif ) - $jumlahDataPerHalaman;
+$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-//fungsi memasukkan data di db ke array
-$agen = mysqli_query($connect,"SELECT * FROM agen LIMIT $awalData, $jumlahDataPerHalaman");
+// Fetch data from the database
+$agen = mysqli_query($connect, "SELECT * FROM agen LIMIT ?, ?");
+$agen->bind_param("ii", $awalData, $jumlahDataPerHalaman);
+$agen->execute();
+$result = $agen->get_result();
 
 
 //ketika tombol cari ditekan

@@ -4,7 +4,65 @@
 
 
 // USERNAME
-function validasiUsername($objek){
+function validasiUsername($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'Username Tidak Boleh Kosong';
+    } else if (!preg_match("/^[a-zA-Z0-9]*$/", $objek)) {
+        $errors[] = 'Username Hanya Boleh Huruf dan Angka';
+    }
+    return $errors;
+}
+
+function validasiTelp($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'No Telp Tidak Boleh Kosong';
+    } else if (!preg_match("/^[0-9]*$/", $objek)) {
+        $errors[] = 'No Telp Hanya Diperbolehkan Angka';
+    }
+    return $errors;
+}
+
+function validasiBerat($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'Form Tidak Boleh Kosong';
+    } else if (!preg_match("/^[0-9]*$/", $objek)) {
+        $errors[] = 'Satuan Berat Hanya Diperbolehkan Angka';
+    }
+    return $errors;
+}
+
+function validasiHarga($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'Form Harga Tidak Boleh Kosong';
+    } else if (!preg_match("/^[0-9]*$/", $objek)) {
+        $errors[] = 'Masukkan Harga Yang Benar !';
+    }
+    return $errors;
+}
+
+function validasiEmail($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'Form Email Tidak Boleh Kosong';
+    } else if (!filter_var($objek, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Masukkan Format Email Yang Benar';
+    }
+    return $errors;
+}
+
+function validasiNama($objek) {
+    $errors = [];
+    if (empty($objek)) {
+        $errors[] = 'Form Nama Tidak Boleh Kosong';
+    } else if (!preg_match("/^[a-zA-Z .]*$/", $objek)) {
+        $errors[] = 'Nama Hanya Diperbolehkan Huruf dan Spasi';
+    }
+    return $errors;
+}
     if (empty($objek)){
         echo "
             <script>

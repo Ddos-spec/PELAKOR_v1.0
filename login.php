@@ -67,7 +67,10 @@ if (isset($_POST["login"])) {
         $email = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
         validasiEmail($email);
-        $result = mysqli_query($connect, "SELECT * FROM agen WHERE email = '$email'");
+$stmt = $connect->prepare("SELECT * FROM agen WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
         if (mysqli_num_rows($result) == 1) {
             $row = mysqli_fetch_assoc($result);
             if (password_verify($password, $row["password"])) {
@@ -104,17 +107,21 @@ if (isset($_POST["login"])) {
             echo "<script>Swal.fire('Gagal Login','Email Tidak Terdaftar','warning');</script>";
         }
 
-    } elseif ($akun == 'admin') { // <-- TIDAK ADA '}' SEBELUMNYA
+    } elseif ($akun == 'admin') {
         $username = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
         validasiUsername($username);
-        $data = mysqli_query($connect, "SELECT * FROM admin WHERE username = '$username'");
-        if (mysqli_num_rows($data) === 1) {
-            $data = mysqli_fetch_assoc($data);
-            $idAdmin = $data["id_admin"];
-            if ($password === $data["password"]) {
+        
+        $stmt = $connect->prepare("SELECT * FROM admin WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows === 1) {
+            $data = $result->fetch_assoc();
+            if (password_verify($password, $data["password"])) {
                 $_SESSION["login-admin"] = true;
-                $_SESSION["admin"] = $idAdmin;
+                $_SESSION["admin"] = $data["id_admin"];
                 echo "<script>document.location.href = 'index.php';</script>";
             } else {
                 echo "<script>Swal.fire('Gagal Login','Password Salah','warning');</script>";

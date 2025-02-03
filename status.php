@@ -6,24 +6,17 @@ include 'functions/functions.php';
 
 cekBelumLogin();
 
-
 // sesuaikan dengan jenis login
-if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
-
+if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     $login = "Admin";
     $idAdmin = $_SESSION["admin"];
-
-}else if(isset($_SESSION["login-agen"]) && isset($_SESSION["agen"])){
-
+} else if (isset($_SESSION["login-agen"]) && isset($_SESSION["agen"])) {
     $idAgen = $_SESSION["agen"];
     $login = "Agen";
-
-}else if (isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"])){
-
+} else if (isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"])) {
     $idPelanggan = $_SESSION["pelanggan"];
     $login = "Pelanggan";
-
-}else {
+} else {
     echo "
         <script>
             window.location = 'login.php';
@@ -31,10 +24,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     ";
 }
 
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +39,13 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <div id="body">
         <h3 class="header col s10 light center">Status Cucian</h3>
         <br>
-        <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE status_cucian != 'Selesai'"); ?>
+        <?php if ($login == "Admin") : 
+            $query = mysqli_query($connect, "SELECT * FROM cucian WHERE status_cucian != 'Selesai'");
+            if (!$query) {
+                echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+                exit;
+            }
+        ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
@@ -64,14 +60,14 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
+                    <td><?php echo $idCucian = $cucian['id_cucian']; ?></td>
                     <td>
                         <?php
                             $data = mysqli_query($connect, "SELECT agen.nama_laundry FROM cucian INNER JOIN agen ON agen.id_agen = cucian.id_agen WHERE id_cucian = $idCucian");
+                            if (!$data) {
+                                echo "<script>Swal.fire('Error', 'Failed to retrieve agent data', 'error');</script>";
+                                exit;
+                            }
                             $data = mysqli_fetch_assoc($data);
                             echo $data["nama_laundry"];
                         ?>
@@ -79,6 +75,10 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td>
                         <?php
                             $data = mysqli_query($connect, "SELECT pelanggan.nama FROM cucian INNER JOIN pelanggan ON pelanggan.id_pelanggan = cucian.id_pelanggan WHERE id_cucian = $idCucian");
+                            if (!$data) {
+                                echo "<script>Swal.fire('Error', 'Failed to retrieve customer data', 'error');</script>";
+                                exit;
+                            }
                             $data = mysqli_fetch_assoc($data);
                             echo $data["nama"];
                         ?>
@@ -92,7 +92,13 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 <?php endwhile; ?>
             </table>
         </div>
-        <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'"); ?>
+        <?php elseif ($login == "Agen") : 
+            $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'");
+            if (!$query) {
+                echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+                exit;
+            }
+        ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
@@ -107,14 +113,14 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
+                    <td><?php echo $idCucian = $cucian['id_cucian']; ?></td>
                     <td>
                         <?php
                             $data = mysqli_query($connect, "SELECT pelanggan.nama FROM cucian INNER JOIN pelanggan ON pelanggan.id_pelanggan = cucian.id_pelanggan WHERE id_cucian = $idCucian");
+                            if (!$data) {
+                                echo "<script>Swal.fire('Error', 'Failed to retrieve customer data', 'error');</script>";
+                                exit;
+                            }
                             $data = mysqli_fetch_assoc($data);
                             echo $data["nama"];
                         ?>
@@ -129,7 +135,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                                     <div class="center"><button class="btn blue darken-2" type="submit" name="simpanBerat"><i class="material-icons">send</i></button></div>
                                 </div>
                             </form>
-                        <?php else : echo $cucian["berat"]; endif;?>
+                        <?php else : echo $cucian["berat"]; endif; ?>
                     </td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
@@ -146,7 +152,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                                 <option value="Pengantaran">Pengantaran</option>
                                 <option value="Selesai">Selesai</option>
                             </select>
-                                
                             <div class="center">
                                 <button class="btn blue darken-2" type="submit" name="simpanStatus"><i class="material-icons">send</i></button>
                             </div>
@@ -156,7 +161,13 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 <?php endwhile; ?>
             </table>
         </div>
-        <?php elseif ($login == "Pelanggan") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'"); ?>
+        <?php elseif ($login == "Pelanggan") : 
+            $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'");
+            if (!$query) {
+                echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+                exit;
+            }
+        ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
@@ -170,14 +181,14 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
+                    <td><?php echo $idCucian = $cucian['id_cucian']; ?></td>
                     <td>
                         <?php
                             $data = mysqli_query($connect, "SELECT agen.nama_laundry FROM cucian INNER JOIN agen ON agen.id_agen = cucian.id_agen WHERE id_cucian = $idCucian");
+                            if (!$data) {
+                                echo "<script>Swal.fire('Error', 'Failed to retrieve agent data', 'error');</script>";
+                                exit;
+                            }
                             $data = mysqli_fetch_assoc($data);
                             echo $data["nama_laundry"];
                         ?>
@@ -187,7 +198,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
-                    
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -200,70 +210,52 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 
 <?php
 
-
 // STATUS CUCIAN
 if ( isset($_POST["simpanStatus"]) ){
-
     // ambil data method post
     $statusCucian = $_POST["status_cucian"];
     $idCucian = $_POST["id_cucian"];
 
     // cari data
     $query = mysqli_query($connect, "SELECT * FROM cucian INNER JOIN harga ON harga.jenis = cucian.jenis WHERE id_cucian = $idCucian");
+    if (!$query) {
+        echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+        exit;
+    }
     $cucian = mysqli_fetch_assoc($query);
     $status = "Selesai";
     // kalau status selesai
-    if ( $statusCucian == $status){
-
+    if ($statusCucian == $status) {
         // isi data di tabel transaksi
         $tglMulai = $cucian["tgl_mulai"];
         $tglSelesai = date("Y-m-d H:i:s");
         $totalBayar = $cucian["berat"] * $cucian["harga"];
         $idCucian = $cucian["id_cucian"];
         $idPelanggan = $cucian["id_pelanggan"];
+        
         // masukkan ke tabel transaksi
-mysqli_query($connect,"INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
-
-                            // Fetch agent details
-                            $agen_query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = $cucian[id_agen]");
-                            if (mysqli_num_rows($agen_query) > 0) {
-                                $agen = mysqli_fetch_assoc($agen_query);
-                                
-                                // Generate and download the invoice
-                                require('functions/invoice.php');
-                                $transaction_details = [
-                                    'Transaction ID' => $idCucian,
-                                    'Agent Name' => $agen['nama_laundry'],
-                                    'Customer Name' => $cucian['nama'],
-                                    'Total Amount' => $totalBayar,
-                                    'Date' => $tglSelesai
-                                ];
-                                generate_invoice($transaction_details);
-                            } else {
-                                echo "Agent not found.";
-                            }
-        if (mysqli_affected_rows($connect) == 0){
-            echo mysqli_error($connect);
+        $insert_query = mysqli_query($connect, "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
+        if (!$insert_query) {
+            echo "<script>Swal.fire('Error', 'Failed to insert transaction', 'error');</script>";
+            exit;
+        }
+        
+        // Update the status of cucian
+        mysqli_query($connect, "UPDATE cucian SET status_cucian = '$statusCucian' WHERE id_cucian = $idCucian");
+        if (mysqli_affected_rows($connect) > 0) {
+            echo "
+                <script>
+                    Swal.fire('Status Berhasil Di Ubah','','success').then(function() {
+                        window.location = 'status.php';
+                    });
+                </script>   
+            ";
         }
     }
-
-    mysqli_query($connect, "UPDATE cucian SET status_cucian = '$statusCucian' WHERE id_cucian = '$idCucian'");
-    if (mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Status Berhasil Di Ubah','','success').then(function() {
-                    window.location = 'status.php';
-                });
-            </script>   
-        ";
-    }
-
-    
 }
 
 // total berat
 if (isset($_POST["simpanBerat"])){
-
     $berat = htmlspecialchars($_POST["berat"]);
     $idCucian = $_POST["id_cucian"];
 
@@ -281,9 +273,6 @@ if (isset($_POST["simpanBerat"])){
             </script>
         ";
     }
-
-    
-
 }
 
 ?>

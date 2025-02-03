@@ -8,7 +8,11 @@ include 'connect-db.php';
 $idAgen = $_GET["id"];
 
 // ambil data agen
-$query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
+$stmt = $connect->prepare("SELECT * FROM agen WHERE id_agen = ?");
+$stmt->bind_param("i", $idAgen);
+$stmt->execute();
+$result = $stmt->get_result();
+$agen = mysqli_fetch_assoc($result);
 $agen = mysqli_fetch_assoc($query);
 
 

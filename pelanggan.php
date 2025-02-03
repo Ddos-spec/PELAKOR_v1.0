@@ -11,8 +11,11 @@ cekPelanggan();
 // mengambil email di session
 $idPelanggan = $_SESSION["pelanggan"];
 
-// ambil data di db
 $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
+if (!$data) {
+    echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
+    exit;
+}
 
 // jadikan array assoc
 $data = mysqli_fetch_assoc($data);
