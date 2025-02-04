@@ -111,3 +111,72 @@ if ( isset($_POST["cari"])) {
 
         <!-- data agen -->
         <table class="uk-table uk-table-divider uk-table-hover">
+            <thead>
+                <tr>
+                    <th>ID Agen</th>
+                    <th>Nama Laundry</th>
+                    <th>Nama Pemilik</th>
+                    <th>No Telp</th>
+                    <th>Email</th>
+                    <th>Plat Driver</th>
+                    <th>Kota</th>
+                    <th>Alamat Lengkap</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($agen as $dataAgen) : ?>
+                <tr>
+                    <td><?= $dataAgen["id_agen"] ?></td>
+                    <td><?= $dataAgen["nama_laundry"] ?></td>
+                    <td><?= $dataAgen["nama_pemilik"] ?></td>
+                    <td><?= $dataAgen["telp"] ?></td>
+                    <td><?= $dataAgen["email"] ?></td>
+                    <td><?= $dataAgen["plat_driver"] ?></td>
+                    <td><?= $dataAgen["kota"] ?></td>
+                    <td><?= $dataAgen["alamat"] ?></td>
+                    <td>
+                        <a class="uk-button uk-button-danger" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                            <i class="material-icons">delete</i>
+                        </a>
+                        <a class="uk-button uk-button-warning" href="reset-password.php?user_id=<?= $dataAgen['id_agen'] ?>">
+                            <i class="material-icons">lock_reset</i>
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+        <!-- end data agen -->
+    </div>
+
+    <!-- footer -->
+    <?php include "footer.php"; ?>
+    <!-- end footer -->
+
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
+</body>
+</html>
+
+<?php
+
+if (isset($_GET["hapus"])){
+    // ambil id agen dari method post
+    $idAgen = $_GET["hapus"];
+
+    // hapus data agen
+    $query = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
+
+    // kalau berhasil dihapus, keluar alert
+    if ( mysqli_affected_rows($connect) > 0 ){
+        echo "
+            <script>
+                Swal.fire('Data Agen Berhasil Di Hapus','','success').then(function(){
+                    window.location = 'list-agen.php';
+                });
+            </script>
+        ";
+    }
+}
+?>

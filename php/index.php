@@ -51,45 +51,28 @@ if (isset($_POST["submitSorting"])){
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     <title>Laundryku</title>
-    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
+    <?php include 'headtags.html' ?>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            background-color: #e0f7fa;
         }
-        .header {
-            background-color: #1e87f0;
-            color: white;
-            padding: 50px 0;
-            text-align: center;
-        }
-        .services {
-            padding: 50px 0;
-        }
-        .services .uk-card {
+        .uk-card {
             border-radius: 10px;
-            padding: 20px;
+            overflow: hidden;
         }
-        .uk-button-primary {
-            background-color: #1e87f0;
-            border-color: #1e87f0;
+        .uk-card img {
+            object-fit: cover;
+            width: 100%;
+            height: 200px;
         }
-        .uk-button-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+        .uk-card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s;
         }
-        .footer {
+        .uk-pagination .uk-active span {
             background-color: #1e87f0;
             color: white;
-            text-align: center;
-            padding: 20px 0;
-            position: relative;
-            bottom: 0;
-            width: 100%;
         }
     </style>
 </head>
@@ -172,19 +155,19 @@ if (isset($_POST["submitSorting"])){
             <ul class="uk-pagination uk-flex-center">
             <?php if( $halamanAktif > 1 ) : ?>
                 <li class="uk-disabled">
-                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
+                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="uk-icon" uk-icon="chevron-left"></i></a>
                 </li>
             <?php endif; ?>
             <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
                 <?php if( $i == $halamanAktif ) : ?>
-                    <li class="uk-active"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+                    <li class="uk-active"><span><?= $i ?></span></li>
                 <?php else : ?>
                     <li><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
                 <?php endif; ?>
             <?php endfor; ?>
             <?php if( $halamanAktif < $jumlahHalaman ) : ?>
                 <li>
-                    <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
+                    <a href="?page=<?= $halamanAktif + 1; ?>"><i class="uk-icon" uk-icon="chevron-right"></i></a>
                 </li>
             <?php endif; ?>
             </ul>
@@ -198,12 +181,12 @@ if (isset($_POST["submitSorting"])){
                             <div class="uk-card uk-card-default uk-card-hover">
                                 <div class="uk-card-media-top">
                                     <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>">
-                                        <img src="img/agen/<?= $dataAgen['foto'] ?>" class="uk-border-circle" width="150" height="150" />
+                                        <img src="img/agen/<?= $dataAgen['foto'] ?>" />
                                     </a>
                                 </div>
                                 <div class="uk-card-body">
                                     <h5 class="uk-text-center uk-text-bold">
-                                        <a class="uk-text-primary" href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
+                                        <a class="uk-link-heading" href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
                                     </h5>
                                     <p class="uk-text-muted">
                                         Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
@@ -220,6 +203,6 @@ if (isset($_POST["submitSorting"])){
 
     <?php include "footer.php" ?>
 </body>
-    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
-    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/scriptAjax.js"></script>
 </html>

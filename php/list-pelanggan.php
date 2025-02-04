@@ -30,7 +30,6 @@ $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelangga
 //ketika tombol cari ditekan
 if ( isset($_POST["cari"])) {
     $keyword = htmlspecialchars($_POST["keyword"]);
-
     $query = "SELECT * FROM pelanggan WHERE 
         nama LIKE '%$keyword%' OR
         kota LIKE '%$keyword%' OR
@@ -38,8 +37,7 @@ if ( isset($_POST["cari"])) {
         alamat LIKE '%$keyword%'
         ORDER BY id_pelanggan DESC
         LIMIT $awalData, $jumlahDataPerHalaman
-        ";
-
+    ";
     $pelanggan = mysqli_query($connect,$query);
 
     //konfirgurasi pagination
@@ -64,7 +62,7 @@ if ( isset($_POST["cari"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>List Pelanggan</title>
 </head>
 <body>
@@ -73,46 +71,43 @@ if ( isset($_POST["cari"])) {
     <?php include 'header.php'; ?>
     <!-- end header -->
 
-<h3 class="header light center">List Pelanggan</h3>
-<!-- Removed the redundant reset button -->
+    <h3 class="uk-heading-line uk-text-center"><span>List Pelanggan</span></h3>
     <br>
 
     <!-- searching -->
-    <form class="col s12 center" action="" method="post">
-        <div class="input-field inline">
-            <input type="text" size=40 name="keyword" placeholder="Keyword">
-            <button type="submit" class="btn waves-effect blue darken-2" name="cari"><i class="material-icons">send</i></button>
+    <form class="uk-form-inline uk-text-center" action="" method="post">
+        <div class="uk-margin">
+            <input class="uk-input" type="text" size=40 name="keyword" placeholder="Keyword">
+            <button class="uk-button uk-button-primary" type="submit" name="cari"><i class="material-icons">search</i></button>
         </div>
     </form>
     <!-- end searching -->
 
-    <div class="row">
-        <div class="col s10 offset-s1">
-
-            <!-- pagination -->
-            <ul class="pagination center">
-            <?php if( $halamanAktif > 1 ) : ?>
-                <li class="disabled-effect blue darken-1">
-                    <!-- halaman pertama -->
-                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
-                </li>
+    <div class="uk-container">
+        <!-- pagination -->
+        <ul class="uk-pagination uk-flex-center">
+        <?php if( $halamanAktif > 1 ) : ?>
+            <li>
+                <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
+            </li>
+        <?php endif; ?>
+        <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
+            <?php if( $i == $halamanAktif ) : ?>
+                <li class="uk-active"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+            <?php else : ?>
+                <li><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
             <?php endif; ?>
-            <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
-                <?php if( $i == $halamanAktif ) : ?>
-                    <li class="active grey"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php else : ?>
-                    <li class="waves-effect blue darken-1"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php endif; ?>
-            <?php endfor; ?>
-            <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-                <li class="waves-effect blue darken-1">
-                    <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
-                </li>
-            <?php endif; ?>
-            </ul>
-            <!-- pagination -->
+        <?php endfor; ?>
+        <?php if( $halamanAktif < $jumlahHalaman ) : ?>
+            <li>
+                <a href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
+            </li>
+        <?php endif; ?>
+        </ul>
+        <!-- end pagination -->
 
-            <table cellpadding=10 border=1>
+        <table class="uk-table uk-table-divider uk-table-hover">
+            <thead>
                 <tr>
                     <th>ID Pelanggan</th>
                     <th>Nama</th>
@@ -122,9 +117,9 @@ if ( isset($_POST["cari"])) {
                     <th>Alamat Lengkap</th>
                     <th>Aksi</th>
                 </tr>
-
+            </thead>
+            <tbody>
                 <?php foreach ($pelanggan as $dataPelanggan) : ?>
-                
                 <tr>
                     <td><?= $dataPelanggan["id_pelanggan"] ?></td>
                     <td><?= $dataPelanggan["nama"] ?></td>
@@ -132,19 +127,26 @@ if ( isset($_POST["cari"])) {
                     <td><?= $dataPelanggan["email"] ?></td>
                     <td><?= $dataPelanggan["kota"] ?></td>
                     <td><?= $dataPelanggan["alamat"] ?></td>
-<td>
-    <a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
-    <a class="btn yellow darken-2" href="reset-password.php?user_id=<?= $dataPelanggan['id_pelanggan'] ?>"><i class="material-icons">lock_reset</i></a>
-</td>
+                    <td>
+                        <a class="uk-button uk-button-danger" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                            <i class="material-icons">delete</i>
+                        </a>
+                        <a class="uk-button uk-button-warning" href="reset-password.php?user_id=<?= $dataPelanggan['id_pelanggan'] ?>">
+                            <i class="material-icons">lock_reset</i>
+                        </a>
+                    </td>
                 </tr>
-
                 <?php endforeach ?>
-            </table>
-            
-        </div>
+            </tbody>
+        </table>
     </div>
 
+    <!-- footer -->
     <?php include "footer.php"; ?>
+    <!-- end footer -->
+
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>
 
