@@ -1,11 +1,11 @@
 <?php
 
-    // koneksi ke db
-    session_start();
-    include 'connect-db.php';
-    include 'functions/functions.php';
+// mulai session
+session_start();
+include 'connect-db.php';
+include 'functions/functions.php';
 
-    cekLogin();
+cekLogin();
 
 ?>
 
@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>Registrasi Pelanggan</title>
 </head>
 <body>
@@ -23,65 +23,62 @@
     <?php include 'header.php'; ?>
     <!-- end header -->
 
-    <h3 class="header light center">Registrasi Pelanggan</h3>
+    <h3 class="uk-heading-line uk-text-center"><span>Registrasi Pelanggan</span></h3>
 
     <!-- body -->
-    <div class="row">
-        <div class="col s6 offset-s3">
-            <form action="" method="POST">
-                <div class="input-field inline">
-                    <ul>
-                        <li>
-                            <label for="nama">Nama</label>
-                            <input type="text" size=70 id="nama" placeholder="Nama" name="nama">
-                        </li>
-                        <li>
-                            <label for="email">Email</label>
-                            <input type="text" size=70 id="email" placeholder="E-mail" name="email">
-                        </li>
-                        <li>
-                            <label for="telp">No Telp</label>
-                            <input type="text" size=70 id="telp" placeholder="No Telp" name="noTelp">
-                        </li>
-                        <li>
-                            <label for="kota">Kota / Kabupaten</label>
-                            <input type="text" size=70 id="kota" placeholder="Kota / Kabupaten" name="kota">
-                        </li>
-                        <li>
-                            <label for="alamat">Alamat Lengkap</label>
-                            <input type="text" size=70 id="alamat" placeholder="Alamat Lengkap" name="alamat">
-                        </li>
-                        <li>
-                            <label for="password">Password</label>
-                            <input type="password" id="password" placeholder="Password" name="password">
-                        </li>
-                        <li>
-                            <label for="repassword">Re-type Password</label>
-                            <input type="password" id="repassword" placeholder="Re-type Password" name="password2">
-                        </li>
-                        <li>
-                            <div class="center">
-                                <button class="btn-large blue darken-3" type="submit" name="registrasi">Daftar</button>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </form>
-            <div class="center">
-                Ingin menjadi mitra kami ?<br/>
-                Dafar sebagai agen sekarang !<br/>
+    <div class="uk-container">
+        <div class="uk-grid-match uk-child-width-1-2@m" uk-grid>
+            <div>
+                <form action="" method="POST">
+                    <div class="uk-margin">
+                        <label for="nama">Nama</label>
+                        <input class="uk-input" type="text" size=70 id="nama" placeholder="Nama" name="nama">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="email">Email</label>
+                        <input class="uk-input" type="text" size=70 id="email" placeholder="E-mail" name="email">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="telp">No Telp</label>
+                        <input class="uk-input" type="text" size=70 id="telp" placeholder="No Telp" name="noTelp">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="kota">Kota / Kabupaten</label>
+                        <input class="uk-input" type="text" size=70 id="kota" placeholder="Kota / Kabupaten" name="kota">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="alamat">Alamat Lengkap</label>
+                        <input class="uk-input" type="text" size=70 id="alamat" placeholder="Alamat Lengkap" name="alamat">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="password">Password</label>
+                        <input class="uk-input" type="password" id="password" placeholder="Password" name="password">
+                    </div>
+                    <div class="uk-margin">
+                        <label for="repassword">Re-type Password</label>
+                        <input class="uk-input" type="password" id="repassword" placeholder="Re-type Password" name="password2">
+                    </div>
+                    <div class="uk-text-center">
+                        <button class="uk-button uk-button-primary uk-button-large" type="submit" name="registrasi">Daftar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="uk-text-center">
+                <p>Ingin menjadi mitra kami?</p>
+                <p>Daftar sebagai agen sekarang!</p>
                 <br>
-                <a class="btn-large red darken-2" href="registrasi-agen.php">Registrasi Sebagai Agen</a>
+                <a class="uk-button uk-button-danger uk-button-large" href="registrasi-agen.php">Registrasi Sebagai Agen</a>
             </div>
         </div>
     </div>
     <!-- end body -->
 
-
     <!-- footer -->
     <?php include "footer.php"; ?>
     <!-- end footer -->
 
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>
 
@@ -106,11 +103,11 @@ function registrasi ($data) {
     validasiTelp($noTelp);
     validasiNama($kota);
 
-    // enskripsi password
+    // enkripsi password
     $password = mysqli_real_escape_string($connect , $data["password"]);
     $password2 = mysqli_real_escape_string($connect , $data["password2"]);
 
-    //cek username apakah ada yg sama        
+    // cek username apakah ada yg sama        
     $result = mysqli_query($connect, "SELECT email FROM pelanggan WHERE email = '$email'");
     if ( mysqli_fetch_assoc($result) ){ //jika ada (TRUE)
         echo "
@@ -122,7 +119,7 @@ function registrasi ($data) {
         return false;
     }
 
-    //cek konfirmasi password
+    // cek konfirmasi password
     if ($password != $password2) {
         echo "
             <script>   
@@ -132,21 +129,21 @@ function registrasi ($data) {
         return false;
     }
 
-    //enskripsi password
+    // enkripsi password
     $password = password_hash($password, PASSWORD_DEFAULT);
 
     // masukkan data user ke db
-    mysqli_query($connect, "INSERT INTO pelanggan VALUES ('','$nama','$email','$noTelp','$kota','$alamat','default.png','$password')");
+    $stmt = $connect->prepare("INSERT INTO pelanggan (nama, email, telp, kota, alamat, foto, password) VALUES (?, ?, ?, ?, ?, 'default.png', ?)");
+    $stmt->bind_param("ssssss", $nama, $email, $noTelp, $kota, $alamat, $password);
+    $stmt->execute();
 
     // RETURN TRUE
-    return mysqli_affected_rows($connect);
+    return $stmt->affected_rows;
 }
-
 
 // ketika tombol registrasi di klik
 if ( isset($_POST["registrasi"]) ){
     if ( registrasi($_POST) > 0 ) {
-
         $email = $_POST["email"];
         $query = mysqli_query($connect, "SELECT * FROM pelanggan WHERE email = '$email'");
         $pelanggan = mysqli_fetch_assoc($query);
@@ -159,10 +156,9 @@ if ( isset($_POST["registrasi"]) ){
                 });
             </script>
         ";
-    }else {
+    } else {
         echo mysqli_error($connect);
     }
-
 }
 
 ?>

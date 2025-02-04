@@ -9,13 +9,12 @@ cekLogin();
 
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>Registrasi</title>
 </head>
 
@@ -24,18 +23,9 @@ cekLogin();
     <?php include 'header.php'; ?>
     <!-- end header -->
 
-    <h3 class="header light center">Halaman Registrasi</h3>
+    <h3 class="uk-heading-line uk-text-center"><span>Halaman Registrasi</span></h3>
     <br>
 
     <!-- body -->
-    <div class="container center">
-        <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="registrasi-pelanggan.php">Registrasi Sebagai Pelanggan</a>
-        <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="registrasi-agen.php">Registrasi Sebagai Agen</a>
-    </div>
-    <!-- body -->
-
-    <!-- footer -->
-    <?php include "footer.php"; ?>
-    <!-- end footer -->
-</body>
-</html>
+    <div class="uk-container uk-text-center">
+        <a id="download-button" class="uk-button uk-button-primary uk-button-large" href="registr
