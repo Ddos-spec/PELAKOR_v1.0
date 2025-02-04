@@ -17,10 +17,10 @@ if ( isset($_GET["page"])){
 
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-$agen = mysqli_query($connect, "SELECT * FROM agen LIMIT ?, ?");
-$agen->bind_param("ii", $awalData, $jumlahDataPerHalaman);
-$agen->execute();
-$result = $agen->get_result();
+$stmt = $connect->prepare("SELECT * FROM agen LIMIT ?, ?");
+$stmt->bind_param("ii", $awalData, $jumlahDataPerHalaman);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ( isset($_POST["cari"])) {
     $keyword = htmlspecialchars($_POST["keyword"]);
@@ -29,9 +29,9 @@ if ( isset($_POST["cari"])) {
         nama_laundry LIKE '%$keyword%'
         LIMIT $awalData, $jumlahDataPerHalaman
     ";
-    $agen = mysqli_query($connect,$query);
+    $result = mysqli_query($connect,$query);
     $jumlahDataPerHalaman = 3;
-    $jumlahData = mysqli_num_rows($agen);
+    $jumlahData = mysqli_num_rows($result);
     $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
     if ( isset($_GET["page"])){
         $halamanAktif = $_GET["page"];
@@ -42,7 +42,7 @@ if ( isset($_POST["cari"])) {
 
 if (isset($_POST["submitSorting"])){
     $sorting = $_POST["sorting"];
-    $agen = mysqli_query($connect, "SELECT * FROM agen JOIN harga ON agen.id_agen = harga.id_agen WHERE harga.jenis = 'komplit' ORDER BY harga.harga ASC LIMIT $awalData, $jumlahDataPerHalaman");
+    $result = mysqli_query($connect, "SELECT * FROM agen JOIN harga ON agen.id_agen = harga.id_agen WHERE harga.jenis = 'komplit' ORDER BY harga.harga ASC LIMIT $awalData, $jumlahDataPerHalaman");
 }
 
 ?>
@@ -51,8 +51,47 @@ if (isset($_POST["submitSorting"])){
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     <title>Laundryku</title>
-    <?php include 'headtags.html' ?>
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #1e87f0;
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+        }
+        .services {
+            padding: 50px 0;
+        }
+        .services .uk-card {
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .uk-button-primary {
+            background-color: #1e87f0;
+            border-color: #1e87f0;
+        }
+        .uk-button-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .footer {
+            background-color: #1e87f0;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
 <body class="uk-background-default uk-text-muted">
 
@@ -154,7 +193,7 @@ if (isset($_POST["submitSorting"])){
         <div class="uk-container">
             <div class="uk-section">
                 <div class="uk-grid uk-child-width-1-3@m" uk-grid>
-                    <?php foreach ( $agen as $dataAgen) : ?>
+                    <?php while ($dataAgen = mysqli_fetch_assoc($result)) : ?>
                         <div>
                             <div class="uk-card uk-card-default uk-card-hover">
                                 <div class="uk-card-media-top">
@@ -163,7 +202,7 @@ if (isset($_POST["submitSorting"])){
                                     </a>
                                 </div>
                                 <div class="uk-card-body">
-                                    <h5 class="uk-text-center">
+                                    <h5 class="uk-text-center uk-text-bold">
                                         <a class="uk-text-primary" href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
                                     </h5>
                                     <p class="uk-text-muted">
@@ -172,7 +211,7 @@ if (isset($_POST["submitSorting"])){
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php endwhile; ?>
                 </div>
             </div>
             <br><br>
@@ -181,6 +220,6 @@ if (isset($_POST["submitSorting"])){
 
     <?php include "footer.php" ?>
 </body>
-    <script src="js/script.js"></script>
-    <script src="js/scriptAjax.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </html>

@@ -14,13 +14,6 @@ $stmt->bind_param("i", $idAgen);
 $stmt->execute();
 $result = $stmt->get_result();
 $agen = mysqli_fetch_assoc($result);
-$result = mysqli_query($connect, $query);
-if (!$result) {
-    echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
-    exit;
-}
-$agen = mysqli_fetch_assoc($result);
-$idAgen = $agen["id_agen"];
 
 ?>
 
@@ -29,7 +22,7 @@ $idAgen = $agen["id_agen"];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include 'headtags.html'; ?>
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>Profil Agen</title>
 </head>
 <body>
@@ -39,52 +32,57 @@ $idAgen = $agen["id_agen"];
     <!-- end header -->
 
     <!-- data agen -->
-    <div class="row">
-        <div class="col s6 offset-s3">
-            <h3 class="header light center">Data Agen</h3>
-            <br><br>
-            <form action="" method="post" enctype="multipart/form-data">
-                <div class="center">
-                    <img src="img/agen/<?= $agen['foto'] ?>" class="circle" width="150" height="150" alt="">
+    <div class="uk-container">
+        <h3 class="uk-heading-line uk-text-center"><span>Data Agen</span></h3>
+        <form action="" method="post" enctype="multipart/form-data">
+            <div class="uk-text-center">
+                <img src="img/agen/<?= $agen['foto'] ?>" class="uk-border-circle" width="150" height="150" alt="">
+            </div>
+            <div class="uk-margin">
+                <div uk-form-custom="target: true">
+                    <input type="file" name="foto" id="foto">
+                    <input class="uk-input uk-form-width-medium" type="text" placeholder="Upload foto profil" disabled>
                 </div>
-                <div class="file-field input-field">
-                    <div class="btn blue darken-2">
-                        <span>Foto Profil</span>
-                        <input type="file" name="foto" id="foto">
-                    </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text" placeholder="Upload foto profil">
-                    </div>
-                </div>
-                <div class="input-field">
-                    <ul>
-                        <li>
-                            <label for="namaLaundry">Nama Laundry</label>
-                            <input type="text" id="namaLaundry" name="namaLaundry" value="<?= $agen['nama_laundry']?>">
-                        </li>
-                        <li>
-                            <label for="namaPemilik">Nama Pemilik</label>
-                            <input type="text" id="namaPemilik" name="namaPemilik" value="<?= $agen['nama_pemilik']?>">
-                        </li>
-                        <li>
-                            <label for="email">Email</label>
-                            <input type="text" id="email" name="email" value="<?= $agen['email']?>">
-                        </li>
-                        <li>
-                            <label for="telp">No Telp</label>
-                            <input type="text" id="telp" name="telp" value="<?= $agen['telp']?>">
-                        </li>
-                        <li>
-                            <label for="plat">Plat Driver</label>
-                            <input type="text" id="plat" name="platDriver" value="<?= $agen['plat_driver']?>">
-                        </li>
-                        <li>
-                            <label for="kota">Kota / Kabupaten</label>
-                            <input type="text" name="kota" value="<?= $agen['kota']?>">
-                        </li>
-                        <li>
-                            <label for="alamat">Alamat</label>
-                            <textarea class="materialize-textarea" name="alamat"><?= $agen['alamat']?></textarea>
-                        </li>
-                        <li>
-                            <
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="namaLaundry">Nama Laundry</label>
+                <input class="uk-input" type="text" id="namaLaundry" name="namaLaundry" value="<?= $agen['nama_laundry']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="namaPemilik">Nama Pemilik</label>
+                <input class="uk-input" type="text" id="namaPemilik" name="namaPemilik" value="<?= $agen['nama_pemilik']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="email">Email</label>
+                <input class="uk-input" type="text" id="email" name="email" value="<?= $agen['email']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="telp">No Telp</label>
+                <input class="uk-input" type="text" id="telp" name="telp" value="<?= $agen['telp']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="plat">Plat Driver</label>
+                <input class="uk-input" type="text" id="plat" name="platDriver" value="<?= $agen['plat_driver']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="kota">Kota / Kabupaten</label>
+                <input class="uk-input" type="text" name="kota" value="<?= $agen['kota']?>">
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="alamat">Alamat</label>
+                <textarea class="uk-textarea" name="alamat"><?= $agen['alamat']?></textarea>
+            </div>
+            <div class="uk-text-center">
+                <button class="uk-button uk-button-primary" type="submit" name="submit">Simpan</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- footer -->
+    <?php include 'footer.php'; ?>
+    <!-- end footer -->
+
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
+</body>
+</html>
