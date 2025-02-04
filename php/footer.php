@@ -1,4 +1,4 @@
-<footer class="bg-[#005f99] text-white">
+<footer class="uk-background-primary uk-light">
     <div class="container mx-auto py-6">
         <div class="row">
             <div class="col l6 s12">

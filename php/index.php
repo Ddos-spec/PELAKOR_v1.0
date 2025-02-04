@@ -54,22 +54,22 @@ if (isset($_POST["submitSorting"])){
     <title>Laundryku</title>
     <?php include 'headtags.html' ?>
 </head>
-<body class="bg-[#ffffff] text-[#4a4a4a]">
+<body class="uk-background-default uk-text-muted">
 
     <?php include 'header.php'; ?>
 
-    <div class="container mx-auto">
+    <div class="uk-container">
         <br>
-        <h1 class="text-center text-[#005f99]"><img src="img/banner.png" width=60% alt=""></h1>
-        <div class="row text-center">
-            <h5 class="text-lg">Solusi Laundry Praktis Tanpa Keluar Rumah</h5>
+        <h1 class="uk-text-center uk-text-primary"><img src="img/banner.png" width=60% alt=""></h1>
+        <div class="uk-text-center">
+            <h5 class="uk-text-large">Solusi Laundry Praktis Tanpa Keluar Rumah</h5>
         </div>
 
-        <div class="row text-center">
+        <div class="uk-text-center">
             <div id="body">
                 <?php if ( isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"]) ) : ?>
-                    <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="pelanggan.php">Profil Saya</a>
+                    <div class="uk-button-group" data-animation="fadeInRight" data-delay="1s">
+                        <a id="download-button" class="uk-button uk-button-primary" href="pelanggan.php">Profil Saya</a>
                         <?php 
                         $idPelanggan = $_SESSION['pelanggan'];
                         $cek = mysqli_query($connect,"SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'");
@@ -86,11 +86,11 @@ if (isset($_POST["submitSorting"])){
                             $transaksi = "Riwayat Transaksi";
                         }
                         ?>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="status.php"><?= $status ?></a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="transaksi.php"><?= $transaksi ?></a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="status.php"><?= $status ?></a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="transaksi.php"><?= $transaksi ?></a>
                     </div>
                 <?php elseif ( isset($_SESSION["login-agen"]) && isset($_SESSION["agen"]) ) : ?>
-                    <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
+                    <div class="uk-button-group" data-animation="fadeInRight" data-delay="1s">
                     <?php
                     $idAgen = $_SESSION['agen'];
                     $cek = mysqli_query($connect,"SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'");
@@ -100,74 +100,76 @@ if (isset($_POST["submitSorting"])){
                         $status = "Status Cucian";
                     }
                     ?>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="agen.php">Profil Saya</a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="status.php"><?= $status ?></a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="transaksi.php">Riwayat Transaksi</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="agen.php">Profil Saya</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="status.php"><?= $status ?></a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="transaksi.php">Riwayat Transaksi</a>
                     </div>
                 <?php elseif ( isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]) ) : ?>
-                    <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="admin.php">Profil Saya</a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="status.php">Status Cucian</a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="transaksi.php">Riwayat Transaksi</a>
+                    <div class="uk-button-group" data-animation="fadeInRight" data-delay="1s">
+                        <a id="download-button" class="uk-button uk-button-primary" href="admin.php">Profil Saya</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="status.php">Status Cucian</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="transaksi.php">Riwayat Transaksi</a>
                         <br><br>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="list-agen.php">Data Agen</a>
-                        <a id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded" href="list-pelanggan.php">Data Pelanggan</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="list-agen.php">Data Agen</a>
+                        <a id="download-button" class="uk-button uk-button-primary" href="list-pelanggan.php">Data Pelanggan</a>
                     </div>
                 <?php else : ?>
-                    <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                        <a href="registrasi.php" id="download-button" class="bg-[#005f99] text-[#ffffff] hover:bg-[#ffcc33] hover:text-[#005f99] py-2 px-4 rounded">Daftar Sekarang</a>
+                    <div class="uk-button-group" data-animation="fadeInRight" data-delay="1s">
+                        <a href="registrasi.php" id="download-button" class="uk-button uk-button-primary">Daftar Sekarang</a>
                     </div>
                 <?php endif ?>
             </div>
             <br>
         </div>
 
-    <form class="col s12 center" action="" method="post">
-        <div class="input-field inline">
-            <input type="text" size=40 name="keyword" placeholder="Kota / Kabupaten" id="keyword" autofocus autocomplete="off" class="border border-gray-300 rounded p-2">
+    <form class="uk-form-inline" action="" method="post">
+        <div class="uk-margin">
+            <input type="text" size=40 name="keyword" placeholder="Kota / Kabupaten" id="keyword" autofocus autocomplete="off" class="uk-input">
         </div>
     </form>
 
     <div id="container">
         <div id="search">
-            <ul class="pagination center">
+            <ul class="uk-pagination uk-flex-center">
             <?php if( $halamanAktif > 1 ) : ?>
-                <li class="disabled-effect bg-[#005f99] text-[#ffffff]">
+                <li class="uk-disabled">
                     <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
                 </li>
             <?php endif; ?>
             <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
                 <?php if( $i == $halamanAktif ) : ?>
-                    <li class="active bg-[#005f99] text-[#ffffff]"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+                    <li class="uk-active"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
                 <?php else : ?>
-                    <li class="bg-[#005f99] text-[#ffffff]"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+                    <li><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
                 <?php endif; ?>
             <?php endfor; ?>
             <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-                <li class="bg-[#005f99] text-[#ffffff]">
+                <li>
                     <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
                 </li>
             <?php endif; ?>
             </ul>
         </div>
 
-        <div class="container">
-            <div class="section">
-                <div class="row card">
+        <div class="uk-container">
+            <div class="uk-section">
+                <div class="uk-grid uk-child-width-1-3@m" uk-grid>
                     <?php foreach ( $agen as $dataAgen) : ?>
-                        <div class="col s12 m4">
-                            <div class="icon-block center bg-[#f2f2f2] shadow-[0_4px_6px_-1px_rgba(179,217,255,0.5)] p-4 rounded">
-                                <h2 class="center text-[#005f99]">
+                        <div>
+                            <div class="uk-card uk-card-default uk-card-hover">
+                                <div class="uk-card-media-top">
                                     <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>">
-                                        <img src="img/agen/<?= $dataAgen['foto'] ?>" class="circle" width="150" height="150" />
+                                        <img src="img/agen/<?= $dataAgen['foto'] ?>" class="uk-border-circle" width="150" height="150" />
                                     </a>
-                                </h2>
-                                <h5 class="center">
-                                    <a class="text-[#005f99]" href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
-                                </h5>
-                                <p class="light">
-                                    Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
-                                    <br/>Telp : <?= $dataAgen["telp"] ?></p>
+                                </div>
+                                <div class="uk-card-body">
+                                    <h5 class="uk-text-center">
+                                        <a class="uk-text-primary" href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
+                                    </h5>
+                                    <p class="uk-text-muted">
+                                        Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
+                                        <br/>Telp : <?= $dataAgen["telp"] ?></p>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
