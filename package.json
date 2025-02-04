@@ -1,0 +1,23 @@
+{
+  "name": "laundryku-master",
+  "version": "1.0.0",
+  "description": "Project ini digunakan sebagai Final Project ukom untuk membuat aplikasi laundry dengan penyempurnaan fitur fitur dan keamanan yang cukup mumpuni",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ddos-spec/LaundryKu_v2.0.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ddos-spec/LaundryKu_v2.0/issues"
+  },
+  "homepage": "https://github.com/Ddos-spec/LaundryKu_v2.0#readme",
+  "dependencies": {
+    "uikit": "^3.23.0"
+  }
+}
