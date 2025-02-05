@@ -1,10 +1,12 @@
-<nav class="uk-navbar-container uk-navbar-primary uk-light" uk-navbar>
+<nav class="uk-navbar-container uk-navbar-primary uk-light" uk-navbar style="background-color: #1e87f0;">
     <div class="uk-navbar-left">
-        <a href="index.php" class="uk-navbar-item uk-logo"><i class="uk-icon-button uk-icon" uk-icon="home"></i> Pelakor</a>
+        <a href="index.php" class="uk-navbar-item uk-logo" style="margin-left: 20px;"><b>PELAKOR</b></a>
     </div>
     <div class="uk-navbar-right">
         <ul class="uk-navbar-nav">
-            <li>
+            <li><a href="index.php"><i class="uk-icon-button uk-icon" uk-icon="home"></i> Home</a></li>
+            <li><a href="registrasi.php"><b>Registrasi</b></a></li>
+            <li><a href="logic/login.php"><b>Login</b></a></li>
                 <?php
                     global $connect;
 

@@ -1,29 +1,23 @@
-<footer class="uk-background-primary uk-light uk-padding-small">
-    <div class="uk-container">
-        <div class="uk-grid-match uk-child-width-1-3@m" uk-grid>
-            <div>
-                <h5>Company Bio</h5>
-                <p>Project ini digunakan sebagai Final Project ukom untuk membuat aplikasi laundry dengan penyempurnaan fitur fitur dan keamanan yang cukup mumpuni</p>
-            </div>
-            <div>
-                <h5>Laundryku</h5>
-                <ul class="uk-list">
-                    <li><a href="index.php" class="uk-link-text">Home</a></li>
-                    <li><a href="term.php" class="uk-link-text">Term and Condition</a></li>
-                    <li><a href="registrasi.php" class="uk-link-text">Registrasi</a></li>
-                    <li><a href="login.php" class="uk-link-text">Login</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5>Developer</h5>
-                <ul class="uk-list">
-                    <li><a href="team.php" class="uk-link-text">Fadjar Aryo Seto</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="uk-text-center">
-            <hr class="uk-divider-icon">
-            <p>&copy; 2025 LaundryKu. All rights reserved. Made by <a href="http://getuikit.com" class="uk-link-text">UIkit</a></p>
-        </div>
+<footer style="background-color: #007bff; color: #fff; padding: 20px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between;">
+      <div style="flex: 1; padding: 10px;">
+        <h3 style="color: white;">Company Bio</h3>
+        <p>Project ini digunakan sebagai Final Project ukom untuk membuat aplikasi laundry dengan penyempurnaan fitur-fitur dan keamanan yang cukup mumpuni.</p>
+      </div>
+      <div style="flex: 1; padding: 10px;">
+        <h3 style="color: white;">Laundryku</h3>
+        <ul>
+          <li><a href="index.php" style="color: white;">Home</a></li>
+          <li><a href="term.php" style="color: white;">Term and Condition</a></li>
+          <li><a href="registrasi.php" style="color: white;">Registrasi</a></li>
+          <li><a href="login.php" style="color: white;">Login</a></li>
+        </ul>
+      </div>
+      <div style="flex: 1; padding: 10px;">
+        <h3 style="color: white;">Developer</h3>
+        <p>Fadjar Aryo Seto</p>
+      </div>
     </div>
+  </div>
 </footer>
