@@ -1,7 +1,7 @@
 <?php
 session_start();
-include '../connect-db.php';
-include '../functions/functions.php';
+include 'connect-db.php';
+include 'functions/functions.php';
 
 // validasi login
 cekLogin();
@@ -12,13 +12,13 @@ cekLogin();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "../headtags.html"; ?>
+<?php include "headtags.html"; ?>
     <title>Halaman Login</title>
 </head>
 <body>
 
     <!-- header -->
-    <?php include '../header.php'; ?>
+include 'header.php';
     <!-- end header -->
 
     <!-- body -->
@@ -52,7 +52,7 @@ cekLogin();
     <!-- end body -->
 
     <!-- footer -->
-    <?php include '../footer.php'; ?>
+include 'footer.php';
     <!-- end footer -->
 
 </body>

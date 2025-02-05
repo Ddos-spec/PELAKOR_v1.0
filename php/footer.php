@@ -11,7 +11,7 @@
           <li><a href="index.php" style="color: white;">Home</a></li>
           <li><a href="term.php" style="color: white;">Term and Condition</a></li>
           <li><a href="registrasi.php" style="color: white;">Registrasi</a></li>
-<li><a href="logic/login.php" style="color: white;">Login</a></li>
+<li><a href="login.php" style="color: white;">Login</a></li>
         </ul>
       </div>
       <div style="flex: 1; padding: 10px;">
