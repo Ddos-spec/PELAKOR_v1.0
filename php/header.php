@@ -12,64 +12,43 @@
             margin: 0;
             font-family: Arial, sans-serif;
         }
-        .navbar {
-            background-color: #1e87f0; /* Blue color */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
+        .uk-navbar-nav button {
+            padding: 10px 15px; /* Increased padding */
+            font-size: 1.1em; /* Increased font size */
+            color: white; /* Ensure text color is white */
+            background-color: transparent; /* Transparent background */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer cursor */
         }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            font-size: 1.2em;
-        }
-        .navbar a:hover {
-            background-color: #0d6efd;
+        .uk-navbar-nav button:hover {
+            background-color: #0d6efd; /* Hover effect */
             border-radius: 5px;
-        }
-        .navbar .logo {
-            font-weight: bold;
-            font-size: 1.5em;
-        }
-        .search-container {
-            display: flex;
-            align-items: center;
-        }
-        .search-container input {
-            padding: 5px;
-            border: none;
-            border-radius: 5px;
-        }
-        .search-container button {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: white;
-            color: #1e87f0; /* Blue color */
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <nav class="uk-container uk-navbar">
+    <nav class="uk-container uk-navbar uk-navbar-container" style="background-color: #1e87f0;">
         <div class="uk-navbar-left">
             <ul class="uk-navbar-nav">
                 <li class="uk-active">
-                    <a href="#">UIKit<strong>ResMenu</strong></a>
+                    <a href="#">PELA<strong>KOR</strong></a>
                 </li>
             </ul>
         </div>
         <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav uk-visible@s">
-                <li><a class="uk-text-large" href="https://shubhamjain.co/about/">home</a></li>
-                <li><a class="uk-text-large" href="https://shubhamjain.co/">registration</a></li>
-                <li><a class="uk-text-large" href="https://shubhamjain.co/">login</a></li>
+            <ul class="uk-navbar-nav">
+                <li>
+                    <button onclick="location.href='index.php'"><span uk-icon="icon: home"></span> Home</button>
+                </li>
+                <li>
+                    <button onclick="location.href='registrasi.php'"><span uk-icon="icon: user"></span> Registration</button>
+                </li>
+                <li>
+<button onclick="location.href='logic/login.php'"><span uk-icon="icon: sign-in"></span> Login</button>
+                </li>
             </ul>
-            <a href="#" class="uk-navbar-toggle uk-hidden@s" uk-navbar-toggle-icon uk-toggle="target: #sidenav"></a>
         </div>
     </nav>
 </header>
@@ -82,36 +61,6 @@
         </ul>
     </div>
 </div>
-
-<nav class="navbar">
-    <div class="logo">PELAKOR</div>
-    <div>
-        <a href="index.php">Home</a>
-        <div class="search-container">
-            <input type="text" placeholder="Search...">
-            <button type="button">Search</button>
-        </div>
-        <?php
-            global $connect;
-
-            if (isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"])) {
-                $idPelanggan = $_SESSION["pelanggan"];
-                $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
-                $data = mysqli_fetch_assoc($data);
-                $nama = $data["nama"];
-                echo "<a href='pelanggan.php'>$nama (Pelanggan)</a>";
-            } else if (isset($_SESSION["login-agen"]) && isset($_SESSION["agen"])) {
-                $id_agen = $_SESSION["agen"];
-                $data = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$id_agen'");
-                $data = mysqli_fetch_assoc($data);
-                $nama = $data["nama_laundry"];
-                echo "<a href='agen.php'>$nama (Agen)</a>";
-            } else if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
-                echo "<a href='admin.php'>Admin (Admin)</a>";
-            }
-        ?>
-    </div>
-</nav>
 
 </body>
 </html>

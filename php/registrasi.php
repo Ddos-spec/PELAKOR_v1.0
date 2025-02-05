@@ -20,7 +20,7 @@ cekLogin();
         <a id="download-button" class="uk-button uk-button-primary uk-button-large" href="registrasi-pelanggan.php">Registrasi Pelanggan</a>
         <a id="download-button" class="uk-button uk-button-danger uk-button-large" href="registrasi-agen.php">Registrasi Agen</a>
     </div>
-    <?php include 'footer.php'; ?>
+<?php include 'footer.php'; ?>
     <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </body>

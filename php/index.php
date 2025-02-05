@@ -190,7 +190,8 @@ if (isset($_POST["submitSorting"])){
                                     </h5>
                                     <p class="uk-text-muted">
                                         Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
-                                        <br/>Telp : <?= $dataAgen["telp"] ?></p>
+<br/>Telp : <?= $dataAgen["telp"] ?></p>
+<img src="img/rating.png" alt="Rating" style="width: 100px; height: auto; display: block; margin: 0 auto;">
                                 </div>
                             </div>
                         </div>
