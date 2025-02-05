@@ -1,107 +1,89 @@
 <?php 
 
-// mulai session
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// validasi login
 cekPelanggan();
 
-// mengambil email di session
 $idPelanggan = $_SESSION["pelanggan"];
-
 $data = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
-if (!$data) {
-    echo "<script>Swal.fire('Error', 'Failed to retrieve data', 'error');</script>";
-    exit;
-}
-
-// jadikan array assoc
 $data = mysqli_fetch_assoc($data);
 
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
-    <title>Data Penggunan - <?= $data["nama"] ?></title>
+    <title>Data Pengguna - <?= $data["nama"] ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.7.3/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.3/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.7.3/dist/js/uikit-icons.min.js"></script>
+    <style>
+        .center-text { text-align: center; }
+        .profile-pic { display: block; margin: 0 auto; border-radius: 50%; width: 150px; height: 150px; }
+        .container { max-width: 600px; margin: 20px auto; }
+        .button-group { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    </style>
 </head>
 <body>
-
-    <!-- header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
-
-    <!-- body -->
-    <div class="row">
-        <div class="uk-text-center">
-            <a href="logout.php" class="uk-button uk-button-danger">Logout</a>
-        </div>
-        <div class="col s6 offset-s3">
-            <h3 class="header light center">DATA PENGGUNA</h3> <!-- Positioned heading -->
-            <form action="" method="post" enctype="multipart/form-data">
-                <div class="input-field inline" style="margin-left: 50px;"> <!-- Adjusted margin here -->
-                    <div class="center">
-                        <img src="img/pelanggan/<?= $data['foto'] ?>" class="circle" width="150" height="150" alt="">
-                    </div>
-                    <div class="file-field input-field">
-                        <div class="btn blue darken-2">
-                            <span>Foto Profil</span>
-                            <input type="file" name="foto" id="foto">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text" placeholder="Upload foto profil">
-                        </div>
-                    </div>
-                    <ul>
-                        <li>
-                            <label for="nama">Nama</label>
-                            <input type="text" size=60 id="nama" name="nama" value="<?= $data['nama'] ?>">
-                        </li>
-                        <li>
-                            <label for="email">Email</label>
-                            <input type="text" size=60 id="email" name="email" value="<?= $data['email'] ?>">
-                        </li>
-                        <li>
-                            <label for="telp">No Telp</label>
-                            <input type="text" size=60 id="telp" name="telp" value="<?= $data['telp'] ?>">
-                        </li>
-                        <li>
-                            <label for="kota">Kota / Kabupaten</label>
-                            <input type="text" size=60 id="kota" name="kota" value="<?= $data['kota'] ?>">
-                        </li>
-                        <li>
-                            <label for="alamat">Alamat</label>
-                            <textarea class="materialize-textarea" id="alamat" name="alamat"><?= $data['alamat'] ?></textarea>
-                        </li>
-                        <li>
-                            <div class="center">
-                                <button class="btn-large blue darken-2" type="submit" name="ubah-data">Simpan Data</button>
-                            </div>
-                        </li>
-                        <br>
-                        <li>
-                            <div class="center">
-                                <a class="btn red darken-2" href="ganti-kata-sandi.php">Ganti Kata Sandi</a>
-                            </div>
-                        </li>
-                    </ul>
+    <div class="uk-container uk-margin-large-top">
+        <h3 class="uk-heading-line uk-text-center"><span>DATA PENGGUNA</span></h3>
+        <form action="" method="post" enctype="multipart/form-data" class="uk-form-stacked uk-card uk-card-default uk-card-body uk-padding">
+            <div class="uk-text-center">
+                <img src="img/pelanggan/<?= $data['foto'] ?>" class="profile-pic uk-box-shadow-medium" alt="Foto Profil">
+            </div>
+            <div class="uk-margin">
+                <div uk-form-custom="target: true">
+                    <input type="file" name="foto" id="foto">
+                    <button class="uk-button uk-button-secondary" type="button" tabindex="-1">Pilih Foto</button>
+                    <input class="uk-input uk-form-width-medium" type="text" placeholder="Tidak ada file terpilih" disabled>
                 </div>
-            </form>
-        </div>
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="nama">Nama</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="text" id="nama" name="nama" value="<?= $data['nama'] ?>">
+                </div>
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="email">Email</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="text" id="email" name="email" value="<?= $data['email'] ?>">
+                </div>
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="telp">No Telp</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="text" id="telp" name="telp" value="<?= $data['telp'] ?>">
+                </div>
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="kota">Kota / Kabupaten</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="text" id="kota" name="kota" value="<?= $data['kota'] ?>">
+                </div>
+            </div>
+            <div class="uk-margin">
+                <label class="uk-form-label" for="alamat">Alamat</label>
+                <div class="uk-form-controls">
+                    <textarea id="alamat" name="alamat" class="uk-textarea"><?= $data['alamat'] ?></textarea>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="uk-button uk-button-primary uk-box-shadow-hover-large" type="submit" name="ubah-data">Simpan Data</button>
+                <a class="uk-button uk-button-secondary uk-box-shadow-hover-large" href="ganti-kata-sandi.php">Ganti Kata Sandi</a>
+                <a class="uk-button uk-button-danger uk-box-shadow-hover-large" href="logout.php">Logout</a>
+            </div>
+        </form>
     </div>
-    <!-- end body -->
-
-    <!-- footer -->
     <?php include "footer.php"; ?>
-    <!-- end footer -->
-
 </body>
 </html>
+
 
 <?php
 

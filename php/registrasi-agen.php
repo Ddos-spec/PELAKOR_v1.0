@@ -11,11 +11,90 @@ cekLogin();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>Registrasi Agen</title>
+    <style>
+        .uk-card {
+            background-color: #1E90FF;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s; /* Animation effects */
+        }
+        .uk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .uk-button-primary {
+            background-color: #fff;
+            color: #1E90FF !important;
+            font-weight: bold;
+            border: 2px solid #1E90FF;
+            transition: background-color 0.3s, transform 0.3s; /* Animation effects */
+        }
+        .uk-button-primary:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.05); /* Button hover effect */
+        }
+        .form-container {
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-between; /* Space between form and card */
+            flex-wrap: wrap;
+        }
+        .form-card {
+            width: 60%; /* Increased width for the form */
+        }
+    </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
     <div class="uk-container">
         <div class="uk-grid-match uk-child-width-1-2@m" uk-grid>
+            <div>
+                <h3 class="uk-heading-line uk-text-center"><span>DAFTAR SEBAGAI AGEN</span></h3>
+                <form action="" method="post" class="uk-form-stacked uk-card uk-card-default uk-card-body">
+                    <div class="uk-margin">
+                        <label for="namaLaundry">Nama Laundry</label>
+                        <input class="uk-input" type="text" size=50 id="namaLaundry" name="namaLaundry" placeholder="Nama Laundry" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="namaPemilik">Nama Pemilik</label>
+                        <input class="uk-input" type="text" size=50 id="namaPemilik" name="namaPemilik" placeholder="Nama Pemilik" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="telp">No Telp</label>
+                        <input class="uk-input" type="text" size=50 id="telp" name="telp" placeholder="No Telp" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="email">E-mail</label>
+                        <input class="uk-input" type="email" size=50 id="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="plat">Plat Driver</label>
+                        <input class="uk-input" type="text" size=50 id="plat" name="platDriver" placeholder="Plat Driver" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="kota">Kota / Kabupaten</label>
+                        <input class="uk-input" type="text" size=50 id="kota" name="kota" placeholder="Kota / Kabupaten" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="alamat">Alamat Lengkap</label>
+                        <textarea class="uk-textarea" id="alamat" name="alamat" placeholder="Alamat Lengkap" required></textarea>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="password">Password</label>
+                        <input class="uk-input" type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="uk-margin">
+                        <label for="repassword">Re-type Password</label>
+                        <input class="uk-input" type="password" id="repassword" name="password2" placeholder="Re-type Password" required>
+                    </div>
+                    <div class="uk-text-center">
+                        <button class="uk-button uk-button-primary uk-button-large" type="submit" name="daftar">Daftar</button>
+                    </div>
+                </form>
+            </div>
             <div>
                 <div class="uk-card uk-card-default uk-card-body">
                     <div class="uk-text-center">
@@ -40,50 +119,6 @@ cekLogin();
                     </div>
                 </div>
             </div>
-            <div>
-                <h3 class="uk-heading-line uk-text-center"><span>DAFTAR SEBAGAI AGEN</span></h3>
-                <form action="" method="post">
-                    <div class="uk-margin">
-                        <label for="namaLaundry">Nama Laundry</label>
-                        <input class="uk-input" type="text" size=50 id="namaLaundry" name="namaLaundry" placeholder="Nama Laundry">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="namaPemilik">Nama Pemilik</label>
-                        <input class="uk-input" type="text" size=50 id="namaPemilik" name="namaPemilik" placeholder="Nama Pemilik">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="telp">No Telp</label>
-                        <input class="uk-input" type="text" size=50 id="telp" name="telp" placeholder="No Telp">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="email">E-mail</label>
-                        <input class="uk-input" type="email" size=50 id="email" name="email" placeholder="Email">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="plat">Plat Driver</label>
-                        <input class="uk-input" type="text" size=50 id="plat" name="platDriver" placeholder="Plat Driver">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="kota">Kota / Kabupaten</label>
-                        <input class="uk-input" type="text" size=50 id="kota" name="kota" placeholder="Kota / Kabupaten">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="alamat">Alamat Lengkap</label>
-                        <textarea class="uk-textarea" id="alamat" name="alamat" placeholder="Alamat Lengkap"></textarea>
-                    </div>
-                    <div class="uk-margin">
-                        <label for="password">Password</label>
-                        <input class="uk-input" type="password" name="password" placeholder="Password">
-                    </div>
-                    <div class="uk-margin">
-                        <label for="repassword">Re-type Password</label>
-                        <input class="uk-input" type="password" id="repassword" name="password2" placeholder="Re-type Password">
-                    </div>
-                    <div class="uk-text-center">
-                        <button class="uk-button uk-button-primary uk-button-large" type="submit" name="daftar">Daftar</button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
     <?php include 'footer.php'; ?>
@@ -92,32 +127,6 @@ cekLogin();
 </body>
 </html>
 <?php
-if (isset($_POST["daftar"])) {
-    $namaLaundry = htmlspecialchars($_POST["namaLaundry"]);
-    $namaPemilik = htmlspecialchars($_POST["namaPemilik"]);
-    $telp = htmlspecialchars($_POST["telp"]);
-    $email = htmlspecialchars($_POST["email"]);
-    $platDriver = htmlspecialchars($_POST["platDriver"]);
-    $kota = htmlspecialchars($_POST["kota"]);
-    $alamat = htmlspecialchars($_POST["alamat"]);
-    $password = htmlspecialchars($_POST["password"]);
-    $password2 = htmlspecialchars($_POST["password2"]);
-    validasiNama($namaLaundry);
-    validasiNama($namaPemilik);
-    validasiTelp($telp);
-    validasiEmail($email);
-    validasiNama($kota);
-    validasiNama($platDriver);
-    if ($password !== $password2) {
-        echo "<script>Swal.fire('Pendaftaran Gagal','Password tidak sama','error');</script>";
-        exit;
-    }
-    $password = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $connect->prepare("INSERT INTO agen (nama_laundry, nama_pemilik, telp, email, plat_driver, kota, alamat, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $namaLaundry, $namaPemilik, $telp, $email, $platDriver, $kota, $alamat, $password);
-    if ($stmt->execute()) {
-        echo "<script>Swal.fire('Pendaftaran Berhasil','Akun Agen Berhasil Dibuat','success').then(function(){ window.location =
-        <?php
 if (isset($_POST["daftar"])) {
     $namaLaundry = htmlspecialchars($_POST["namaLaundry"]);
     $namaPemilik = htmlspecialchars($_POST["namaPemilik"]);
