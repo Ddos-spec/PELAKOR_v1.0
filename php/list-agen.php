@@ -4,34 +4,28 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// validasi login
+// Validasi login
 cekAdmin();
 
-//konfirgurasi pagination
+// Konfigurasi pagination
 $jumlahDataPerHalaman = 5;
 $stmt = $connect->prepare("SELECT * FROM agen");
 $stmt->execute();
 $result = $stmt->get_result();
 $jumlahData = mysqli_num_rows($result);
-//ceil() = pembulatan ke atas
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
-//menentukan halaman aktif
-//$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-if ( isset($_GET["page"])){
-    $halamanAktif = $_GET["page"];
-}else{
-    $halamanAktif = 1;
-}
+// Menentukan halaman aktif
+$halamanAktif = isset($_GET["page"]) ? $_GET["page"] : 1;
 
-//data awal
-$awalData = ( $jumlahDataPerHalaman * $halamanAktif ) - $jumlahDataPerHalaman;
+// Data awal
+$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-//fungsi memasukkan data di db ke array
-$agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
+// Fungsi memasukkan data di db ke array
+$agen = mysqli_query($connect, "SELECT * FROM agen ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
 
-//ketika tombol cari ditekan
-if ( isset($_POST["cari"])) {
+// Ketika tombol cari ditekan
+if (isset($_POST["cari"])) {
     $keyword = htmlspecialchars($_POST["keyword"]);
     $query = "SELECT * FROM agen WHERE 
         nama_laundry LIKE '%$keyword%' OR
@@ -40,23 +34,12 @@ if ( isset($_POST["cari"])) {
         email LIKE '%$keyword%' OR
         alamat LIKE '%$keyword%'
         ORDER BY id_agen DESC
-        LIMIT $awalData, $jumlahDataPerHalaman
-    ";
-    $agen = mysqli_query($connect,$query);
+        LIMIT $awalData, $jumlahDataPerHalaman";
+    $agen = mysqli_query($connect, $query);
 
-    //konfirgurasi pagination
-    $jumlahDataPerHalaman = 3;
     $jumlahData = mysqli_num_rows($agen);
-    //ceil() = pembulatan ke atas
     $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
-    //menentukan halaman aktif
-    //$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-    if ( isset($_GET["page"])){
-        $halamanAktif = $_GET["page"];
-    }else{
-        $halamanAktif = 1;
-    }
+    $halamanAktif = isset($_GET["page"]) ? $_GET["page"] : 1;
 }
 ?>
 
@@ -69,48 +52,28 @@ if ( isset($_POST["cari"])) {
     <title>Data Agen</title>
 </head>
 <body>
-
-    <!-- header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
-
     <h3 class="uk-heading-line uk-text-center"><span>List Agen</span></h3>
     <br>
-
-    <!-- searching -->
     <form class="uk-form-inline uk-text-center" action="" method="post">
         <div class="uk-margin">
-            <input class="uk-input" type="text" size=40 name="keyword" placeholder="Keyword">
+            <input class="uk-input" type="text" name="keyword" placeholder="Keyword">
             <button class="uk-button uk-button-primary" type="submit" name="cari"><i class="material-icons">search</i></button>
         </div>
     </form>
-    <!-- end searching -->
-
     <div class="uk-container">
-        <!-- pagination -->
         <ul class="uk-pagination uk-flex-center">
-        <?php if( $halamanAktif > 1 ) : ?>
-            <li>
-                <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
-            </li>
-        <?php endif; ?>
-        <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
-            <?php if( $i == $halamanAktif ) : ?>
-                <li class="uk-active"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-            <?php else : ?>
-                <li><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+            <?php if ($halamanAktif > 1) : ?>
+            <li><a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a></li>
             <?php endif; ?>
-        <?php endfor; ?>
-        <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-            <li>
-                <a href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
-            </li>
-        <?php endif; ?>
+            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+            <li class="<?= $i == $halamanAktif ? 'uk-active' : '' ?>"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+            <?php endfor; ?>
+            <?php if ($halamanAktif < $jumlahHalaman) : ?>
+            <li><a href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a></li>
+            <?php endif; ?>
         </ul>
-        <!-- end pagination -->
-
-        <!-- data agen -->
-        <table class="uk-table uk-table-divider uk-table-hover">
+        <table class="uk-table uk-table-divider uk-table-hover uk-table-responsive">
             <thead>
                 <tr>
                     <th>ID Agen</th>
@@ -120,7 +83,7 @@ if ( isset($_POST["cari"])) {
                     <th>Email</th>
                     <th>Plat Driver</th>
                     <th>Kota</th>
-                    <th>Alamat Lengkap</th>
+                    <th>AlamatLengkap</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -147,13 +110,8 @@ if ( isset($_POST["cari"])) {
                 <?php endforeach ?>
             </tbody>
         </table>
-        <!-- end data agen -->
     </div>
-
-    <!-- footer -->
     <?php include "footer.php"; ?>
-    <!-- end footer -->
-
     <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </body>
@@ -161,22 +119,20 @@ if ( isset($_POST["cari"])) {
 
 <?php
 
-if (isset($_GET["hapus"])){
-    // ambil id agen dari method post
+if (isset($_GET["hapus"])) {
     $idAgen = $_GET["hapus"];
 
-    // hapus data agen
     $query = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
 
-    // kalau berhasil dihapus, keluar alert
-    if ( mysqli_affected_rows($connect) > 0 ){
+    if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
-                Swal.fire('Data Agen Berhasil Di Hapus','','success').then(function(){
+                Swal.fire('Data Agen Berhasil Di Hapus', '', 'success').then(function() {
                     window.location = 'list-agen.php';
                 });
             </script>
         ";
     }
 }
+
 ?>
