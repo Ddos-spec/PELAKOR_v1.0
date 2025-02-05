@@ -12,47 +12,60 @@ cekLogin();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<?php include "headtags.html"; ?>
+    <link rel="stylesheet" href="../uikit/dist/css/uikit.css"> <!-- Include UIkit CSS -->
+    <link rel="stylesheet" href="../uikit/dist/css/custom.css"> <!-- Include custom CSS -->
     <title>Halaman Login</title>
+    <style>
+        .container {
+            min-height: 80vh; /* Adjust this value as needed */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .login-card {
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            max-width: 400px; /* Set a max width for the card */
+            margin: auto; /* Center the card */
+        }
+    </style>
 </head>
 <body>
 
     <!-- header -->
-include 'header.php';
+    <?php include 'header.php'; ?>
     <!-- end header -->
 
     <!-- body -->
-    <div class="container center">  
-        <h3 class="header light center">Halaman Login</h3>
-        <form action="" method="post">
-            <div class="input-field inline">
-                <ul>
-                    <li>
+    <div class="container uk-text-center">  
+        <div class="login-card uk-card uk-card-default">
+            <h3 class="header light">Halaman Login</h3>
+            <form action="" method="post" class="uk-form-stacked">
+                <div class="uk-margin">
+                    <div class="uk-form-controls">
                         <label><input name="akun" value="admin" type="radio"/><span>Admin</span> </label>
                         <label><input name="akun" value="agen" type="radio"/><span>Agen</span> </label>
                         <label><input name="akun" value="pelanggan" type="radio"/><span>Pelanggan</span></label>
-                    </li>
-                    <li>
-                        <input type="text" id="email" name="email" placeholder="Email">
-                    </li>
-                    <li>
-                        <input type="password" id="password" name="password" placeholder="Password">
-                        <p class="tes"></p>
-                    </li>
-                    <br>
-                    <li>
-                        <div class="center">
-                            <button class="waves-effect blue darken-2 btn" type="submit" name="login">Login</button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </form>
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <input type="text" id="email" name="email" class="uk-input" placeholder="Email/Username" required>
+                </div>
+                <div class="uk-margin">
+                    <input type="password" id="password" name="password" class="uk-input" placeholder="Password" required>
+                </div>
+                <div class="uk-margin">
+                    <button class="uk-button uk-button-primary" type="submit" name="login">Login</button>
+                </div>
+            </form>
+        </div>
     </div>
     <!-- end body -->
 
     <!-- footer -->
-include 'footer.php';
+    <?php include 'footer.php'; ?>
     <!-- end footer -->
 
 </body>
