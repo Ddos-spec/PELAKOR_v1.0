@@ -46,7 +46,7 @@
                     <button onclick="location.href='registrasi.php'"><span uk-icon="icon: user"></span> Registration</button>
                 </li>
                 <li>
-<button onclick="location.href='logic/login.php'"><span uk-icon="icon: sign-in"></span> Login</button>
+<button onclick="location.href='login.php'"><span uk-icon="icon: sign-in"></span> Login</button>
                 </li>
             </ul>
         </div>

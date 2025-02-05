@@ -33,6 +33,9 @@ $agen = mysqli_fetch_assoc($result);
 
     <!-- data agen -->
     <div class="uk-container">
+        <div class="uk-text-center">
+            <a href="logout.php" class="uk-button uk-button-danger">Logout</a>
+        </div>
         <h3 class="uk-heading-line uk-text-center"><span>Data Agen</span></h3>
         <form action="" method="post" enctype="multipart/form-data">
             <div class="uk-text-center">

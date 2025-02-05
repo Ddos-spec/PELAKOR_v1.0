@@ -65,6 +65,7 @@ cekLogin();
             height: 100%;
         }
     </style>
+    <link rel="icon" href="img/laundryku.ico" type="image/x-icon">
     <title>Registrasi</title>
 </head>
 <body>

@@ -38,6 +38,9 @@ $data = mysqli_fetch_assoc($data);
 
     <!-- body -->
     <div class="row">
+        <div class="uk-text-center">
+            <a href="logout.php" class="uk-button uk-button-danger">Logout</a>
+        </div>
         <div class="col s6 offset-s3">
             <h3 class="header light center">DATA PENGGUNA</h3> <!-- Positioned heading -->
             <form action="" method="post" enctype="multipart/form-data">

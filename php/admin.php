@@ -27,6 +27,9 @@ $admin = mysqli_fetch_assoc($data);
 <body>
     <?php include 'header.php'; ?>
     <div id="body">
+        <div class="uk-text-center">
+            <a href="logout.php" class="uk-button uk-button-danger">Logout</a>
+        </div>
         <h3 class="header col s24 light center">Profil Admin</h3>
         <form action="" class="col s18 center" method="post">
             <div class="input-field inline">

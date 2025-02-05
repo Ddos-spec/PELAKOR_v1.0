@@ -14,6 +14,7 @@ cekLogin();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../uikit/dist/css/uikit.css"> <!-- Include UIkit CSS -->
     <link rel="stylesheet" href="../uikit/dist/css/custom.css"> <!-- Include custom CSS -->
+    <link rel="icon" href="img/laundryku.ico" type="image/x-icon">
     <title>Halaman Login</title>
     <style>
         .container {
@@ -89,7 +90,13 @@ if (isset($_POST["login"])) {
             if (password_verify($password, $row["password"])) {
                 $_SESSION["agen"] = $row["id_agen"];
                 $_SESSION["login-agen"] = true;
-                echo "<script>document.location.href = '../index.php';</script>";
+                echo "
+                <script>
+                    Swal.fire('Login Berhasil', 'Selamat datang, Agen!', 'success').then(function() {
+                        document.location.href = '../index.php';
+                    });
+                </script>
+                ";
                 exit;
             } else {
                 echo "<script>Swal.fire('Gagal Login','Password Salah','warning');</script>";
@@ -111,7 +118,13 @@ if (isset($_POST["login"])) {
             if (password_verify($password, $data["password"])) {
                 $_SESSION["pelanggan"] = $data["id_pelanggan"];
                 $_SESSION["login-pelanggan"] = true;
-                echo "<script>document.location.href = '../index.php';</script>";
+                echo "
+                <script>
+                    Swal.fire('Login Berhasil', 'Selamat datang, Pelanggan!', 'success').then(function() {
+                        document.location.href = '../index.php';
+                    });
+                </script>
+                ";
                 exit;
             } else {
                 echo "<script>Swal.fire('Gagal Login','Password Salah','warning');</script>";
@@ -121,7 +134,8 @@ if (isset($_POST["login"])) {
         }
 
     } elseif ($akun == 'admin') {
-        $username = htmlspecialchars($_POST["email"]);
+        $username = htmlspecialchars($_POST["email"]); // Debugging: Log the username
+        error_log("Attempting to log in with username: " . $username);
         $password = htmlspecialchars($_POST["password"]);
         validasiUsername($username);
         
@@ -135,7 +149,13 @@ if (isset($_POST["login"])) {
             if (password_verify($password, $data["password"])) {
                 $_SESSION["login-admin"] = true;
                 $_SESSION["admin"] = $data["id_admin"];
-                echo "<script>document.location.href = '../index.php';</script>";
+                echo "
+                <script>
+                    Swal.fire('Login Berhasil', 'Selamat datang, Admin!', 'success').then(function() {
+                        document.location.href = '../index.php';
+                    });
+                </script>
+                ";
             } else {
                 echo "<script>Swal.fire('Gagal Login','Password Salah','warning');</script>";
             }
