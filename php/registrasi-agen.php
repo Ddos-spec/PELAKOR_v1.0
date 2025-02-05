@@ -1,14 +1,9 @@
 <?php
-
-// mulai session
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
-
-// kalau sudah login
 cekLogin();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,18 +13,13 @@ cekLogin();
     <title>Registrasi Agen</title>
 </head>
 <body>
-
-    <!-- header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
-
     <div class="uk-container">
         <div class="uk-grid-match uk-child-width-1-2@m" uk-grid>
-            <!-- term -->
             <div>
                 <div class="uk-card uk-card-default uk-card-body">
                     <div class="uk-text-center">
-                        <img src="img/banner.png" alt="laundryku" width="100%" /><br><br>
+                        <img src="img/banner.png" alt="laundryku" width="100%"/><br><br>
                         <h3 class="uk-card-title">Syarat dan Ketentuan :</h3>
                     </div>
                     <div>
@@ -50,9 +40,6 @@ cekLogin();
                     </div>
                 </div>
             </div>
-            <!-- end term -->
-
-            <!-- regis -->
             <div>
                 <h3 class="uk-heading-line uk-text-center"><span>DAFTAR SEBAGAI AGEN</span></h3>
                 <form action="" method="post">
@@ -70,7 +57,7 @@ cekLogin();
                     </div>
                     <div class="uk-margin">
                         <label for="email">E-mail</label>
-                        <input class="uk-input" type="text" size=50 id="email" name="email" placeholder="Email">
+                        <input class="uk-input" type="email" size=50 id="email" name="email" placeholder="Email">
                     </div>
                     <div class="uk-margin">
                         <label for="plat">Plat Driver</label>
@@ -97,21 +84,14 @@ cekLogin();
                     </div>
                 </form>
             </div>
-            <!-- end regis -->
         </div>
     </div>
-
-    <!-- footer -->
     <?php include 'footer.php'; ?>
-    <!-- end footer -->
-
     <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>
-
 <?php
-
 if (isset($_POST["daftar"])) {
     $namaLaundry = htmlspecialchars($_POST["namaLaundry"]);
     $namaPemilik = htmlspecialchars($_POST["namaPemilik"]);
@@ -122,46 +102,49 @@ if (isset($_POST["daftar"])) {
     $alamat = htmlspecialchars($_POST["alamat"]);
     $password = htmlspecialchars($_POST["password"]);
     $password2 = htmlspecialchars($_POST["password2"]);
-
-    // Validasi input
     validasiNama($namaLaundry);
     validasiNama($namaPemilik);
     validasiTelp($telp);
     validasiEmail($email);
     validasiNama($kota);
     validasiNama($platDriver);
-
-    // Cek password
     if ($password !== $password2) {
-        echo "
-            <script>
-                Swal.fire('Pendaftaran Gagal','Password tidak sama','error');
-            </script>
-        ";
+        echo "<script>Swal.fire('Pendaftaran Gagal','Password tidak sama','error');</script>";
         exit;
     }
-
-    // Hash password
     $password = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert data
     $stmt = $connect->prepare("INSERT INTO agen (nama_laundry, nama_pemilik, telp, email, plat_driver, kota, alamat, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssss", $namaLaundry, $namaPemilik, $telp, $email, $platDriver, $kota, $alamat, $password);
     if ($stmt->execute()) {
-        echo "
-            <script>
-                Swal.fire('Pendaftaran Berhasil','Akun Agen Berhasil Dibuat','success').then(function(){
-                    window.location = 'index.php';
-                });
-            </script>
-        ";
+        echo "<script>Swal.fire('Pendaftaran Berhasil','Akun Agen Berhasil Dibuat','success').then(function(){ window.location =
+        <?php
+if (isset($_POST["daftar"])) {
+    $namaLaundry = htmlspecialchars($_POST["namaLaundry"]);
+    $namaPemilik = htmlspecialchars($_POST["namaPemilik"]);
+    $telp = htmlspecialchars($_POST["telp"]);
+    $email = htmlspecialchars($_POST["email"]);
+    $platDriver = htmlspecialchars($_POST["platDriver"]);
+    $kota = htmlspecialchars($_POST["kota"]);
+    $alamat = htmlspecialchars($_POST["alamat"]);
+    $password = htmlspecialchars($_POST["password"]);
+    $password2 = htmlspecialchars($_POST["password2"]);
+    validasiNama($namaLaundry);
+    validasiNama($namaPemilik);
+    validasiTelp($telp);
+    validasiEmail($email);
+    validasiNama($kota);
+    validasiNama($platDriver);
+    if ($password !== $password2) {
+        echo "<script>Swal.fire('Pendaftaran Gagal','Password tidak sama','error');</script>";
+        exit;
+    }
+    $password = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $connect->prepare("INSERT INTO agen (nama_laundry, nama_pemilik, telp, email, plat_driver, kota, alamat, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $namaLaundry, $namaPemilik, $telp, $email, $platDriver, $kota, $alamat, $password);
+    if ($stmt->execute()) {
+        echo "<script>Swal.fire('Pendaftaran Berhasil','Akun Agen Berhasil Dibuat','success').then(function(){ window.location = 'index.php'; });</script>";
     } else {
-        echo "
-            <script>
-                Swal.fire('Pendaftaran Gagal','Terjadi kesalahan, coba lagi nanti','error');
-            </script>
-        ";
+        echo "<script>Swal.fire('Pendaftaran Gagal','Terjadi kesalahan, coba lagi nanti','error');</script>";
     }
 }
-
 ?>

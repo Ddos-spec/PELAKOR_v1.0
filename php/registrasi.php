@@ -1,14 +1,9 @@
 <?php
-
-// mulai session
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
-
 cekLogin();
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,15 +12,16 @@ cekLogin();
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css" />
     <title>Registrasi</title>
 </head>
-
 <body>
-    <!-- header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
-
     <h3 class="uk-heading-line uk-text-center"><span>Halaman Registrasi</span></h3>
     <br>
-
-    <!-- body -->
     <div class="uk-container uk-text-center">
-        <a id="download-button" class="uk-button uk-button-primary uk-button-large" href="registr
+        <a id="download-button" class="uk-button uk-button-primary uk-button-large" href="registrasi-pelanggan.php">Registrasi Pelanggan</a>
+        <a id="download-button" class="uk-button uk-button-danger uk-button-large" href="registrasi-agen.php">Registrasi Agen</a>
+    </div>
+    <?php include 'footer.php'; ?>
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit-icons.min.js"></script>
+</body>
+</html>
