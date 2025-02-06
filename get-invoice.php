@@ -2,7 +2,7 @@
 require __DIR__ . '/vendor/autoload.php';
 include 'connect-db.php';
 
-use Spipu\Html2Pdf\Html2Pdf;
+use Dompdf\Dompdf;
 
 $kodeTransaksi = $_GET['kode_transaksi'];
 $query = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = '$kodeTransaksi'");
@@ -57,6 +57,8 @@ ob_start();
 <?php
 $content = ob_get_clean();
 
-$html2pdf = new Html2Pdf();
-$html2pdf->writeHTML($content);
-$html2pdf->output('invoice.pdf');
+$dompdf = new Dompdf();
+$dompdf->loadHtml($content);
+$dompdf->setPaper('A4', 'portrait');
+$dompdf->render();
+$dompdf->stream('invoice.pdf');
