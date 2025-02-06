@@ -16,6 +16,10 @@ $idCucian = $transaksi['id_cucian'];
 $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$idCucian'");
 $cucian = mysqli_fetch_assoc($cucian);
 
+$idAgen = $transaksi['id_agen'];
+$agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
+$agen = mysqli_fetch_assoc($agen);
+
 ob_start();
 ?>
 
@@ -122,6 +126,10 @@ ob_start();
             <th>Tanggal Selesai</th>
             <td><?= $transaksi['tgl_selesai'] ?></td>
         </tr>
+        <tr>
+            <th>Nama Agen</th>
+            <td><?= $agen['nama_laundry'] ?></td>
+        </tr>
     </table>
     <div class="footer">
         <p>Terima kasih atas kepercayaan Anda menggunakan layanan kami.</p>
@@ -137,3 +145,4 @@ $dompdf->loadHtml($content);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 $dompdf->stream('invoice.pdf');
+?>

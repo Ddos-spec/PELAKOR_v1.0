@@ -70,6 +70,22 @@ if (isset($_POST["submitSorting"])){
     
     <title>Laundryku</title>
     <?php include 'headtags.html' ?>
+    <style>
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        border-radius: 15px; /* Membulatkan sudut card */
+        overflow: hidden; /* Agar gambar tidak keluar dari batas card */
+    }
+    .card:hover {
+        transform: scale(1.05); /* Efek membesar saat hover */
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .card-img-top {
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+</style>
+
 </head>
 <body>
 
@@ -199,47 +215,37 @@ if (isset($_POST["submitSorting"])){
         <!-- list agen -->
     
         <div class="container">
-            <div class="section">
-
-                <!--   Icon Section   -->
-                <div class="row card">
-                    <?php foreach ( $agen as $dataAgen) : ?>
-                        <div class="col s12 m4">
-                            <div class="icon-block center">
-                                <h2 class="center light-blue-text"><a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><img src="img/agen/<?= $dataAgen['foto'] ?>" class="circle resposive-img" width=60% /></a></h2>
-                                <h5 class="center"><a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a></h5>
-                                <?php
-                                    $temp = $dataAgen["id_agen"];
-                                    $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                                    $totalStar = 0;
-                                    $i = 0;
-                                    while ($star = mysqli_fetch_assoc($queryStar)){
-
-                                        // kalau belum kasi rating gk dihitung
-                                        if ($star["rating"] != 0){
-                                            $totalStar += $star["rating"];
-                                            $i++;
-                                            $fixStar = ceil($totalStar / $i);
-                                        }
+    <div class="row">
+        <?php foreach ($agen as $dataAgen) : ?>
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow-sm">
+                    <img src="img/agen/<?= $dataAgen['foto'] ?>" class="card-img-top" alt="<?= $dataAgen['nama_laundry'] ?>" style="height: 200px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"> <?= $dataAgen['nama_laundry'] ?> </h5>
+                        <p class="card-text">Alamat: <?= $dataAgen['alamat'] . ', ' . $dataAgen['kota'] ?></p>
+                        <p class="card-text">Telp: <?= $dataAgen['telp'] ?></p>
+                        <div>
+                            <?php
+                                $temp = $dataAgen['id_agen'];
+                                $queryStar = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = '$temp'");
+                                $totalStar = 0;
+                                $i = 0;
+                                while ($star = mysqli_fetch_assoc($queryStar)) {
+                                    if ($star['rating'] != 0) {
+                                        $totalStar += $star['rating'];
+                                        $i++;
                                     }
-                                        
-                                    if ( $totalStar == 0 ) {
-                                ?>
-                                    <center><fieldset class="bintang"><span class="starImg star-0"></span></fieldset></center>
-                                <?php }else { ?>
-                                    <center><fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset></center>
-                                <?php } ?>
-
-                                <p class="light">
-                                    Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
-                                    <br/>Telp : <?= $dataAgen["telp"] ?></p>
-                                </p>
-                            </div>
+                                }
+                                $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
+                            ?>
+                            <span class="starImg star-<?= $fixStar ?>"></span>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
                 </div>
-
             </div>
+        <?php endforeach; ?>
+    </div>
+</div>
             <br><br>
         </div>
     </div>
