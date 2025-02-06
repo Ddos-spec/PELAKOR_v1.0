@@ -23,7 +23,7 @@
             <h5 class="white-text">Developer</h5>
             <ul>
                 <li><a class="white-text" href="team.php">Fadjar Aryo Seto </a></li>
-                <li><a class="white-text" href="team.php">Eka Nadya</a></li>
+                <li><a class="white-text" href="team.php">Adam GPT</a></li>
                 
             </ul>
             </div>

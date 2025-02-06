@@ -158,8 +158,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
                     <td>
-                        <button class="btn blue darken-2 lihat-invoice" data-id="<?= $transaksi['kode_transaksi'] ?>">Lihat Invoice</button>
-                        <button class="btn green darken-2 cetak-invoice" data-id="<?= $transaksi['kode_transaksi'] ?>">Cetak</button>
+                        <a class="btn blue darken-2" href="get-invoice.php?kode_transaksi=<?= $transaksi['kode_transaksi'] ?>">Lihat Invoice</a>
+                        <a class="btn green darken-2" href="get-invoice.php?kode_transaksi=<?= $transaksi['kode_transaksi'] ?>">Cetak</a>
                     </td>
                 </tr>
                 <?php endwhile; ?>
@@ -246,46 +246,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     </div>
     <?php include "footer.php"; ?>
 
-    <!-- Modal Structure -->
-    <div id="invoiceModal" class="modal">
-        <div class="modal-content">
-            <h4>Invoice</h4>
-            <div id="invoiceContent">
-                <!-- Invoice content will be loaded here -->
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn blue darken-2" id="cetakInvoice">Cetak</button>
-            <button class="modal-close btn red darken-2">Tutup</button>
-        </div>
-    </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-    <script>
-    $(document).ready(function(){
-        $('.modal').modal();
-
-        $('.lihat-invoice').on('click', function(){
-            var kodeTransaksi = $(this).data('id');
-            $.ajax({
-                url: 'get-invoice.php',
-                type: 'GET',
-                data: { kode_transaksi: kodeTransaksi },
-                success: function(data){
-                    $('#invoiceContent').html(data);
-                    $('#invoiceModal').modal('open');
-                }
-            });
-        });
-
-        $('#cetakInvoice').on('click', function(){
-            var element = document.getElementById('invoiceContent');
-            html2pdf(element);
-        });
-    });
-    </script>
 </body>
 </html>
 
@@ -324,3 +287,44 @@ if ( isset($_POST["kirimKomentar"])){
 }
 
 ?>
+
+<!-- Modal Structure -->
+<div id="invoiceModal" class="modal">
+    <div class="modal-content">
+        <h4>Invoice</h4>
+        <div id="invoiceContent">
+            <!-- Invoice content will be loaded here -->
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn blue darken-2" id="cetakInvoice">Cetak</button>
+        <button class="modal-close btn red darken-2">Tutup</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.modal').modal();
+
+    $('.lihat-invoice').on('click', function(){
+        var kodeTransaksi = $(this).data('id');
+        $.ajax({
+            url: 'get-invoice.php',
+            type: 'GET',
+            data: { kode_transaksi: kodeTransaksi },
+            success: function(data){
+                $('#invoiceContent').html(data);
+                $('#invoiceModal').modal('open');
+            }
+        });
+    });
+
+    $('#cetakInvoice').on('click', function(){
+        var element = document.getElementById('invoiceContent');
+        html2pdf(element);
+    });
+});
+</script>
