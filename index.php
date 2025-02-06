@@ -215,37 +215,45 @@ if (isset($_POST["submitSorting"])){
         <!-- list agen -->
     
         <div class="container">
-    <div class="row">
-        <?php foreach ($agen as $dataAgen) : ?>
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card shadow-sm">
-                    <img src="img/agen/<?= $dataAgen['foto'] ?>" class="card-img-top" alt="<?= $dataAgen['nama_laundry'] ?>" style="height: 200px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"> <?= $dataAgen['nama_laundry'] ?> </h5>
-                        <p class="card-text">Alamat: <?= $dataAgen['alamat'] . ', ' . $dataAgen['kota'] ?></p>
-                        <p class="card-text">Telp: <?= $dataAgen['telp'] ?></p>
-                        <div>
-                            <?php
-                                $temp = $dataAgen['id_agen'];
-                                $queryStar = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                                $totalStar = 0;
-                                $i = 0;
-                                while ($star = mysqli_fetch_assoc($queryStar)) {
-                                    if ($star['rating'] != 0) {
-                                        $totalStar += $star['rating'];
-                                        $i++;
-                                    }
-                                }
-                                $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
-                            ?>
-                            <span class="starImg star-<?= $fixStar ?>"></span>
+            <div class="section">
+                <div class="row">
+                    <?php foreach ( $agen as $dataAgen) : ?>
+                        <div class="col s12 m4">
+                            <div class="card">
+                                <div class="card-image">
+                                    <img src="img/agen/<?= $dataAgen['foto'] ?>" alt="Foto Agen">
+                                    <span class="card-title"><?= $dataAgen["nama_laundry"] ?></span>
+                                </div>
+                                <div class="card-content">
+                                    <?php
+                                        $temp = $dataAgen["id_agen"];
+                                        $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
+                                        $totalStar = 0;
+                                        $i = 0;
+                                        while ($star = mysqli_fetch_assoc($queryStar)){
+                                            if ($star["rating"] != 0){
+                                                $totalStar += $star["rating"];
+                                                $i++;
+                                                $fixStar = ceil($totalStar / $i);
+                                            }
+                                        }
+                                            
+                                        if ( $totalStar == 0 ) {
+                                    ?>
+                                        <div class="center"><fieldset class="bintang"><span class="starImg star-0"></span></fieldset></div>
+                                    <?php }else { ?>
+                                        <div class="center"><fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset></div>
+                                    <?php } ?>
+                                    <p>Alamat: <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"] ?><br>Telp: <?= $dataAgen["telp"] ?></p>
+                                </div>
+                                <div class="card-action">
+                                    <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>">Lihat Detail</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        <?php endforeach; ?>
-    </div>
-</div>
             <br><br>
         </div>
     </div>
@@ -254,7 +262,9 @@ if (isset($_POST["submitSorting"])){
     <?php include "footer.php" ?>
     <!-- end footer -->
 
-</body>
+    <!-- Tambahkan link Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="js/script.js"></script>
     <script src="js/scriptAjax.js"></script>
+</body>
 </html>
