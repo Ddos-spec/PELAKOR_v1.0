@@ -1,10 +1,10 @@
 # LaundryKu
-Project ini digunakan sebagai Final Project ukom untuk membuat aplikasi laundry dengan penyempurnaan fitur fitur dan keamanan yang cukup mumpuni 
+Proyek ini merupakan Final Project Uji Kompetensi (UKOM) Al-Amanah yang diselenggarakan sebagai salah satu syarat kelulusan. Repositori ini berisi pengenalan singkat mengenai proyek yang dikembangkan, serta dokumentasi terkait untuk keperluan README.md di GitHub.
 
 # CARA INSTALL
 
 ## 1. Download atau Clone Repository ini
-## 2. Buat database bernama "laundryku" (phpmyadmin/MySQL)
+## 2. Buat database bernama "laundryku" (DBMS: MySQL/phpmyadmin)
 ## 3. Import "laundryku.sql" ke dalam database "laundryku"
 
 # LOGIN ADMIN
