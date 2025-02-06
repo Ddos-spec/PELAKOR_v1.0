@@ -122,6 +122,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Tanggal Selesai</td>
                     <td style="font-weight:bold">Rating</td>
                     <td style="font-weight:bold">Komentar</td>
+                    <td style="font-weight:bold">Aksi</td>
                 </tr>
                 <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -156,6 +157,10 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
+                    <td>
+                        <button class="btn blue darken-2 lihat-invoice" data-id="<?= $transaksi['kode_transaksi'] ?>">Lihat Invoice</button>
+                        <button class="btn green darken-2 cetak-invoice" data-id="<?= $transaksi['kode_transaksi'] ?>">Cetak</button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -240,6 +245,47 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <?php endif; ?>
     </div>
     <?php include "footer.php"; ?>
+
+    <!-- Modal Structure -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <h4>Invoice</h4>
+            <div id="invoiceContent">
+                <!-- Invoice content will be loaded here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn blue darken-2" id="cetakInvoice">Cetak</button>
+            <button class="modal-close btn red darken-2">Tutup</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        $('.modal').modal();
+
+        $('.lihat-invoice').on('click', function(){
+            var kodeTransaksi = $(this).data('id');
+            $.ajax({
+                url: 'get-invoice.php',
+                type: 'GET',
+                data: { kode_transaksi: kodeTransaksi },
+                success: function(data){
+                    $('#invoiceContent').html(data);
+                    $('#invoiceModal').modal('open');
+                }
+            });
+        });
+
+        $('#cetakInvoice').on('click', function(){
+            var element = document.getElementById('invoiceContent');
+            html2pdf(element);
+        });
+    });
+    </script>
 </body>
 </html>
 
