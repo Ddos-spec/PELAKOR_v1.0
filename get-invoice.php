@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 include 'connect-db.php';
 
 use Spipu\Html2Pdf\Html2Pdf;
