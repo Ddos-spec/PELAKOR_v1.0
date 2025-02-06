@@ -1,34 +1,23 @@
-//menangkap id
 var keyword = document.getElementById('keyword');
-var cariData = document.getElementById('cariData');
 var container = document.getElementById('container');
+var debounceTimer;
 
-//trigger ketika cariData di klik
-// cariData.addEventListener('mouseover', function () {
-//     alert('Tombol Ditekan !');
-// });
+keyword.addEventListener('keyup', function (event) {
+    // Abaikan tombol kontrol (misalnya, Ctrl, Shift, Alt, dll.)
+    if (event.key.length > 1) return; 
 
-//trigger ketika 
-keyword.addEventListener('keyup', function () {
-    //alert('Tombol Ditekan !');
-
-    // buat object ajax
-    var xhr = new XMLHttpRequest();
-
-    // cek kesiapan ajax
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            //menampilkan di console
-            // console.log(xhr.responseText);
-
-            // manipulasi dokumen html id='container'
-            container.innerHTML = xhr.responseText;
+    // Hapus timer sebelumnya
+    clearTimeout(debounceTimer);
+    
+    // Set timer baru
+    debounceTimer = setTimeout(function () {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                container.innerHTML = xhr.responseText;
+            }
         }
-    }
-
-    // eksekusi ajax
-    // metode = GET, sumber = ajax/coba.txt, true = ashyncronous
-    xhr.open('GET', 'ajax/agen.php?keyword=' + keyword.value, true);
-    xhr.send();
-
+        xhr.open('GET', 'ajax/agen.php?keyword=' + encodeURIComponent(keyword.value), true);
+        xhr.send();
+    }, 300); // tunggu 300ms setelah berhenti mengetik
 });

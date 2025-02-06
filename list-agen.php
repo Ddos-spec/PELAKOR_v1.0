@@ -143,7 +143,11 @@ if ( isset($_POST["cari"])) {
                     <td><?= $dataAgen["plat_driver"] ?></td>
                     <td><?= $dataAgen["kota"] ?></td>
                     <td><?= $dataAgen["alamat"] ?></td>
-                    <td><a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a></td>
+                    
+                                        <td>
+                        <a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
+                        <a class="btn blue darken-2" href="reset-password-admin.php?type=agen&id=<?= $dataAgen['id_agen'] ?>">Reset</a>
+                    </td>
                 </tr>
 
                 <?php endforeach ?>

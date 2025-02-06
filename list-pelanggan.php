@@ -131,7 +131,11 @@ if ( isset($_POST["cari"])) {
                     <td><?= $dataPelanggan["email"] ?></td>
                     <td><?= $dataPelanggan["kota"] ?></td>
                     <td><?= $dataPelanggan["alamat"] ?></td>
-                    <td><a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a></td>
+                    
+                                        <td>
+                        <a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
+                        <a class="btn blue darken-2" href="reset-password-admin.php?type=pelanggan&id=<?= $dataPelanggan['id_pelanggan'] ?>">Reset</a>
+                    </td>
                 </tr>
 
                 <?php endforeach ?>
