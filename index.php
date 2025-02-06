@@ -214,6 +214,7 @@ if (isset($_POST["submitSorting"])){
 
         <!-- list agen -->
     
+        <!-- list agen -->
         <div class="container">
             <div class="section">
                 <div class="row">
@@ -222,7 +223,6 @@ if (isset($_POST["submitSorting"])){
                             <div class="card">
                                 <div class="card-image">
                                     <img src="img/agen/<?= $dataAgen['foto'] ?>" alt="Foto Agen">
-                                    <span class="card-title"><?= $dataAgen["nama_laundry"] ?></span>
                                 </div>
                                 <div class="card-content">
                                     <?php
@@ -247,7 +247,7 @@ if (isset($_POST["submitSorting"])){
                                     <p>Alamat: <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"] ?><br>Telp: <?= $dataAgen["telp"] ?></p>
                                 </div>
                                 <div class="card-action">
-                                    <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>">Lihat Detail</a>
+                                    <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a>
                                 </div>
                             </div>
                         </div>
