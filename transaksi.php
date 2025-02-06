@@ -49,6 +49,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <br>
         <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM transaksi"); ?>
         <div class="col s10 offset-s1">
+            <div class="right-align">
+                <a class="btn green darken-3" href="laporan-keuangan.php">Laporan</a>
+            </div>
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold;">Kode Transaksi</td>

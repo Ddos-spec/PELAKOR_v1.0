@@ -1,19 +1,14 @@
 <?php
-
-//session 
 session_start();
 include 'connect-db.php';
 
-// mengambil id agen dg method get
+// Mengambil id agen dari URL
 $idAgen = $_GET["id"];
 
-// ambil data agen
+// Ambil data agen
 $query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
 $agen = mysqli_fetch_assoc($query);
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,157 +16,174 @@ $agen = mysqli_fetch_assoc($query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
     <title><?= $agen["nama_laundry"] ?></title>
+    <style>
+        /* Ukuran foto profil dikurangi */
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        /* Container foto dan detail agen diatur agar tidak saling menggeser */
+        .profile-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .profile-details {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .price-card {
+            text-align: center;
+        }
+        .price-card button {
+            margin-bottom: 10px;
+        }
+        .price-card div {
+            margin-top: 5px;
+        }
+        /* Styling untuk ulasan */
+        .review-container {
+            margin-top: 30px;
+        }
+        /* Styling untuk bintang rating */
+        .rating-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
-
 <body>
-
-    <!-- header -->
+    <!-- Header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
     <br><br>
-    <!-- data agen -->
+    <!-- Data Agen -->
     <div class="row">
-        <div class="col s2 offset-s4">
-            <img src="img/agen/<?= $agen['foto'] ?>" class="circle responsive-img" width="70%" />
+        <div class="col s12 m4 offset-m4 profile-container">
+            <img src="img/agen/<?= $agen['foto'] ?>" alt="Foto Agen" class="profile-photo">
+            <br>
             <a id="download-button" class="btn red darken-3" href="pesan-laundry.php?id=<?= $idAgen ?>">PESAN LAUNDRY</a>
         </div>
-        <div class="col s6">
+    </div>
+    <div class="row profile-details">
+        <div class="col s12 center">
             <h3><?= $agen["nama_laundry"] ?></h3>
-            <ul>
-                <li>
-                    <?php
-                        $temp = $agen["id_agen"];
-                        $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                        $totalStar = 0;
-                        $i = 0;
-                        while ($star = mysqli_fetch_assoc($queryStar)){
-
-                            // kalau belum kasi rating gak dihitung
-                            if ($star["rating"] != 0){
-                                $totalStar += $star["rating"];
-                                $i++;
-                                $fixStar = ceil($totalStar / $i);
-                            }
+            <div class="rating-container">
+                <?php
+                    // Menghitung rating agen
+                    $temp = $agen["id_agen"];
+                    $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
+                    $totalStar = 0;
+                    $i = 0;
+                    while ($star = mysqli_fetch_assoc($queryStar)) {
+                        if ($star["rating"] != 0) {
+                            $totalStar += $star["rating"];
+                            $i++;
                         }
-                            
-                        if ( $totalStar == 0 ) {
-                    ?>
-                        <fieldset class="bintang"><span class="starImg star-0"></span></fieldset>
-                    <?php }else { ?>
-                        <fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset>
-                    <?php } ?>
-                </li>
-                <li>Alamat : <?= $agen["alamat"] . ", " . $agen["kota"] ?></li>
-                <li>No. HP : <?= $agen["telp"] ?></li>
+                    }
+                    $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
+                ?>
+                <fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset>
+            </div>
+            <ul>
+                <li>Alamat: <?= $agen["alamat"] . ", " . $agen["kota"] ?></li>
+                <li>No. HP: <?= $agen["telp"] ?></li>
             </ul>
         </div>
     </div>
-
-        <!-- data harga -->
+    
+    <!-- Data Harga (Layanan) -->
     <div class="row">
-        <div class="col s3 offset-s2">
-            <div class="card-panel grey lighten-5 z-depth-1">
+        <div class="col s12 m4 offset-m2">
+            <div class="card-panel grey lighten-5 z-depth-1 price-card">
                 <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=cuci" style="margin:0% 15%"><button class="btn blue darken-3">CUCI</button></a>
-                    <div>
+                    <div class="col s12">
+                        <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=cuci">
+                            <button class="btn blue darken-3">CUCI</button>
+                        </a>
                         <?php
                             $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'cuci'");
                             $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
+                            echo "<div>Rp. " . $harga['harga'] . " /Kg</div>";
                         ?>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col s3">
-            <div class="card-panel grey lighten-5 z-depth-1">
+        <div class="col s12 m4">
+            <div class="card-panel grey lighten-5 z-depth-1 price-card">
                 <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=setrika" style="margin:0% 15%"><button class="btn blue darken-3">SETRIKA</button></a>
-                    <div>
+                    <div class="col s12">
+                        <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=setrika">
+                            <button class="btn blue darken-3">SETRIKA</button>
+                        </a>
                         <?php
                             $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'setrika'");
                             $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
+                            echo "<div>Rp. " . $harga['harga'] . " /Kg</div>";
                         ?>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col s3">
-            <div class="card-panel grey lighten-5 z-depth-1">
+    </div>
+    <div class="row">
+        <div class="col s12 m4 offset-m4">
+            <div class="card-panel grey lighten-5 z-depth-1 price-card">
                 <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=komplit" style="margin:0% 15%"><button class="btn blue darken-3">KOMPLIT</button></a>
-                    <div>
+                    <div class="col s12">
+                        <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=komplit">
+                            <button class="btn blue darken-3">KOMPLIT</button>
+                        </a>
                         <?php
                             $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'komplit'");
                             $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
+                            echo "<div>Rp. " . $harga['harga'] . " /Kg</div>";
                         ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- end agen -->
-
-
+    
     <hr><br>
-
-    <!-- komentar -->
+    
+    <!-- Ulasan Pengguna -->
     <h3 class="header light center">Ulasan Pengguna</h3>
     <br>
-
-    <div class="row">
+    <div class="row review-container">
         <?php
-
-        $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen");
-        while ( $transaksi = mysqli_fetch_assoc($temp) ) :
-        
-        $idPelanggan = $transaksi["id_pelanggan"];
-        $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
-        $pelanggan = mysqli_fetch_assoc($temp2);
-
+            $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen");
+            while ($transaksi = mysqli_fetch_assoc($temp)) :
+                $idPelanggan = $transaksi["id_pelanggan"];
+                $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
+                $pelanggan = mysqli_fetch_assoc($temp2);
         ?>
-
-
-        <div class="container">
-        <div class="col s3 offset-s1">
-        <table border=0>
-            <tr>
-                <td width=100px rowspan=3><img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" width=100px alt="foto"></td>
-                <td><?= "<h6 class='light'>" . $pelanggan["nama"] . "</h6>";?></td>
-            </tr>
-            <tr>
-                <td><fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset></td>
-            </tr>
-            <tr>
-                <td><?= $transaksi["komentar"]; ?></td>
-            </tr>
-        </table>
+        <div class="col s12 m3 offset-m1 center">
+            <table border="0">
+                <tr>
+                    <td width="150" rowspan="3">
+                        <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" alt="Foto Pelanggan" class="circle responsive-img profile-photo">
+                    </td>
+                    <td><?= "<h6 class='light'>" . $pelanggan["nama"] . "</h6>"; ?></td>
+                </tr>
+                <tr>
+                    <td>
+                        <fieldset class="bintang">
+                            <span class="starImg star-<?= $transaksi['rating'] ?>"></span>
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td><?= $transaksi["komentar"]; ?></td>
+                </tr>
+            </table>
         </div>
-        </div>
-
-
-
-
-
-
-        <!-- <div class="col s5 offset-s1">
-            <div class="col s2">
-                <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" width=100% alt="foto">
-            </div>
-
-            <?= "<h6 class='light'>" . $pelanggan["nama"] . "</h6>";?>
-
-            <div class="col s4">
-                <fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset>
-                <?= $transaksi["komentar"]; ?>
-            </div>
-        </div> -->
         <?php endwhile; ?>
     </div>
-
+    
     <?php include "footer.php"; ?>
-
 </body>
 </html>
