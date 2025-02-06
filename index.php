@@ -75,6 +75,7 @@ if (isset($_POST["submitSorting"])){
         transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         border-radius: 15px; /* Membulatkan sudut card */
         overflow: hidden; /* Agar gambar tidak keluar dari batas card */
+        height: 400px; /* Pastikan semua card memiliki tinggi yang sama */
     }
     .card:hover {
         transform: scale(1.05); /* Efek membesar saat hover */
@@ -83,6 +84,23 @@ if (isset($_POST["submitSorting"])){
     .card-img-top {
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
+    }
+    .card .card-image img {
+        height: 200px; /* Atur tinggi gambar */
+        object-fit: cover;
+    }
+    .card .card-content {
+        height: 150px; /* Atur tinggi konten card */
+    }
+    .card .card-action {
+        height: 50px; /* Atur tinggi bagian aksi (action) card */
+    }
+    
+    
+    .card .card-action a {
+        color: #ff9800; /* Ubah warna menjadi oranye */
+        font-size: 1.2em; /* Perbesar ukuran teks */
+        font-weight: bold; /* Pertebal teks */
     }
 </style>
 
