@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 03 Feb 2025 pada 18.38
+-- Waktu pembuatan: 07 Feb 2025 pada 20.20
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -68,8 +68,8 @@ INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, 
 (18, 'Pelakor Fresh', 'levi', '083457682536', 'fresh@gmail.com', 'hbvabdabh', 'gyjdchgd', '1231', '679f40108cb18.jpg', '$2y$10$xbte90xvoI516x7UhdAKnO9KDdJos6we5.XrGB3aIB46J990xz11S'),
 (19, 'Pelakor bubble', 'king', '082346273412', 'bubble@gmail.com', 'dgvssdvd', 'gvdsbvsvs', '2313', '679f4029e0c7a.jpg', '$2y$10$lCuRaDBW6KxvbkKnBtkc.up6Jku8kyTxQBFC78Ca3qWWTzdwBKCwW'),
 (20, 'Pelakor Clean', 'coki', '096216372151', 'clean@gmail.com', 'scaca', 'fcsacfadcsa', '123213', '679f404468194.jpg', '$2y$10$mCk62rD4.rU9Vyamb5CeFOJ5CgEALNza4QU02aNRfPob3cRniroBS'),
-(21, 'cemerlang ', 'cemer', '1243141431', 'cemerlang@gmail.com', 'fafcafqwaf', 'cafafadfwa', '1231', '679f9d4f98daf.jpg', '$2y$10$paRwh.AZjljwp6QD7b3CJeX78Gbxk13ZcAuC9eaABzXeOPt1SlQPy'),
-(22, 'bersinar', 'bersinar', '0865276316', 'bersinar@gmail.com', 'afadwwad', 'dawdwad', 'adafvaf', '679f9d9c64589.jpg', '$2y$10$gUS7.F8jX24EmUp/SJUg2OYQzT6I8m8cUwODrFhTZZJl20ZXcG.f2');
+(21, 'Pelakor cemerlang ', 'cemer', '1243141431', 'cemerlang@gmail.com', 'fafcafqwaf', 'cafafadfwa', '1231', '679f9d4f98daf.jpg', '$2y$10$Z1/.1kGb8xmqSTQ92kG7AuCMoY8hnC0xdx4y85lXTaPk6f8Tp3NrK'),
+(22, 'Pelakor bersinar', 'bersinar', '0865276316', 'bersinar@gmail.com', 'afadwwad', 'dawdwad', 'adafvaf', '679f9d9c64589.jpg', '$2y$10$pzATqcMWJaxHFUhzsS1tAeiQfETALGbdiA8bNXApN5wh.g/jI5TM6');
 
 -- --------------------------------------------------------
 
@@ -107,7 +107,9 @@ INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_
 (22, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1, NULL, 'fasfcasca, sfcdad', '', 'Penjemputan'),
 (23, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1000, 100, 'sefecef, afcfvrg', '', 'Selesai'),
 (24, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1, 50, 'sefecef, afcfvrg', '', 'Selesai'),
-(25, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1, 50, 'sefecef, afcfvrg', '', 'Selesai');
+(25, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1, 50, 'sefecef, afcfvrg', '', 'Selesai'),
+(26, 17, 17, '2025-02-06', '0000-00-00', 'komplit', 1231, 100, 'fasfcasca, sfcdad', '', 'Selesai'),
+(27, 18, 17, '2025-02-06', '0000-00-00', 'komplit', 1231, NULL, 'fasfcasca, sfcdad', '', 'Penjemputan');
 
 -- --------------------------------------------------------
 
@@ -175,11 +177,11 @@ CREATE TABLE `pelanggan` (
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `nama`, `email`, `telp`, `kota`, `alamat`, `foto`, `password`) VALUES
 (16, 'nagumo', 'nagumo@gmail.com', '0852416738425', 'sfff', 'dascef', '679f92aaf10e7.jpg', '$2y$10$.mFleJveky0htDVyUP7w9epQMPyJvdJd1.o6Klm1rLow8yI06xZHO'),
-(17, 'sakamoto', 'sakamoto@gmail.com', '0837152732167', 'sfcdad', 'fasfcasca', '679f9340e709b.jpg', '$2y$10$8SrLOxH8xdez1GrIFS5bduqs49oLuEkarlrMvyN14A5XGY52ui8J2'),
+(17, 'sakamoto', 'sakamoto@gmail.com', '0837152732167', 'sfcdad', 'fasfcasca', '679f9340e709b.jpg', '$2y$10$Am.V5AeggTtKVoeYKIsJDeZgdJdznDJkzDOHPxt/wU6yf26hf5IyK'),
 (18, 'uzuki', 'uzuki@gmail.com', '0812321436', 'adawdwa', 'dwadwad', '679f937d333e1.jpg', '$2y$10$o9d0R4gw3/kbasIlLEp9U.PYGyzurCiCR2VyAOSOFdb3g2bJz8v1i'),
 (19, 'sisiba', 'sisiba@gmail.com', '082143162365', 'afcvas', 'fsaasafqwa', '679f93ac689ec.jpg', '$2y$10$sQ.X7qF/0eC.yJi5pt2U2.HT5ran/KNP5lRy2oHujc5DMXA0ForZW'),
 (20, 'osaragi', 'osaragi@gmail.com', '081231634', 'afcfvrg', 'sefecef', '679f93ff10102.jpg', '$2y$10$5U/fcEGOWRM3HNHDYmKnEu0r9gbu7ltVXzZpbxgW0.wPr5VzvyO4.'),
-(21, 'rion', 'rion@gmail.com', '082143124', 'afcvfsfgew', 'fefescff', '679f97f949134.jpg', '$2y$10$l7B1ezX/ip6VYOwBKuFLv.oHa4cHrRSgK/wlWG6xgXk3QZzt.40di');
+(21, 'rion', 'rion@gmail.com', '082143124', 'afcvfsfgew', 'fefescff', '679f97f949134.jpg', '$2y$10$9aCv5ItZuLxzA95qb4QjMehw2Uo6YG.c.5o2jIe.UORc1hgBTGng6');
 
 -- --------------------------------------------------------
 
@@ -204,7 +206,6 @@ CREATE TABLE `transaksi` (
 --
 
 INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `rating`, `komentar`) VALUES
-(25, 14, 15, 15, '2025-02-02', '2025-02-02', 70000, 10, 'wah sangat bagus'),
 (26, 15, 17, 17, '2025-02-02', '2025-02-02', 0, 8, 'mantap\r\n'),
 (27, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'mantap'),
 (28, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 2, 'gud'),
@@ -221,11 +222,12 @@ INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan
 (39, 17, 18, 17, '2025-02-02', '2025-02-02', 0, 8, 'ad'),
 (40, 18, 18, 17, '2025-02-02', '2025-02-02', 0, 6, 'adw'),
 (41, 19, 18, 17, '2025-02-02', '2025-02-02', 0, 8, 'adaw'),
-(42, 20, 18, 17, '2025-02-02', '2025-02-02', 700000, 0, ''),
-(43, 21, 18, 17, '2025-02-02', '2025-02-02', 700000, 0, ''),
+(42, 20, 18, 17, '2025-02-02', '2025-02-02', 700000, 10, 'anjayyyyyyy'),
+(43, 21, 18, 17, '2025-02-02', '2025-02-02', 700000, 8, 'anjayyyyyyy'),
 (44, 23, 17, 20, '2025-02-03', '2025-02-03', 700000, 10, 'nice'),
 (45, 24, 17, 20, '2025-02-03', '2025-02-03', 350000, 0, ''),
-(46, 25, 17, 20, '2025-02-03', '2025-02-03', 350000, 0, '');
+(46, 25, 17, 20, '2025-02-03', '2025-02-03', 350000, 0, ''),
+(47, 26, 17, 17, '2025-02-06', '2025-02-06', 700000, 10, 'anjayyyyyyy');
 
 --
 -- Indexes for dumped tables
@@ -287,7 +289,7 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -299,13 +301,13 @@ ALTER TABLE `harga`
 -- AUTO_INCREMENT untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
-  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

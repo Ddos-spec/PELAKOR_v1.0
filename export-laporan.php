@@ -29,8 +29,18 @@ if ($start_date && $end_date) {
     $query .= " WHERE tgl_mulai BETWEEN '$start_date' AND '$end_date'";
 }
 
-// Lakukan query ke database
 $result = mysqli_query($connect, $query);
+
+if ($result) {
+    // Debugging: Log the output of the query to a temporary file
+    $logFile = 'query_output.log';
+    file_put_contents($logFile, "Query: $query\n", FILE_APPEND);
+    while ($row = mysqli_fetch_assoc($result)) {
+        file_put_contents($logFile, json_encode($row) . "\n", FILE_APPEND);
+    }
+} else {
+    file_put_contents('query_output.log', "Query Error: " . mysqli_error($connect) . "\n", FILE_APPEND);
+}
 
 // Cek format output yang diinginkan (pdf atau excel)
 $format = isset($_GET['format']) ? $_GET['format'] : '';
@@ -151,9 +161,9 @@ if ($format == 'pdf') {
         $sheet->setCellValue('D' . $row, getCucianTotalItem($transaksi["id_cucian"]));
         $sheet->setCellValue('E' . $row, getCucianBerat($transaksi["id_cucian"]));
         $sheet->setCellValue('F' . $row, getCucianJenis($transaksi["id_cucian"]));
-        $sheet->setCellValue('G' . $row, $transaksi["total_bayar"]);
-        $sheet->setCellValue('H' . $row, $transaksi["tgl_mulai"]);
-        $sheet->setCellValue('I' . $row, $transaksi["tgl_selesai"]);
+        $sheet->setCellValue('G' . $row, (float)$transaksi["total_bayar"] ?: 0); // Default to 0 if empty
+        $sheet->setCellValue('H' . $row, $transaksi["tgl_mulai"] ?: ''); // Default to empty string if null
+        $sheet->setCellValue('I' . $row, $transaksi["tgl_selesai"] ?: ''); // Default to empty string if null
         $row++;
     }
 
