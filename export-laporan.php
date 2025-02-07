@@ -1,9 +1,13 @@
 <?php
+// Pastikan tidak ada output sebelum tag pembuka PHP
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// cek apakah admin sudah login
+// Cek apakah admin sudah login
 cekAdmin();
 
 require 'vendor/autoload.php';
@@ -12,108 +16,120 @@ use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-// ambil data transaksi
-$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
-$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+// Mulai output buffering
+ob_start();
 
+// Ambil parameter filter tanggal
+$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
+$end_date   = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+
+// Siapkan query untuk mengambil data transaksi
 $query = "SELECT * FROM transaksi";
 if ($start_date && $end_date) {
     $query .= " WHERE tgl_mulai BETWEEN '$start_date' AND '$end_date'";
 }
+
+// Lakukan query ke database
 $result = mysqli_query($connect, $query);
 
-// cek format
+// Cek format output yang diinginkan (pdf atau excel)
 $format = isset($_GET['format']) ? $_GET['format'] : '';
 
-// fungsi untuk mendapatkan data transaksi dalam bentuk HTML tabel
+// --- Fungsi-Fungsi Pembantu ---
+
+// Fungsi untuk mendapatkan data transaksi dalam bentuk HTML tabel (digunakan untuk PDF)
 function getTransaksiTable($result) {
     $table = '<table border="1" cellpadding="10" class="responsive-table centered">
                 <tr>
-                    <td style="font-weight:bold;">Kode Transaksi</td>
-                    <td style="font-weight:bold;">Agen</td>
-                    <td style="font-weight:bold;">Pelanggan</td>
-                    <td style="font-weight:bold;">Total Item</td>
-                    <td style="font-weight:bold;">Berat</td>
-                    <td style="font-weight:bold;">Jenis</td>
-                    <td style="font-weight:bold;">Total Bayar</td>
-                    <td style="font-weight:bold;">Tanggal Pesan</td>
-                    <td style="font-weight:bold;">Tanggal Selesai</td>
+                    <th>Kode Transaksi</th>
+                    <th>Agen</th>
+                    <th>Pelanggan</th>
+                    <th>Total Item</th>
+                    <th>Berat</th>
+                    <th>Jenis</th>
+                    <th>Total Bayar</th>
+                    <th>Tanggal Pesan</th>
+                    <th>Tanggal Selesai</th>
                 </tr>';
-
     while ($transaksi = mysqli_fetch_assoc($result)) {
         $table .= '<tr>
-                    <td>' . $transaksi["kode_transaksi"] . '</td>
-                    <td>' . getAgenName($transaksi["id_agen"]) . '</td>
-                    <td>' . getPelangganName($transaksi["id_pelanggan"]) . '</td>
-                    <td>' . getCucianTotalItem($transaksi["id_cucian"]) . '</td>
-                    <td>' . getCucianBerat($transaksi["id_cucian"]) . '</td>
-                    <td>' . getCucianJenis($transaksi["id_cucian"]) . '</td>
-                    <td>' . $transaksi["total_bayar"] . '</td>
-                    <td>' . $transaksi["tgl_mulai"] . '</td>
-                    <td>' . $transaksi["tgl_selesai"] . '</td>
+                    <td>' . htmlspecialchars($transaksi["kode_transaksi"]) . '</td>
+                    <td>' . htmlspecialchars(getAgenName($transaksi["id_agen"])) . '</td>
+                    <td>' . htmlspecialchars(getPelangganName($transaksi["id_pelanggan"])) . '</td>
+                    <td>' . htmlspecialchars(getCucianTotalItem($transaksi["id_cucian"])) . '</td>
+                    <td>' . htmlspecialchars(getCucianBerat($transaksi["id_cucian"])) . '</td>
+                    <td>' . htmlspecialchars(getCucianJenis($transaksi["id_cucian"])) . '</td>
+                    <td>' . htmlspecialchars($transaksi["total_bayar"]) . '</td>
+                    <td>' . htmlspecialchars($transaksi["tgl_mulai"]) . '</td>
+                    <td>' . htmlspecialchars($transaksi["tgl_selesai"]) . '</td>
                 </tr>';
     }
-
     $table .= '</table>';
     return $table;
 }
 
-// fungsi untuk mendapatkan nama agen
+// Fungsi untuk mendapatkan nama agen
 function getAgenName($id_agen) {
     global $connect;
-    $agen = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$id_agen'");
-    $agen = mysqli_fetch_assoc($agen);
-    return $agen["nama_laundry"];
+    $agenQuery = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$id_agen'");
+    $agen = mysqli_fetch_assoc($agenQuery);
+    return isset($agen["nama_laundry"]) ? $agen["nama_laundry"] : '';
 }
 
-// fungsi untuk mendapatkan nama pelanggan
+// Fungsi untuk mendapatkan nama pelanggan
 function getPelangganName($id_pelanggan) {
     global $connect;
-    $pelanggan = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'");
-    $pelanggan = mysqli_fetch_assoc($pelanggan);
-    return $pelanggan["nama"];
+    $pelangganQuery = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'");
+    $pelanggan = mysqli_fetch_assoc($pelangganQuery);
+    return isset($pelanggan["nama"]) ? $pelanggan["nama"] : '';
 }
 
-// fungsi untuk mendapatkan total item cucian
+// Fungsi untuk mendapatkan total item cucian
 function getCucianTotalItem($id_cucian) {
     global $connect;
-    $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
-    $cucian = mysqli_fetch_assoc($cucian);
-    return $cucian["total_item"];
+    $cucianQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
+    $cucian = mysqli_fetch_assoc($cucianQuery);
+    return isset($cucian["total_item"]) ? $cucian["total_item"] : '';
 }
 
-// fungsi untuk mendapatkan berat cucian
+// Fungsi untuk mendapatkan berat cucian
 function getCucianBerat($id_cucian) {
     global $connect;
-    $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
-    $cucian = mysqli_fetch_assoc($cucian);
-    return $cucian["berat"];
+    $cucianQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
+    $cucian = mysqli_fetch_assoc($cucianQuery);
+    return isset($cucian["berat"]) ? $cucian["berat"] : '';
 }
 
-// fungsi untuk mendapatkan jenis cucian
+// Fungsi untuk mendapatkan jenis cucian
 function getCucianJenis($id_cucian) {
     global $connect;
-    $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
-    $cucian = mysqli_fetch_assoc($cucian);
-    return $cucian["jenis"];
+    $cucianQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = '$id_cucian'");
+    $cucian = mysqli_fetch_assoc($cucianQuery);
+    return isset($cucian["jenis"]) ? $cucian["jenis"] : '';
 }
 
+// --- Proses Export Berdasarkan Format ---
 if ($format == 'pdf') {
-    // buat PDF
-    $dompdf = new Dompdf();
-    $html = '
-    <h3>Laporan Keuangan</h3>
-    <p>Periode: ' . $start_date . ' s/d ' . $end_date . '</p>
-    ' . getTransaksiTable($result);
+    // Karena pointer result bisa bergeser, jalankan ulang query untuk PDF
+    $resultPdf = mysqli_query($connect, $query);
+    $html = '<h3>Laporan Keuangan</h3>
+             <p>Periode: ' . htmlspecialchars($start_date) . ' s/d ' . htmlspecialchars($end_date) . '</p>
+             ' . getTransaksiTable($resultPdf);
 
+    $dompdf = new Dompdf();
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'landscape');
+    if (ob_get_length()) {
+        ob_end_clean();
+    }
     $dompdf->render();
     $dompdf->stream("laporan_keuangan.pdf", array("Attachment" => 1));
     exit();
 
 } elseif ($format == 'excel') {
-    // buat Excel
+    // Jalankan ulang query untuk Excel agar data lengkap
+    $resultExcel = mysqli_query($connect, $query);
+    
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setTitle('Laporan Keuangan');
@@ -128,7 +144,7 @@ if ($format == 'pdf') {
     $sheet->setCellValue('I1', 'Tanggal Selesai');
 
     $row = 2;
-    while ($transaksi = mysqli_fetch_assoc($result)) {
+    while ($transaksi = mysqli_fetch_assoc($resultExcel)) {
         $sheet->setCellValue('A' . $row, $transaksi["kode_transaksi"]);
         $sheet->setCellValue('B' . $row, getAgenName($transaksi["id_agen"]));
         $sheet->setCellValue('C' . $row, getPelangganName($transaksi["id_pelanggan"]));
@@ -142,6 +158,9 @@ if ($format == 'pdf') {
     }
 
     $writer = new Xlsx($spreadsheet);
+    if (ob_get_length()) {
+        ob_clean();
+    }
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment;filename="laporan_keuangan.xlsx"');
     header('Cache-Control: max-age=0');
