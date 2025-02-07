@@ -106,8 +106,8 @@ if ($filterApplied && $start_date && $end_date) {
 
         <!-- Tombol Export -->
         <div class="text-center">
-            <a class="btn btn-success" href="export-laporan.php?format=pdf"><i class="material-icons">picture_as_pdf</i> Export PDF</a>
-            <a class="btn btn-warning" href="export-laporan.php?format=excel"><i class="material-icons">grid_on</i> Export Excel</a>
+            <a class="btn btn-success" href="export-laporan.php?format=pdf&start_date=<?= htmlspecialchars($start_date) ?>&end_date=<?= htmlspecialchars($end_date) ?>"><i class="material-icons">picture_as_pdf</i> Export PDF</a>
+            <a class="btn btn-warning" href="export-laporan.php?format=excel&start_date=<?= htmlspecialchars($start_date) ?>&end_date=<?= htmlspecialchars($end_date) ?>"><i class="material-icons">grid_on</i> Export Excel</a>
         </div>
 
         <!-- Tampilkan Tabel Hanya Jika Filter Sudah Diterapkan -->
