@@ -41,6 +41,12 @@ h1 {
     color: #ddd;
     float: right;
 }
+.rating {
+    display: flex;
+    justify-content: center; /* Agar berada di tengah secara horizontal */
+    align-items: center; /* Agar berada di tengah secara vertikal (jika dibutuhkan) */
+    margin: 0 auto; /* Tambahkan margin otomatis untuk memastikan posisi di tengah */
+}
 
 /***** CSS untuk hover nya *****/
 

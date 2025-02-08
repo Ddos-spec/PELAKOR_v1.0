@@ -53,6 +53,14 @@ $agen = mysqli_fetch_assoc($query);
             text-align: center;
             margin-top: 10px;
         }
+        /* Tambahan styling untuk bintang rating agar tampil di tengah */
+        .bintang {
+            width: 100px;
+            margin: 0 auto;  /* Membuat fieldset berada di tengah */
+            border: none;
+            font-weight: bold;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -85,7 +93,9 @@ $agen = mysqli_fetch_assoc($query);
                     }
                     $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
                 ?>
-                <fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset>
+                <fieldset class="bintang">
+                    <span class="starImg star-<?= $fixStar ?>"></span>
+                </fieldset>
             </div>
             <ul>
                 <li>Alamat: <?= $agen["alamat"] . ", " . $agen["kota"] ?></li>
