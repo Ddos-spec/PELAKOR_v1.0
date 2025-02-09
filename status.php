@@ -201,8 +201,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 <?php
 
 
+
 // STATUS CUCIAN
-if ( isset($_POST["simpanStatus"]) ){
+if (isset($_POST["simpanStatus"])) {
 
     // ambil data method post
     $statusCucian = $_POST["status_cucian"];
@@ -212,8 +213,21 @@ if ( isset($_POST["simpanStatus"]) ){
     $query = mysqli_query($connect, "SELECT * FROM cucian INNER JOIN harga ON harga.jenis = cucian.jenis WHERE id_cucian = $idCucian");
     $cucian = mysqli_fetch_assoc($query);
     $status = "Selesai";
+
+    // Pengecekan berat untuk agen
+    if ($login == "Agen" && is_null($cucian["berat"])) {
+        echo "
+            <script>
+                Swal.fire('Gagal Mengubah Status', 'Harus mengisi berat', 'error').then(function() {
+                    window.location = 'status.php';
+                });
+            </script>
+        ";
+        exit;
+    }
+
     // kalau status selesai
-    if ( $statusCucian == $status){
+    if ($statusCucian == $status) {
 
         // isi data di tabel transaksi
         $tglMulai = $cucian["tgl_mulai"];
@@ -222,28 +236,26 @@ if ( isset($_POST["simpanStatus"]) ){
         $idCucian = $cucian["id_cucian"];
         $idPelanggan = $cucian["id_pelanggan"];
         // masukkan ke tabel transaksi
-        mysqli_query($connect,"INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
-        if (mysqli_affected_rows($connect) == 0){
+        mysqli_query($connect, "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
+        if (mysqli_affected_rows($connect) == 0) {
             echo mysqli_error($connect);
         }
     }
 
     mysqli_query($connect, "UPDATE cucian SET status_cucian = '$statusCucian' WHERE id_cucian = '$idCucian'");
-    if (mysqli_affected_rows($connect) > 0){
+    if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
-                Swal.fire('Status Berhasil Di Ubah','','success').then(function() {
+                Swal.fire('Status Berhasil Di Ubah', '', 'success').then(function() {
                     window.location = 'status.php';
                 });
-            </script>   
+            </script>
         ";
     }
-
-    
 }
 
 // total berat
-if (isset($_POST["simpanBerat"])){
+if (isset($_POST["simpanBerat"])) {
 
     $berat = htmlspecialchars($_POST["berat"]);
     $idCucian = $_POST["id_cucian"];
@@ -253,18 +265,13 @@ if (isset($_POST["simpanBerat"])){
 
     mysqli_query($connect, "UPDATE cucian SET berat = $berat WHERE id_cucian = $idCucian");
 
-    if (mysqli_affected_rows($connect) > 0){
+    if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
-                Swal.fire('Data Berhasil Di Ubah','','success').then(function() {
+                Swal.fire('Data Berhasil Di Ubah', '', 'success').then(function() {
                     window.location = 'status.php';
                 });
             </script>
         ";
     }
-
-    
-
 }
-
-?>

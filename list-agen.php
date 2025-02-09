@@ -1,183 +1,162 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// validasi login
+// Validasi login
 cekAdmin();
 
-//konfirgurasi pagination
-$jumlahDataPerHalaman = 5;
-$query = mysqli_query($connect,"SELECT * FROM agen");
-$jumlahData = mysqli_num_rows($query);
-//ceil() = pembulatan ke atas
-$jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
-//menentukan halaman aktif
-//$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-if ( isset($_GET["page"])){
-    $halamanAktif = $_GET["page"];
-}else{
-    $halamanAktif = 1;
-}
-
-//data awal
-$awalData = ( $jumlahDataPerHalaman * $halamanAktif ) - $jumlahDataPerHalaman;
-
-//fungsi memasukkan data di db ke array
-$agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
-
-
-//ketika tombol cari ditekan
-if ( isset($_POST["cari"])) {
+// Ambil semua data agen tanpa pagination
+$query = "SELECT * FROM agen ORDER BY id_agen DESC";
+if (isset($_POST["cari"])) {
     $keyword = htmlspecialchars($_POST["keyword"]);
-
     $query = "SELECT * FROM agen WHERE 
         nama_laundry LIKE '%$keyword%' OR
         nama_pemilik LIKE '%$keyword%' OR
         kota LIKE '%$keyword%' OR
         email LIKE '%$keyword%' OR
         alamat LIKE '%$keyword%'
-        ORDER BY id_agen DESC
-        LIMIT $awalData, $jumlahDataPerHalaman
-        ";
-
-    $agen = mysqli_query($connect,$query);
-
-    //konfirgurasi pagination
-    $jumlahDataPerHalaman = 3;
-    $jumlahData = mysqli_num_rows($agen);
-    //ceil() = pembulatan ke atas
-    $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
-    //menentukan halaman aktif
-    //$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-    if ( isset($_GET["page"])){
-        $halamanAktif = $_GET["page"];
-    }else{
-        $halamanAktif = 1;
-    }
+        ORDER BY id_agen DESC";
 }
+$agen = mysqli_query($connect, $query);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
-    <title>Data Agen</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php include "headtags.html"; ?>
+  <title>Data Agen</title>
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    /* Card lebih panjang agar gambar tidak terpotong */
+    .card {
+      height: 450px; /* Tinggi card diperbesar */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    /* Gambar menggunakan object-fit: cover */
+    .card .card-image img {
+      width: 100%;
+      height: 250px; /* Tinggi gambar tetap */
+      min-height: 200px;
+      max-height: 300px;
+      object-fit: cover; /* Gambar selalu mengisi area */
+      background-color: #f1f1f1; /* Background abu-abu jika diperlukan */
+    }
+    .card .card-content {
+      flex-grow: 1;
+    }
+    /* Grid: 3 card per baris; jika baris terakhir kurang, tetap di tengah */
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .col.s12.m4 {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Posisi ikon activator (titik tiga) di sudut kanan atas gambar */
+    .card .card-image .card-title.activator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+    /* Grup tombol pada card-content */
+    .btn-group a {
+      margin-right: 5px;
+    }
+  </style>
 </head>
 <body>
+  <!-- Header -->
+  <?php include 'header.php'; ?>
 
-    <!-- header -->
-    <?php include 'header.php'; ?>
-    <!-- end header -->
+  <h3 class="header light center">List Agen</h3>
+  <br>
 
-
-    <h3 class="header light center">List Agen</h3>
-    <br>
-
-
-    <!-- searching -->
-    <form class="col s12 center" action="" method="post">
-        <div class="input-field inline">
-            <input type="text" size=40 name="keyword" placeholder="Keyword">
-            <button type="submit" class="btn waves-effect blue darken-2" name="cari"><i class="material-icons">send</i></button>
-        </div>
-    </form>
-    <!-- end searching -->
-
-    <div class="row">
-        <div class="col s10 offset-s1">
-            
-            <!-- pagination -->
-            <ul class="pagination center">
-            <?php if( $halamanAktif > 1 ) : ?>
-                <li class="disabled-effect blue darken-1">
-                    <!-- halaman pertama -->
-                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
-                </li>
-            <?php endif; ?>
-            <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
-                <?php if( $i == $halamanAktif ) : ?>
-                    <li class="active grey"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php else : ?>
-                    <li class="waves-effect blue darken-1"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php endif; ?>
-            <?php endfor; ?>
-            <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-                <li class="waves-effect blue darken-1">
-                    <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
-                </li>
-            <?php endif; ?>
-            </ul>
-            <!-- pagination -->
-
-        
-        
-            <!-- data agen -->
-            
-            <table cellpadding=10 border=1>
-                <tr>
-                    <th>ID Agen</th>
-                    <th>Nama Laundry</th>
-                    <th>Nama Pemilik</th>
-                    <th>No Telp</th>
-                    <th>Email</th>
-                    <th>Plat Driver</th>
-                    <th>Kota</th>
-                    <th>Alamat Lengkap</th>
-                    <th>Aksi</th>
-                </tr>
-
-                <?php foreach ($agen as $dataAgen) : ?>
-                
-                <tr>
-                    <td><?= $dataAgen["id_agen"] ?></td>
-                    <td><?= $dataAgen["nama_laundry"] ?></td>
-                    <td><?= $dataAgen["nama_pemilik"] ?></td>
-                    <td><?= $dataAgen["telp"] ?></td>
-                    <td><?= $dataAgen["email"] ?></td>
-                    <td><?= $dataAgen["plat_driver"] ?></td>
-                    <td><?= $dataAgen["kota"] ?></td>
-                    <td><?= $dataAgen["alamat"] ?></td>
-                    
-                                        <td>
-                        <a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
-                        <a class="btn blue darken-2" href="reset-password-admin.php?type=agen&id=<?= $dataAgen['id_agen'] ?>">Reset</a>
-                    </td>
-                </tr>
-
-                <?php endforeach ?>
-            </table>
-            <!-- end data agen -->
-
-
-
-        </div>
-        </div>
-        
+  <!-- Searching -->
+  <form class="col s12 center" action="" method="post">
+    <div class="input-field inline">
+      <input type="text" size="40" name="keyword" placeholder="Keyword">
+      <button type="submit" class="btn waves-effect blue darken-2" name="cari">
+        <i class="material-icons">send</i>
+      </button>
     </div>
+  </form>
+  <!-- End Searching -->
 
-    <!-- footer -->
-    <?php include "footer.php"; ?>
-    <!-- end footer -->
+  <div class="container">
+    <div class="row">
+      <?php foreach ($agen as $dataAgen) : ?>
+      <div class="col s12 m4">
+        <div class="card">
+          <!-- Card Image dengan efek waves dan activator -->
+          <div class="card-image waves-effect waves-block waves-light">
+            <?php if ($dataAgen["foto"]) : ?>
+              <img class="activator" src="img/agen/<?= $dataAgen["foto"] ?>" alt="<?= $dataAgen["nama_laundry"] ?>">
+            <?php else : ?>
+              <img class="activator" src="img/default.jpg" alt="Default Image">
+            <?php endif; ?>
+            <!-- Tombol tiga titik (activator) untuk menampilkan card-reveal -->
+            <span class="card-title activator grey-text text-darken-4">
+              <i class="material-icons">more_vert</i>
+            </span>
+          </div>
+          <!-- Card Content: Menampilkan ID Agen dan Nama Laundry -->
+          <div class="card-content">
+            <p>ID Agen: <?= $dataAgen["id_agen"] ?></p>
+            <p>Nama Laundry: <?= $dataAgen["nama_laundry"] ?></p>
+            <div class="btn-group" style="margin-top:10px;">
+              <a href="reset-password-admin.php?type=agen&id=<?= $dataAgen['id_agen'] ?>" class="btn blue darken-2">
+                <i class="material-icons">lock_reset</i>
+              </a>
+              <a href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" class="btn red darken-2" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                <i class="material-icons">delete</i>
+              </a>
+            </div>
+          </div>
+          <!-- Card Reveal: Menampilkan detail agen -->
+          <div class="card-reveal">
+            <span class="card-title grey-text text-darken-4">
+              Detail Agen
+              <i class="material-icons right">close</i>
+            </span>
+            <p>Nama Pemilik: <?= $dataAgen["nama_pemilik"] ?></p>
+            <p>No Telp: <?= $dataAgen["telp"] ?></p>
+            <p>Email: <?= $dataAgen["email"] ?></p>
+            <p>Plat Driver: <?= $dataAgen["plat_driver"] ?></p>
+            <p>Kota: <?= $dataAgen["kota"] ?></p>
+            <p>Alamat: <?= $dataAgen["alamat"] ?></p>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+  <?php include "footer.php"; ?>
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inisialisasi semua komponen Materialize
+      M.AutoInit();
+    });
+  </script>
 </body>
 </html>
 <?php
-
-if (isset($_GET["hapus"])){
-
-    // ambil id agen dri method post
+if (isset($_GET["hapus"])) {
     $idAgen = $_GET["hapus"];
-
-    // hapus data agen
     $query = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
-
-    // kalau berhasil di hapus, keluar alert
-    if ( mysqli_affected_rows($connect) > 0 ){
+    if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
                 Swal.fire('Data Agen Berhasil Di Hapus','','success').then(function(){
