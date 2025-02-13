@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 07 Feb 2025 pada 20.20
+-- Waktu pembuatan: 13 Feb 2025 pada 14.23
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -56,20 +56,21 @@ CREATE TABLE `agen` (
   `alamat` varchar(100) DEFAULT NULL,
   `plat_driver` varchar(12) DEFAULT NULL,
   `foto` text NOT NULL,
-  `password` varchar(255) DEFAULT NULL
+  `password` varchar(255) DEFAULT NULL,
+  `harga_kiloan` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `agen`
 --
 
-INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`) VALUES
-(17, 'pelakor kilat', 'guntur', '083457682536', 'kilat@gmail.com', 'sdfffd', 'esafcfecef', '21312', '679f3ff7cbdcf.jpg', '$2y$10$LVamXEoKr3.9QG1am8XF2uQXS9pIYZoLXt7xF2To.JSvWawTTO/Nm'),
-(18, 'Pelakor Fresh', 'levi', '083457682536', 'fresh@gmail.com', 'hbvabdabh', 'gyjdchgd', '1231', '679f40108cb18.jpg', '$2y$10$xbte90xvoI516x7UhdAKnO9KDdJos6we5.XrGB3aIB46J990xz11S'),
-(19, 'Pelakor bubble', 'king', '082346273412', 'bubble@gmail.com', 'dgvssdvd', 'gvdsbvsvs', '2313', '679f4029e0c7a.jpg', '$2y$10$lCuRaDBW6KxvbkKnBtkc.up6Jku8kyTxQBFC78Ca3qWWTzdwBKCwW'),
-(20, 'Pelakor Clean', 'coki', '096216372151', 'clean@gmail.com', 'scaca', 'fcsacfadcsa', '123213', '679f404468194.jpg', '$2y$10$mCk62rD4.rU9Vyamb5CeFOJ5CgEALNza4QU02aNRfPob3cRniroBS'),
-(21, 'Pelakor cemerlang ', 'cemer', '1243141431', 'cemerlang@gmail.com', 'fafcafqwaf', 'cafafadfwa', '1231', '679f9d4f98daf.jpg', '$2y$10$Z1/.1kGb8xmqSTQ92kG7AuCMoY8hnC0xdx4y85lXTaPk6f8Tp3NrK'),
-(22, 'Pelakor bersinar', 'bersinar', '0865276316', 'bersinar@gmail.com', 'afadwwad', 'dawdwad', 'adafvaf', '679f9d9c64589.jpg', '$2y$10$pzATqcMWJaxHFUhzsS1tAeiQfETALGbdiA8bNXApN5wh.g/jI5TM6');
+INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`, `harga_kiloan`) VALUES
+(17, 'pelakor kilat', 'guntur', '083457682536', 'kilat@gmail.com', 'sdfffd', 'esafcfecef', '21312', '679f3ff7cbdcf.jpg', '$2y$10$LVamXEoKr3.9QG1am8XF2uQXS9pIYZoLXt7xF2To.JSvWawTTO/Nm', 0),
+(18, 'Pelakor Fresh', 'levi', '083457682536', 'fresh@gmail.com', 'hbvabdabh', 'gyjdchgd', '1231', '679f40108cb18.jpg', '$2y$10$xbte90xvoI516x7UhdAKnO9KDdJos6we5.XrGB3aIB46J990xz11S', 0),
+(19, 'Pelakor bubble', 'king', '082346273412', 'bubble@gmail.com', 'dgvssdvd', 'gvdsbvsvs', '2313', '679f4029e0c7a.jpg', '$2y$10$lCuRaDBW6KxvbkKnBtkc.up6Jku8kyTxQBFC78Ca3qWWTzdwBKCwW', 0),
+(20, 'Pelakor Clean', 'coki', '096216372151', 'clean@gmail.com', 'scaca', 'fcsacfadcsa', '123213', '679f404468194.jpg', '$2y$10$mCk62rD4.rU9Vyamb5CeFOJ5CgEALNza4QU02aNRfPob3cRniroBS', 0),
+(21, 'Pelakor cemerlang ', 'cemer', '1243141431', 'cemerlang@gmail.com', 'fafcafqwaf', 'cafafadfwa', '1231', '679f9d4f98daf.jpg', '$2y$10$Z1/.1kGb8xmqSTQ92kG7AuCMoY8hnC0xdx4y85lXTaPk6f8Tp3NrK', 0),
+(22, 'Pelakor bersinar', 'bersinar', '0865276316', 'bersinar@gmail.com', 'afadwwad', 'dawdwad', 'adafvaf', '679f9d9c64589.jpg', '$2y$10$pzATqcMWJaxHFUhzsS1tAeiQfETALGbdiA8bNXApN5wh.g/jI5TM6', 0);
 
 -- --------------------------------------------------------
 
@@ -91,26 +92,6 @@ CREATE TABLE `cucian` (
   `status_cucian` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data untuk tabel `cucian`
---
-
-INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `total_item`, `berat`, `alamat`, `catatan`, `status_cucian`) VALUES
-(14, 15, 15, '2025-02-02', '0000-00-00', 'komplit', 100, 10, 'ada dimana aja , jepang', 'cepet jadiin kalo ga dihancurin', 'Selesai'),
-(15, 17, 17, '2025-02-02', '0000-00-00', 'komplit', 5, NULL, 'fasfcasca, sfcdad', '', 'Selesai'),
-(16, 17, 17, '2025-02-02', '0000-00-00', 'komplit', 1000, 100, 'fasfcasca, sfcdad', '', 'Selesai'),
-(17, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1000, NULL, 'fasfcasca, sfcdad', '', 'Selesai'),
-(18, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1666, NULL, 'fasfcasca, sfcdad', '', 'Selesai'),
-(19, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 12312, NULL, 'fasfcasca, sfcdad', '', 'Selesai'),
-(20, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1, 100, 'fasfcasca, sfcdad', '', 'Selesai'),
-(21, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1, 100, 'fasfcasca, sfcdad', '', 'Selesai'),
-(22, 18, 17, '2025-02-02', '0000-00-00', 'komplit', 1, NULL, 'fasfcasca, sfcdad', '', 'Penjemputan'),
-(23, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1000, 100, 'sefecef, afcfvrg', '', 'Selesai'),
-(24, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1, 50, 'sefecef, afcfvrg', '', 'Selesai'),
-(25, 17, 20, '2025-02-03', '0000-00-00', 'komplit', 1, 50, 'sefecef, afcfvrg', '', 'Selesai'),
-(26, 17, 17, '2025-02-06', '0000-00-00', 'komplit', 1231, 100, 'fasfcasca, sfcdad', '', 'Selesai'),
-(27, 18, 17, '2025-02-06', '0000-00-00', 'komplit', 1231, NULL, 'fasfcasca, sfcdad', '', 'Penjemputan');
-
 -- --------------------------------------------------------
 
 --
@@ -123,36 +104,6 @@ CREATE TABLE `harga` (
   `id_agen` int(11) NOT NULL,
   `harga` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `harga`
---
-
-INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`) VALUES
-(49, 'cuci', 15, 5000),
-(50, 'setrika', 15, 3000),
-(51, 'komplit', 15, 7000),
-(52, 'cuci', 16, 3500),
-(53, 'setrika', 16, 5500),
-(54, 'komplit', 16, 9000),
-(55, 'cuci', 17, 5000),
-(56, 'setrika', 17, 6000),
-(57, 'komplit', 17, 11000),
-(58, 'cuci', 18, 4000),
-(59, 'setrika', 18, 3500),
-(60, 'komplit', 18, 7500),
-(61, 'cuci', 19, 10000),
-(62, 'setrika', 19, 11000),
-(63, 'komplit', 19, 21000),
-(64, 'cuci', 20, 7000),
-(65, 'setrika', 20, 8000),
-(66, 'komplit', 20, 15000),
-(67, 'cuci', 21, 1000),
-(68, 'setrika', 21, 2000),
-(69, 'komplit', 21, 3000),
-(70, 'cuci', 22, 2000),
-(71, 'setrika', 22, 2500),
-(72, 'komplit', 22, 5000);
 
 -- --------------------------------------------------------
 
@@ -198,36 +149,9 @@ CREATE TABLE `transaksi` (
   `tgl_selesai` date DEFAULT NULL,
   `total_bayar` int(11) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL,
-  `komentar` text NOT NULL
+  `komentar` text NOT NULL,
+  `tipe_transaksi` enum('kiloan','satuan') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `transaksi`
---
-
-INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `rating`, `komentar`) VALUES
-(26, 15, 17, 17, '2025-02-02', '2025-02-02', 0, 8, 'mantap\r\n'),
-(27, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'mantap'),
-(28, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 2, 'gud'),
-(29, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'gud'),
-(30, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 8, 'gud'),
-(31, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'gud'),
-(32, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'gud'),
-(33, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 8, 'gud'),
-(34, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 6, 'gud'),
-(35, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'gud'),
-(36, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 8, 'gud'),
-(37, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 6, 'gud'),
-(38, 16, 17, 17, '2025-02-02', '2025-02-02', 700000, 10, 'gud'),
-(39, 17, 18, 17, '2025-02-02', '2025-02-02', 0, 8, 'ad'),
-(40, 18, 18, 17, '2025-02-02', '2025-02-02', 0, 6, 'adw'),
-(41, 19, 18, 17, '2025-02-02', '2025-02-02', 0, 8, 'adaw'),
-(42, 20, 18, 17, '2025-02-02', '2025-02-02', 700000, 10, 'anjayyyyyyy'),
-(43, 21, 18, 17, '2025-02-02', '2025-02-02', 700000, 8, 'anjayyyyyyy'),
-(44, 23, 17, 20, '2025-02-03', '2025-02-03', 700000, 10, 'nice'),
-(45, 24, 17, 20, '2025-02-03', '2025-02-03', 350000, 0, ''),
-(46, 25, 17, 20, '2025-02-03', '2025-02-03', 350000, 0, ''),
-(47, 26, 17, 17, '2025-02-06', '2025-02-06', 700000, 10, 'anjayyyyyyy');
 
 --
 -- Indexes for dumped tables
@@ -289,7 +213,7 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -307,7 +231,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
