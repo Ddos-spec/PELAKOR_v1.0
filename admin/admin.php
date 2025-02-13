@@ -16,11 +16,15 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn">Add Admin</button>
+            <button type="submit" name="add_admin" class="btn">Add Admin</button>
         </form>
 
         <h2 class="center-align">Edit Admin</h2>
         <form method="post" action="">
+            <div class="input-field">
+                <label for="edit_id">Admin ID:</label>
+                <input type="text" id="edit_id" name="edit_id" required>
+            </div>
             <div class="input-field">
                 <label for="edit_username">Username:</label>
                 <input type="text" id="edit_username" name="edit_username" required>
@@ -29,7 +33,16 @@
                 <label for="edit_password">Password:</label>
                 <input type="password" id="edit_password" name="edit_password" required>
             </div>
-            <button type="submit" class="btn">Edit Admin</button>
+            <button type="submit" name="edit_admin" class="btn">Edit Admin</button>
+        </form>
+
+        <h2 class="center-align">Delete Admin</h2>
+        <form method="post" action="">
+            <div class="input-field">
+                <label for="delete_id">Admin ID:</label>
+                <input type="text" id="delete_id" name="delete_id" required>
+            </div>
+            <button type="submit" name="delete_admin" class="btn red">Delete Admin</button>
         </form>
 
         <h2 class="center-align">Admin List</h2>
