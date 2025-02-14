@@ -40,7 +40,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
-    <title>Transasksi - <?= $login ?></title>
+    <title>Transaksi - <?= $login ?></title>
 </head>
 <body>
 <?php include 'header.php'; ?>
@@ -244,7 +244,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 </html>
 
 <?php
-
 
 // jika pelanggan rating
 if ( isset($_POST["simpanRating"]) ){

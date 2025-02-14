@@ -1,9 +1,7 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
-
 
 // harus agen yg kesini
 cekAgen();
@@ -14,9 +12,6 @@ $query = "SELECT * FROM agen WHERE id_agen = '$idAgen'";
 $result = mysqli_query($connect, $query);
 $agen = mysqli_fetch_assoc($result);
 $idAgen = $agen["id_agen"];
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -95,6 +90,54 @@ $idAgen = $agen["id_agen"];
                 <a class="btn red darken-2" href="edit-harga.php">Ganti Data Harga</a>
             </div>
 
+            <!-- Tampilkan Transaksi -->
+            <h4 class="header light center">Transaksi Satuan</h4>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Jumlah</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query = "SELECT * FROM transaksi_satuan WHERE id_agen = '$idAgen'";
+                    $result = mysqli_query($connect, $query);
+                    while ($transaksi = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                                <td>{$transaksi['item']}</td>
+                                <td>{$transaksi['jumlah']}</td>
+                                <td>{$transaksi['catatan']}</td>
+                              </tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+
+            <h4 class="header light center">Transaksi Kiloan</h4>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Jenis Pakaian</th>
+                        <th>Paket</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query = "SELECT * FROM transaksi_kiloan WHERE id_agen = '$idAgen'";
+                    $result = mysqli_query($connect, $query);
+                    while ($transaksi = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                                <td>{$transaksi['jenis_pakaian']}</td>
+                                <td>{$transaksi['paket']}</td>
+                                <td>{$transaksi['catatan']}</td>
+                              </tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
     </div>
     <!-- end data agen -->
@@ -105,10 +148,7 @@ $idAgen = $agen["id_agen"];
 </body>
 </html>
 
-
 <?php
-
-
 
 // klo ubah data agen
 if ( isset($_POST["simpan"]) ){
@@ -207,6 +247,5 @@ if ( isset($_POST["simpan"]) ){
         ";
     }
 }
-
 
 ?>

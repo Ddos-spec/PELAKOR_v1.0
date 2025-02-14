@@ -15,7 +15,7 @@ cekLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
-    <title>Halaman Login</title>
+    <title>Halaman Login Pelanggan</title>
 </head>
 <body>
 
@@ -24,32 +24,32 @@ cekLogin();
     <!-- end header -->
 
     <!-- body -->
-    <div class="container center">  
-        <h3 class="header light center">Halaman Login</h3>
-        <form action="" method="post">
-            <div class="input-field inline">
-                <ul>
-                <li>
-                        <label><input name="akun" value="admin" type="radio"/><span>Admin</span> </label>
-                        <label><input name="akun" value="agen" type="radio"/><span>Agen</span> </label>
-                        <label><input name="akun" value="pelanggan" type="radio"/><span>Pelanggan</span></label>
-                    </li>
-                    <li>
-                        <input type="text" id="email" name="email" placeholder="Email">
-                    </li>
-                    <li>
-                        <input type="password" id="password" name="password" placeholder="Password">
-                        <p class="tes"></p>
-                    </li>
-                    <br>
-                    <li>
-                        <div class="center">
-                            <button class="waves-effect blue darken-2 btn" type="submit" name="login">Login</button>
-                        </div>
-                    </li>
-                </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m6 offset-m3">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title center">Login Pelanggan</span>
+                        <form action="" method="post">
+                            <div class="input-field">
+                                <input type="text" id="email" name="email" placeholder="Email" required>
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="input-field">
+                                <input type="password" id="password" name="password" placeholder="Password" required>
+                                <label for="password">Password</label>
+                            </div>
+                            <div class="center">
+                                <button class="waves-effect blue darken-2 btn" type="submit" name="login">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-action center">
+                        <a href="registrasi.php">Belum punya akun? Daftar di sini</a>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
     <!-- end body -->
 
@@ -57,139 +57,51 @@ cekLogin();
     <?php include "footer.php"; ?>
     <!-- end footer -->
 
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
 
 <?php
 
 if ( isset($_POST["login"]) ){
+    $email = htmlspecialchars($_POST["email"]);
+    $password = htmlspecialchars($_POST["password"]);
 
-    if ($_POST["akun"] == 'agen'){
-        // masukkan ke var
-        $email = htmlspecialchars($_POST["email"]);
-        $password = htmlspecialchars($_POST["password"]);
+    validasiEmail($email);
 
-        validasiEmail($email);
-
-        // cari data di db
-        $result = mysqli_query($connect, "SELECT * FROM agen WHERE email = '$email'");
-
-        // kalau ada email
-        if(mysqli_num_rows($result) == 1){
-            // masukan ke array assoc
-            $row = mysqli_fetch_assoc($result);
-            // verif password
-            if(password_verify($password, $row["password"])){
-                $_SESSION["agen"] = $row["id_agen"];
-                $_SESSION["login-agen"] = true;
-
-                echo "
-                    <script>
-                        document.location.href = 'index.php';
-                    </script>
-                ";
-                exit;
-            }else {
-                echo "
-                    <script>
-                        Swal.fire('Gagal Login','Password Yang Anda Masukkan Salah','warning');
-                    </script>
-                ";
-            }
-        }else {
-            echo "
-                <script>
-                    Swal.fire('Gagal Login','Email Belum Terdaftar','warning');
-                </script>
-            ";
-        }
-    }else if ($_POST["akun"] == 'pelanggan'){
-        $email = htmlspecialchars($_POST["email"]);
-        $password = htmlspecialchars($_POST["password"]);
-
-        validasiEmail($email);
-
-        //cek apakah ada email atau tidak
-        $result = mysqli_query($connect, "SELECT * FROM pelanggan WHERE email = '$email'");
+    //cek apakah ada email atau tidak
+    $result = mysqli_query($connect, "SELECT * FROM pelanggan WHERE email = '$email'");
+    
+    //jika ada username
+    if ( mysqli_num_rows($result) === 1 ){   //fungsi menghitung jumlah baris di db
         
-        //jika ada username
-        if ( mysqli_num_rows($result) === 1 ){   //fungsi menghitung jumlah baris di db
-            
-            //memasukkan data db ke array assosiative
-            $data = mysqli_fetch_assoc($result);
+        //memasukkan data db ke array assosiative
+        $data = mysqli_fetch_assoc($result);
 
-            //cek apakah password sama
-            if ( password_verify($password, $data["password"]) ){
-                //session login 
-                $_SESSION["pelanggan"] = $data["id_pelanggan"];
-                $_SESSION["login-pelanggan"] = true;
+        //cek apakah password sama
+        if ( password_verify($password, $data["password"]) ){
+            //session login 
+            $_SESSION["pelanggan"] = $data["id_pelanggan"];
+            $_SESSION["login-pelanggan"] = true;
 
-                echo "
-                    <script>
-                        document.location.href = 'index.php';
-                    </script>
-                ";
-                
-            }else {
-                echo "
-                    <script>
-                        Swal.fire('Gagal Login','Password Yang Anda Masukkan Salah','warning');
-                    </script>
-                ";
-            }
-        }else {
             echo "
                 <script>
-                    Swal.fire('Gagal Login','Email Belum Terdaftar','warning');
+                    document.location.href = 'index.php';
                 </script>
             ";
-        }
-    }else if ($_POST["akun"] == 'admin' ){
-        $username = htmlspecialchars($_POST["email"]);
-        $password = htmlspecialchars($_POST["password"]);
-
-        validasiUsername($username);
-    
-        // cek di db
-        $data = mysqli_query($connect, "SELECT * FROM admin WHERE username = '$username'");
-    
-        // jika email ada
-        if ( mysqli_num_rows($data) === 1 ){
-    
-            // jadikan array asosiatif
-            $data = mysqli_fetch_assoc($data);
-            $idAdmin = $data["id_admin"];
-    
-            // jika password benar
-            if ( $password === $data["password"])   {
-                //session login 
-                $_SESSION["login-admin"] = true;
-                $_SESSION["admin"] = $idAdmin;
-
-                echo "
-                    <script>
-                        document.location.href = 'index.php';
-                    </script>
-                ";
-                
-            }else {
-                echo "
-                    <script>
-                        Swal.fire('Gagal Login','Password Yang Anda Masukkan Salah','warning');
-                    </script>
-                ";
-            }
+            
         }else {
             echo "
                 <script>
-                    Swal.fire('Gagal Login','Username Tidak Terdaftar Sebagai Admin','warning');
+                    Swal.fire('Gagal Login','Password Yang Anda Masukkan Salah','warning');
                 </script>
             ";
         }
     }else {
         echo "
             <script>
-                Swal.fire('Gagal Login','Pilih Jenis Akun Terlebih Dahulu','warning');
+                Swal.fire('Gagal Login','Email Belum Terdaftar','warning');
             </script>
         ";
     }
