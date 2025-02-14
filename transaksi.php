@@ -276,4 +276,38 @@ if ( isset($_POST["kirimKomentar"])){
     ";
 }
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id_layanan = $_POST['id_layanan'];
+    $jenis_layanan = $_POST['jenis_layanan'];
+    $id_pelanggan = $_POST['id_pelanggan'];
+    $tanggal = date('Y-m-d H:i:s');
+
+    // Validate inputs
+    if (empty($id_layanan) || empty($jenis_layanan) || empty($id_pelanggan)) {
+        echo "
+            <script>
+                alert('Lengkapi semua field.');
+                window.history.back();
+            </script>
+        ";
+        exit;
+    }
+
+    if ($jenis_layanan == 'kiloan') {
+        // Insert transaksi kiloan
+        $query = "INSERT INTO transaksi (id_layanan, id_pelanggan, tanggal, status) VALUES ('$id_layanan', '$id_pelanggan', '$tanggal', 'Menunggu Penimbangan')";
+        // ...execute query...
+    } else if ($jenis_layanan == 'satuan') {
+        // Insert transaksi satuan
+        $items = $_POST['items']; // array of items with quantity
+        $query = "INSERT INTO transaksi (id_layanan, id_pelanggan, tanggal, status) VALUES ('$id_layanan', '$id_pelanggan', '$tanggal', 'Menunggu')";
+        // ...execute query...
+        $id_transaksi = // ...get last inserted id...
+        foreach ($items as $item) {
+            $query = "INSERT INTO cucian (id_transaksi, item, quantity) VALUES ('$id_transaksi', '{$item['name']}', '{$item['quantity']}')";
+            // ...execute query...
+        }
+    }
+}
+
 ?>

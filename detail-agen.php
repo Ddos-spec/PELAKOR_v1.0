@@ -11,6 +11,8 @@ $idAgen = $_GET["id"];
 $query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
 $agen = mysqli_fetch_assoc($query);
 
+// ambil data layanan
+$queryLayanan = mysqli_query($connect, "SELECT * FROM layanan WHERE id_agen = '$idAgen'");
 ?>
 
 <!DOCTYPE html>

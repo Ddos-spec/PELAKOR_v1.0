@@ -8,17 +8,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $items = $_POST['items'];
     $jumlah = $_POST['jumlah'];
     $catatan = htmlspecialchars($_POST['catatan']);
+    $totalHarga = 0;
+
+    // Validate inputs
+    if (empty($items)) {
+        echo "
+            <script>
+                alert('Pilih setidaknya satu item.');
+                window.history.back();
+            </script>
+        ";
+        exit;
+    }
 
     // Simpan transaksi ke database
     foreach ($items as $item) {
         $jumlahItem = $jumlah[$item];
-        $query = "INSERT INTO transaksi_satuan (id_agen, item, jumlah, catatan) VALUES ('$idAgen', '$item', '$jumlahItem', '$catatan')";
+        if ($jumlahItem <= 0) {
+            echo "
+                <script>
+                    alert('Jumlah item harus lebih dari 0.');
+                    window.history.back();
+                </script>
+            ";
+            exit;
+        }
+        $hargaItem = $items[$item][2];
+        $totalHarga += $hargaItem * $jumlahItem;
+        $query = "INSERT INTO transaksi_satuan (id_agen, item, jumlah, harga, catatan) VALUES ('$idAgen', '$item', '$jumlahItem', '$hargaItem', '$catatan')";
         mysqli_query($connect, $query);
     }
 
     echo "
         <script>
-            alert('Transaksi berhasil dikirim');
+            alert('Transaksi berhasil dikirim\\nTotal Harga: Rp " . number_format($totalHarga) . "');
             window.location.href = 'agen.php';
         </script>
     ";
@@ -52,12 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="row">
                 <?php
                 $items = [
-                    'baju' => ['img/baju.jpg', 'Baju'],
-                    'celana' => ['img/celana.jpg', 'Celana'],
-                    'jaket' => ['img/jaket.jpg', 'Jaket'],
-                    'bajukhusus' => ['img/bajukhusus.jpg', 'Baju Khusus'],
-                    'karpet' => ['img/karpet.jpg', 'Karpet'],
-                    'selimut' => ['img/selimut.jpg', 'Selimut']
+                    'baju' => ['img/baju.jpg', 'Baju', 5000],
+                    'celana' => ['img/celana.jpg', 'Celana', 7000],
+                    'jaket' => ['img/jaket.jpg', 'Jaket', 10000],
+                    'bajukhusus' => ['img/bajukhusus.jpg', 'Baju Khusus', 15000],
+                    'karpet' => ['img/karpet.jpg', 'Karpet', 20000],
+                    'selimut' => ['img/selimut.jpg', 'Selimut', 25000]
                 ];
                 foreach ($items as $key => $item) {
                     $img = $item[0];
