@@ -49,17 +49,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <div id="body">
         <h3 class="header col s10 light center">Status Cucian</h3>
         <br>
-        <?php if ($login == "Admin") : ?>
-        <?php
-            $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
-            $query = "SELECT * FROM cucian JOIN transaksi ON cucian.id_transaksi = transaksi.id WHERE 1";
-            if ($filter == 'kiloan') {
-                $query .= " AND transaksi.id_layanan IN (SELECT id FROM layanan WHERE jenis = 'kiloan')";
-            } else if ($filter == 'satuan') {
-                $query .= " AND transaksi.id_layanan IN (SELECT id FROM layanan WHERE jenis = 'satuan')";
-            }
-            $query = mysqli_query($connect, $query);
-        ?>
+        <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
@@ -257,17 +247,6 @@ if (isset($_POST["simpanBerat"])){
 
     $berat = htmlspecialchars($_POST["berat"]);
     $idCucian = $_POST["id_cucian"];
-
-    // Validate weight
-    if ($berat <= 0) {
-        echo "
-            <script>
-                alert('Berat harus lebih dari 0.');
-                window.history.back();
-            </script>
-        ";
-        exit;
-    }
 
     // validasi 
     validasiBerat($berat);

@@ -1,1 +1,8 @@
-document.addEventListener('DOMContentLoaded', function() {    document.querySelector('form').addEventListener('submit', function(event) {        let valid = true;        // Validate kiloan inputs        if (document.querySelector('[name="jenis_layanan"]').value == 'kiloan') {            let berat = document.querySelector('[name="berat"]').value;            if (berat == '' || isNaN(berat) || berat <= 0) {                document.querySelector('[name="berat"]').classList.add('is-invalid');                valid = false;            } else {                document.querySelector('[name="berat"]').classList.remove('is-invalid');            }        } else {            // Validate satuan inputs            let jumlah = document.querySelector('[name="jumlah"]').value;            if (jumlah == '' || isNaN(jumlah) || jumlah <= 0) {                document.querySelector('[name="jumlah"]').classList.add('is-invalid');                valid = false;            } else {                document.querySelector('[name="jumlah"]').classList.remove('is-invalid');            }        }        if (!valid) {            alert('Please correct the errors in the form.');            event.preventDefault();        }    });});
+$(document).ready(function () {
+    $('.sidenav').sidenav();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var elems = document.querySelectorAll('.slider');
+    var instances = M.Slider.init(elems, options);
+});
