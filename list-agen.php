@@ -167,21 +167,55 @@ if ( isset($_POST["cari"])) {
 </html>
 <?php
 
-if (isset($_GET["hapus"])){
-
-    // ambil id agen dri method post
+if (isset($_GET["hapus"])) {
     $idAgen = $_GET["hapus"];
-
-    // hapus data agen
-    $query = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
-
-    // kalau berhasil di hapus, keluar alert
-    if ( mysqli_affected_rows($connect) > 0 ){
+    
+    // Cek apakah ada cucian yang sedang berlangsung
+    $check = mysqli_query($connect, "SELECT COUNT(*) as count FROM cucian 
+                                   WHERE id_agen = '$idAgen' 
+                                   AND status_cucian != 'Selesai'");
+    $active = mysqli_fetch_assoc($check)['count'];
+    
+    if($active > 0) {
+        echo "
+            <script>
+                Swal.fire('Tidak dapat menghapus agen',
+                         'Masih ada cucian yang sedang diproses',
+                         'warning');
+            </script>
+        ";
+        exit;
+    }
+    
+    try {
+        // Mulai transaction
+        mysqli_begin_transaction($connect);
+        
+        // Hapus data dari tabel-tabel terkait terlebih dahulu
+        mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
+        mysqli_query($connect, "DELETE FROM harga WHERE id_agen = '$idAgen'");
+        mysqli_query($connect, "DELETE FROM transaksi WHERE id_agen = '$idAgen'");
+        mysqli_query($connect, "DELETE FROM cucian WHERE id_agen = '$idAgen'");
+        
+        // Terakhir hapus data agen
+        mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
+        
+        // Commit jika semua berhasil
+        mysqli_commit($connect);
+        
         echo "
             <script>
                 Swal.fire('Data Agen Berhasil Di Hapus','','success').then(function(){
                     window.location = 'list-agen.php';
                 });
+            </script>
+        ";
+    } catch (Exception $e) {
+        // Rollback jika terjadi error
+        mysqli_rollback($connect);
+        echo "
+            <script>
+                Swal.fire('Gagal menghapus data','Error: " . $e->getMessage() . "','error');
             </script>
         ";
     }

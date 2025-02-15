@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 15 Feb 2025 pada 09.40
+-- Waktu pembuatan: 15 Feb 2025 pada 09.48
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -59,14 +59,6 @@ CREATE TABLE `agen` (
   `password` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data untuk tabel `agen`
---
-
-INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`) VALUES
-(1, 'Nadya LaundryKu', 'Nadya Eka', '083123456789', 'agen1@gmail.com', 'Denpasar', 'Jl. Diponegoro No 55', 'DK 1234 AA', '5eab524e20d98.jpg', '$2y$10$tQ4th/nx/LLxYB7iHpbg4.FX1wdffLb5yplJIJsTdU6XlUCNPgEC6'),
-(12, 'dacafacaf', 'sadacafwa', '2143124214124', 'bakwan@gmail.com', 'ffesfafqwfr', 'adaff', '123131', 'default.png', '$2y$10$H8dYj7pQO11eoX1C1AV03OdusFtwpBQVI/3Rf0uYA7k3tAhnbnD4e');
-
 -- --------------------------------------------------------
 
 --
@@ -89,22 +81,6 @@ CREATE TABLE `cucian` (
   `catatan_berat` text DEFAULT NULL,
   `status_cucian` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `cucian`
---
-
-INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `estimasi_item`, `tipe_layanan`, `total_item`, `berat`, `alamat`, `catatan`, `catatan_berat`, `status_cucian`) VALUES
-(1, 1, 11, '2020-04-25', '0000-00-00', 'setrika', NULL, 'kiloan', 2, 1, 'Jl. Aceg No 44, Aceh', 'tak ada', NULL, 'Selesai'),
-(2, 5, 8, '2020-04-25', '0000-00-00', 'komplit', NULL, 'kiloan', 6, 4, 'Jl. Melati No 99, Denpasar', 'yang bersih yaaaa', NULL, 'Selesai'),
-(3, 1, 11, '2020-04-26', '0000-00-00', 'cuci', NULL, 'kiloan', 1, 5, 'Jl. Aceg No 44, Aceh', 'cepet ya', NULL, 'Selesai'),
-(4, 4, 11, '2020-04-27', '0000-00-00', 'cuci', NULL, 'kiloan', 1, 5, 'Jl. Aceg No 44, Aceh', 'cepet', NULL, 'Selesai'),
-(5, 5, 11, '2020-04-27', '0000-00-00', 'komplit', NULL, 'kiloan', 5, 6, 'Jl. Aceg No 44, Aceh', 'yg bersih y', NULL, 'Selesai'),
-(6, 7, 9, '2020-04-27', '0000-00-00', 'setrika', NULL, 'kiloan', 1, NULL, 'Jl. Goa Gong, No 99, Kec Kuta Selatan (Rumah warna hitam), Badung', 'ngebut ya\r\n', NULL, 'Penjemputan'),
-(7, 5, 12, '2020-04-29', '0000-00-00', 'setrika', NULL, 'kiloan', 4, 2, 'Jl. Umum No 77, Singaraja', 'yang sabar', NULL, 'Sedang Di Jemur'),
-(8, 5, 12, '2020-05-06', '0000-00-00', 'setrika', NULL, 'kiloan', 5, 3, 'Jl. Umum No 77, Singaraja', 'Yang Harum ya beb', NULL, 'Sedang di Cuci'),
-(9, 5, 13, '2020-05-06', '0000-00-00', 'komplit', NULL, 'kiloan', 1, 1, 'Jl. Semarang No 99, Semarang', 'tes', NULL, 'Selesai'),
-(10, 1, 14, '2025-02-15', '0000-00-00', 'komplit', 'ada 100 baju', 'kiloan', NULL, NULL, '', '', NULL, 'Penjemputan');
 
 -- --------------------------------------------------------
 
@@ -138,31 +114,6 @@ CREATE TABLE `harga` (
 --
 
 INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`) VALUES
-(1, 'cuci', 3, 2000),
-(2, 'setrika', 3, 1000),
-(3, 'komplit', 3, 2500),
-(4, 'cuci', 1, 5000),
-(5, 'setrika', 1, 3000),
-(6, 'komplit', 1, 7000),
-(7, 'cuci', 4, 300),
-(8, 'setrika', 4, 200),
-(9, 'komplit', 4, 400),
-(10, 'cuci', 5, 4000),
-(11, 'setrika', 5, 3000),
-(12, 'komplit', 5, 5000),
-(13, 'cuci', 6, 7000),
-(14, 'setrika', 6, 3000),
-(15, 'komplit', 6, 8000),
-(16, 'cuci', 7, 3000),
-(17, 'setrika', 7, 2000),
-(18, 'komplit', 7, 4500),
-(19, 'cuci', 8, 6000),
-(20, 'setrika', 8, 3000),
-(21, 'komplit', 8, 7500),
-(22, 'cuci', 9, 4000),
-(23, 'setrika', 9, 2000),
-(24, 'komplit', 9, 5000),
-(25, 'cuci', 10, 5000),
 (26, 'setrika', 10, 3000),
 (27, 'komplit', 10, 6000),
 (28, 'cuci', 10, 5000),
@@ -182,23 +133,6 @@ CREATE TABLE `harga_satuan` (
   `jenis` varchar(30) NOT NULL,
   `harga` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `harga_satuan`
---
-
-INSERT INTO `harga_satuan` (`id_harga_satuan`, `id_agen`, `nama_item`, `jenis`, `harga`) VALUES
-(1, 1, 'Kemeja', 'cuci', 8000),
-(2, 1, 'Kemeja', 'setrika', 6000),
-(3, 1, 'Kemeja', 'komplit', 12000),
-(4, 1, 'Celana', 'cuci', 10000),
-(5, 1, 'Celana', 'setrika', 7000),
-(6, 1, 'Celana', 'komplit', 15000),
-(7, 1, 'Jaket', 'cuci', 15000),
-(8, 1, 'Jaket', 'setrika', 10000),
-(9, 1, 'Jaket', 'komplit', 20000),
-(10, 12, 'adawda', '', 1000),
-(11, 12, 'dawda', '', 10000);
 
 -- --------------------------------------------------------
 
@@ -234,18 +168,6 @@ CREATE TABLE `transaksi` (
   `rating` int(11) DEFAULT NULL,
   `komentar` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `transaksi`
---
-
-INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `rating`, `komentar`) VALUES
-(6, 1, 1, 11, '2020-04-25', '2020-04-26', 1000, 6, 'Mantap'),
-(19, 4, 4, 11, '2020-04-27', '2020-04-27', 10000, 10, 'Reccomended'),
-(20, 3, 1, 11, '2020-04-26', '2020-04-29', 10000, 10, 'Sangat cocok, agennya ramah sampe ke ubun ubun'),
-(21, 2, 5, 8, '2020-04-25', '2020-05-06', 10000, 0, ''),
-(22, 5, 5, 11, '2020-04-27', '2020-05-06', 15000, 0, ''),
-(23, 9, 5, 13, '2020-05-06', '2020-05-06', 2500, 10, 'Sangat direkomendasikan');
 
 --
 -- Indexes for dumped tables

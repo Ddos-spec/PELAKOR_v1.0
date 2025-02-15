@@ -102,13 +102,23 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
                 <div id="listItemSatuan">
                     <!-- Template awal -->
                     <div class="row item-satuan" id="template-item" style="display: none;">
-                        <div class="col s5">
+                        <div class="col s4">
                             <div class="input-field">
                                 <input type="text" name="nama_item[]" required>
                                 <label>Nama Item</label>
                             </div>
                         </div>
-                        <div class="col s5">
+                        <div class="col s3">
+                            <div class="input-field">
+                                <select name="jenis[]" required>
+                                    <option value="cuci">Cuci</option>
+                                    <option value="setrika">Setrika</option>
+                                    <option value="komplit">Komplit</option>
+                                </select>
+                                <label>Jenis</label>
+                            </div>
+                        </div>
+                        <div class="col s3">
                             <div class="input-field">
                                 <input type="number" name="harga_satuan[]" required>
                                 <label>Harga (Rp)</label>
@@ -126,13 +136,23 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
                     while($item = mysqli_fetch_assoc($querySatuan)):
                     ?>
                     <div class="row item-satuan">
-                        <div class="col s5">
+                        <div class="col s4">
                             <div class="input-field">
                                 <input type="text" name="nama_item[]" value="<?= $item['nama_item'] ?>" required>
                                 <label>Nama Item</label>
                             </div>
                         </div>
-                        <div class="col s5">
+                        <div class="col s3">
+                            <div class="input-field">
+                                <select name="jenis[]" required>
+                                    <option value="cuci" <?= $item['jenis'] == 'cuci' ? 'selected' : '' ?>>Cuci</option>
+                                    <option value="setrika" <?= $item['jenis'] == 'setrika' ? 'selected' : '' ?>>Setrika</option>
+                                    <option value="komplit" <?= $item['jenis'] == 'komplit' ? 'selected' : '' ?>>Komplit</option>
+                                </select>
+                                <label>Jenis</label>
+                            </div>
+                        </div>
+                        <div class="col s3">
                             <div class="input-field">
                                 <input type="number" name="harga_satuan[]" value="<?= $item['harga'] ?>" required>
                                 <label>Harga (Rp)</label>
@@ -163,8 +183,13 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi tabs
         var tabs = document.querySelectorAll('.tabs');
         M.Tabs.init(tabs);
+        
+        // Inisialisasi select
+        var selects = document.querySelectorAll('select');
+        M.FormSelect.init(selects);
         
         if(document.querySelectorAll('.item-satuan:not(#template-item)').length === 0) {
             tambahItemSatuan();
@@ -209,6 +234,11 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
         });
         
         document.getElementById('listItemSatuan').appendChild(newItem);
+        
+        // Inisialisasi select pada item baru
+        var selects = newItem.querySelectorAll('select');
+        M.FormSelect.init(selects);
+        
         M.updateTextFields();
         console.log('Item baru ditambahkan');
     }
@@ -326,6 +356,8 @@ if (isset($_POST["simpanKiloan"])) {
 }
 
 if (isset($_POST["simpanSatuan"])) {
+    error_log("POST Data: " . print_r($_POST, true));
+    
     // 1. Validate form data existence
     if(!isset($_POST["nama_item"]) || !isset($_POST["harga_satuan"])) {
         echo "<script>
@@ -339,6 +371,7 @@ if (isset($_POST["simpanSatuan"])) {
     }
 
     $nama_items = $_POST["nama_item"];
+    $jenis_items = $_POST["jenis"];
     $harga_satuans = $_POST["harga_satuan"];
     
     mysqli_begin_transaction($connect);
@@ -350,6 +383,7 @@ if (isset($_POST["simpanSatuan"])) {
         
         foreach($nama_items as $i => $nama) {
             $nama = htmlspecialchars($nama);
+            $jenis = htmlspecialchars($jenis_items[$i]);
             $harga = htmlspecialchars($harga_satuans[$i]);
             
             // Detailed validation
@@ -357,9 +391,12 @@ if (isset($_POST["simpanSatuan"])) {
             if(empty($harga)) throw new Exception("Harga item ke-".($i+1)." kosong");
             if(!is_numeric($harga)) throw new Exception("Harga harus berupa angka");
             if($harga <= 0) throw new Exception("Harga harus lebih dari 0");
+            if(!in_array($jenis, ['cuci', 'setrika', 'komplit'])) {
+                throw new Exception("Jenis layanan tidak valid");
+            }
             
-            $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
-                     VALUES ('$idAgen', '$nama', '$harga')";
+            $query = "INSERT INTO harga_satuan (id_agen, nama_item, jenis, harga) 
+                     VALUES ('$idAgen', '$nama', '$jenis', '$harga')";
             
             error_log("Executing query: " . $query);
             
