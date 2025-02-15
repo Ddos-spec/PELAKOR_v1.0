@@ -27,6 +27,17 @@ $komplit = mysqli_fetch_assoc($komplit);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
     <title>Ubah Data Harga</title>
+    <style>
+        .item-satuan {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .btn-hapus {
+            margin-top: 25px;
+        }
+    </style>
 </head>
 <body>
 
@@ -50,79 +61,91 @@ $komplit = mysqli_fetch_assoc($komplit);
 
         <!-- Harga Kiloan -->
         <div id="hargaKiloan">
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title">Harga Layanan Kiloan</span>
-                    <form action="" method="post">
-                        <div class="input-field">
-                            <input type="number" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
-                            <label for="cuci">Cuci (Rp/Kg)</label>
-                        </div>
-                        <div class="input-field">
-                            <input type="number" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
-                            <label for="setrika">Setrika (Rp/Kg)</label>
-                        </div>
-                        <div class="input-field">
-                            <input type="number" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
-                            <label for="komplit">Cuci + Setrika (Rp/Kg)</label>
-                        </div>
-                        <div class="center">
-                            <button class="btn-large blue darken-2" type="submit" name="simpanKiloan">
-                                Simpan Harga Kiloan
-                            </button>
-                        </div>
-                    </form>
+            <form action="" method="post">
+                <div class="input-field">
+                    <input type="number" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
+                    <label for="cuci">Cuci (Rp/Kg)</label>
                 </div>
-            </div>
+                <div class="input-field">
+                    <input type="number" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
+                    <label for="setrika">Setrika (Rp/Kg)</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
+                    <label for="komplit">Cuci + Setrika (Rp/Kg)</label>
+                </div>
+                <div class="center">
+                    <button class="btn-large blue darken-2" type="submit" name="simpanKiloan">
+                        Simpan Harga Kiloan
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Harga Satuan -->
         <div id="hargaSatuan">
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title">Harga Layanan Satuan</span>
-                    <form action="" method="post" id="formHargaSatuan">
-                        <div class="row">
-                            <div class="col s12">
-                                <button type="button" class="btn blue" onclick="tambahItemSatuan()">
-                                    <i class="material-icons left">add</i>Tambah Item
-                                </button>
-                            </div>
-                        </div>
-                        <div id="listItemSatuan">
-                            <?php
-                            $querySatuan = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = '$idAgen'");
-                            while($item = mysqli_fetch_assoc($querySatuan)):
-                            ?>
-                            <div class="row item-satuan">
-                                <div class="col s5">
-                                    <div class="input-field">
-                                        <input type="text" name="nama_item[]" value="<?= $item['nama_item'] ?>" required>
-                                        <label>Nama Item</label>
-                                    </div>
-                                </div>
-                                <div class="col s5">
-                                    <div class="input-field">
-                                        <input type="number" name="harga_satuan[]" value="<?= $item['harga'] ?>" required>
-                                        <label>Harga (Rp)</label>
-                                    </div>
-                                </div>
-                                <div class="col s2">
-                                    <button type="button" class="btn-floating red" onclick="hapusItem(this)">
-                                        <i class="material-icons">delete</i>
-                                    </button>
-                                </div>
-                            </div>
-                            <?php endwhile; ?>
-                        </div>
-                        <div class="center">
-                            <button class="btn-large blue darken-2" type="submit" name="simpanSatuan">
-                                Simpan Harga Satuan
-                            </button>
-                        </div>
-                    </form>
+            <div class="row">
+                <div class="col s12">
+                    <button type="button" class="btn blue" onclick="tambahItemSatuan()">
+                        <i class="material-icons left">add</i>Tambah Item
+                    </button>
                 </div>
             </div>
+            <form action="" method="post" id="formHargaSatuan">
+                <div id="listItemSatuan">
+                    <!-- Template awal -->
+                    <div class="row item-satuan" id="template-item" style="display: none;">
+                        <div class="col s5">
+                            <div class="input-field">
+                                <input type="text" name="nama_item[]" required>
+                                <label>Nama Item</label>
+                            </div>
+                        </div>
+                        <div class="col s5">
+                            <div class="input-field">
+                                <input type="number" name="harga_satuan[]" required>
+                                <label>Harga (Rp)</label>
+                            </div>
+                        </div>
+                        <div class="col s2">
+                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <?php
+                    $querySatuan = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = '$idAgen'");
+                    while($item = mysqli_fetch_assoc($querySatuan)):
+                    ?>
+                    <div class="row item-satuan">
+                        <div class="col s5">
+                            <div class="input-field">
+                                <input type="text" name="nama_item[]" value="<?= $item['nama_item'] ?>" required>
+                                <label>Nama Item</label>
+                            </div>
+                        </div>
+                        <div class="col s5">
+                            <div class="input-field">
+                                <input type="number" name="harga_satuan[]" value="<?= $item['harga'] ?>" required>
+                                <label>Harga (Rp)</label>
+                            </div>
+                        </div>
+                        <div class="col s2">
+                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endwhile; ?>
+                </div>
+
+                <div class="center">
+                    <button class="btn-large blue darken-2" type="submit" name="simpanSatuan">
+                        Simpan Harga Satuan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     <!-- end body -->
@@ -132,34 +155,75 @@ $komplit = mysqli_fetch_assoc($komplit);
     <!-- end footer -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var tabs = document.querySelectorAll('.tabs');
-            M.Tabs.init(tabs);
-        });
-
-        function tambahItemSatuan() {
-            var template = document.querySelector('.item-satuan').cloneNode(true);
-            template.querySelectorAll('input').forEach(input => {
-                input.value = '';
+    document.addEventListener('DOMContentLoaded', function() {
+        var tabs = document.querySelectorAll('.tabs');
+        M.Tabs.init(tabs);
+        
+        if(document.querySelectorAll('.item-satuan:not(#template-item)').length === 0) {
+            tambahItemSatuan();
+        }
+        
+        // Add form validation
+        document.getElementById('formHargaSatuan').addEventListener('submit', function(e) {
+            const items = document.querySelectorAll('.item-satuan:not(#template-item)');
+            let isValid = true;
+            
+            items.forEach((item, index) => {
+                const nama = item.querySelector('[name="nama_item[]"]').value;
+                const harga = item.querySelector('[name="harga_satuan[]"]').value;
+                
+                if(!nama || !harga) {
+                    isValid = false;
+                    M.toast({html: `Item ke-${index + 1} tidak lengkap`});
+                }
             });
-            document.getElementById('listItemSatuan').appendChild(template);
-            M.updateTextFields();
-        }
-
-        function hapusItem(btn) {
-            var items = document.querySelectorAll('.item-satuan');
-            if(items.length > 1) {
-                btn.closest('.item-satuan').remove();
-            } else {
-                M.toast({html: 'Minimal harus ada 1 item!'});
+            
+            if(!isValid) {
+                e.preventDefault();
             }
+        });
+    });
+
+    function tambahItemSatuan() {
+        console.log('Menambah item baru');
+        var template = document.getElementById('template-item');
+        if (!template) {
+            console.error('Template item tidak ditemukan');
+            return;
         }
+        
+        var newItem = template.cloneNode(true);
+        newItem.style.display = 'block';
+        newItem.removeAttribute('id');
+        
+        console.log('Mereset nilai input');
+        newItem.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+        
+        document.getElementById('listItemSatuan').appendChild(newItem);
+        M.updateTextFields();
+        console.log('Item baru ditambahkan');
+    }
+
+    function hapusItem(btn) {
+        var items = document.querySelectorAll('.item-satuan:not(#template-item)');
+        if(items.length > 1) {
+            btn.closest('.item-satuan').remove();
+        } else {
+            M.toast({html: 'Minimal harus ada 1 item!'});
+        }
+    }
     </script>
 
 </body>
 </html>
 
 <?php
+
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // fungsi mengubah harga
 function ubahHarga($data){
@@ -205,18 +269,73 @@ if (isset($_POST["simpanKiloan"])) {
 }
 
 if (isset($_POST["simpanSatuan"])) {
+    // 1. Validate form data existence
+    if(!isset($_POST["nama_item"]) || !isset($_POST["harga_satuan"])) {
+        echo "<script>
+            Swal.fire({
+                title: 'Error!',
+                text: 'Data tidak lengkap',
+                icon: 'error'
+            });
+        </script>";
+        exit;
+    }
+
     $nama_items = $_POST["nama_item"];
     $harga_satuans = $_POST["harga_satuan"];
     
-    mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
+    mysqli_begin_transaction($connect);
     
-    foreach($nama_items as $i => $nama) {
-        $harga = $harga_satuans[$i];
-        mysqli_query($connect, "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
-                              VALUES ('$idAgen', '$nama', '$harga')");
+    try {
+        error_log("Menghapus data lama untuk agen: " . $idAgen);
+        
+        mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
+        
+        foreach($nama_items as $i => $nama) {
+            $nama = htmlspecialchars($nama);
+            $harga = htmlspecialchars($harga_satuans[$i]);
+            
+            // Detailed validation
+            if(empty($nama)) throw new Exception("Nama item ke-".($i+1)." kosong");
+            if(empty($harga)) throw new Exception("Harga item ke-".($i+1)." kosong");
+            if(!is_numeric($harga)) throw new Exception("Harga harus berupa angka");
+            if($harga <= 0) throw new Exception("Harga harus lebih dari 0");
+            
+            $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
+                     VALUES ('$idAgen', '$nama', '$harga')";
+            
+            error_log("Executing query: " . $query);
+            
+            if(!mysqli_query($connect, $query)) {
+                throw new Exception(mysqli_error($connect));
+            }
+        }
+        
+        mysqli_commit($connect);
+        
+        echo "<script>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data berhasil disimpan',
+                icon: 'success'
+            }).then(() => {
+                window.location.reload();
+            });
+        </script>";
+        
+    } catch(Exception $e) {
+        mysqli_rollback($connect);
+        
+        echo "<script>
+            Swal.fire({
+                title: 'Error!',
+                text: '".$e->getMessage()."',
+                icon: 'error'
+            });
+        </script>";
+        
+        error_log("Error in simpanSatuan: " . $e->getMessage());
     }
-    
-    echo "<script>Swal.fire('Berhasil','Harga satuan berhasil diupdate','success');</script>";
 }
 
 ?>

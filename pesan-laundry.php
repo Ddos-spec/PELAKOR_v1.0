@@ -224,9 +224,17 @@ $pelanggan = mysqli_fetch_assoc($query);
     });
 
     function updateDaftarItem(jenis) {
+        // Tampilkan loading
+        document.getElementById('daftarItem').innerHTML = '<div class="center"><div class="preloader-wrapper small active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>';
+        
         fetch('get_harga_satuan.php?id_agen=<?= $idAgen ?>&jenis=' + jenis)
             .then(response => response.json())
             .then(data => {
+                if(data.length === 0) {
+                    document.getElementById('daftarItem').innerHTML = '<p class="center">Tidak ada item yang tersedia</p>';
+                    return;
+                }
+                
                 let html = '';
                 data.forEach(item => {
                     html += `
@@ -251,6 +259,10 @@ $pelanggan = mysqli_fetch_assoc($query);
                 document.getElementById('daftarItem').innerHTML = html;
                 M.updateTextFields();
                 hitungTotal();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('daftarItem').innerHTML = '<p class="center red-text">Error mengambil data</p>';
             });
     }
 
