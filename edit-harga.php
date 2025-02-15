@@ -114,6 +114,11 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
                                 <label for="harga_satuan_template">Harga (Rp)</label>
                             </div>
                         </div>
+                        <div class="col s2">
+                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </div>
                     </div>
 
                     <?php
@@ -163,41 +168,38 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi tabs
-        var tabs = document.querySelectorAll('.tabs');
-        M.Tabs.init(tabs);
+        // Initialize all Materialize components
+        M.AutoInit();
         
-        // Inisialisasi select
-        var selects = document.querySelectorAll('select');
-        M.FormSelect.init(selects);
-        
+        // Add first item if empty
         if(document.querySelectorAll('.item-satuan:not(#template-item)').length === 0) {
             tambahItemSatuan();
         }
-        
-        // Add form validation
+
+        // Form validation
         document.getElementById('formHargaSatuan').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default submission first
+            
             const items = document.querySelectorAll('.item-satuan:not(#template-item)');
             let isValid = true;
             
             items.forEach((item, index) => {
-                const nama = item.querySelector('[name="nama_item[]"]').value;
-                const harga = item.querySelector('[name="harga_satuan[]"]').value;
+                const nama = item.querySelector('[name="nama_item[]"]');
+                const harga = item.querySelector('[name="harga_satuan[]"]');
                 
-                if(!nama || !harga) {
+                if(!nama.value || !harga.value || harga.value <= 0) {
                     isValid = false;
-                    M.toast({html: `Item ke-${index + 1} tidak lengkap`});
+                    M.toast({html: `Item ke-${index + 1} tidak lengkap atau tidak valid`});
                 }
             });
             
-            if(!isValid) {
-                e.preventDefault();
+            if(isValid) {
+                this.submit(); // Submit form if valid
             }
         });
     });
 
     function tambahItemSatuan() {
-        console.log('Menambah item baru');
         var template = document.getElementById('template-item');
         if (!template) {
             console.error('Template item tidak ditemukan');
@@ -212,22 +214,27 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
         var timestamp = new Date().getTime();
         var namaInput = newItem.querySelector('input[name="nama_item[]"]');
         var hargaInput = newItem.querySelector('input[name="harga_satuan[]"]');
-        var namaLabel = newItem.querySelector('label[for="nama_item_template"]');
-        var hargaLabel = newItem.querySelector('label[for="harga_satuan_template"]');
+        
+        // Remove tabindex from cloned items
+        namaInput.removeAttribute('tabindex');
+        hargaInput.removeAttribute('tabindex');
         
         // Set new IDs
         namaInput.id = 'nama_item_' + timestamp;
         hargaInput.id = 'harga_satuan_' + timestamp;
-        namaLabel.setAttribute('for', 'nama_item_' + timestamp);
-        hargaLabel.setAttribute('for', 'harga_satuan_' + timestamp);
+        
+        // Update labels
+        newItem.querySelector('label[for="nama_item_template"]').setAttribute('for', 'nama_item_' + timestamp);
+        newItem.querySelector('label[for="harga_satuan_template"]').setAttribute('for', 'harga_satuan_' + timestamp);
         
         // Reset values
         namaInput.value = '';
         hargaInput.value = '';
         
         document.getElementById('listItemSatuan').appendChild(newItem);
+        
+        // Initialize Materialize select
         M.updateTextFields();
-        console.log('Item baru ditambahkan');
     }
 
     function hapusItem(btn) {
@@ -343,79 +350,32 @@ if (isset($_POST["simpanKiloan"])) {
 }
 
 if (isset($_POST["simpanSatuan"])) {
-    error_log("POST Data: " . print_r($_POST, true));
-    
-    // 1. Validate form data existence
-    if(!isset($_POST["nama_item"]) || !isset($_POST["harga_satuan"])) {
-        echo "<script>
-            Swal.fire({
-                title: 'Error!',
-                text: 'Data tidak lengkap',
-                icon: 'error'
-            });
-        </script>";
-        exit;
-    }
-
     $nama_items = $_POST["nama_item"];
-    $jenis_items = $_POST["jenis"];
     $harga_satuans = $_POST["harga_satuan"];
     
     mysqli_begin_transaction($connect);
     
     try {
-        error_log("Menghapus data lama untuk agen: " . $idAgen);
-        
         mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
         
         foreach($nama_items as $i => $nama) {
             $nama = htmlspecialchars($nama);
-            $jenis = htmlspecialchars($jenis_items[$i]);
             $harga = htmlspecialchars($harga_satuans[$i]);
             
-            // Detailed validation
-            if(empty($nama)) throw new Exception("Nama item ke-".($i+1)." kosong");
-            if(empty($harga)) throw new Exception("Harga item ke-".($i+1)." kosong");
-            if(!is_numeric($harga)) throw new Exception("Harga harus berupa angka");
-            if($harga <= 0) throw new Exception("Harga harus lebih dari 0");
-            if(!in_array($jenis, ['cuci', 'setrika', 'komplit'])) {
-                throw new Exception("Jenis layanan tidak valid");
-            }
-            
-            $query = "INSERT INTO harga_satuan (id_agen, nama_item, jenis, harga) 
-                     VALUES ('$idAgen', '$nama', '$jenis', '$harga')";
-            
-            error_log("Executing query: " . $query);
-            
+            $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
+                     VALUES ('$idAgen', '$nama', '$harga')";
+                     
             if(!mysqli_query($connect, $query)) {
                 throw new Exception(mysqli_error($connect));
             }
         }
         
         mysqli_commit($connect);
-        
-        echo "<script>
-            Swal.fire({
-                title: 'Berhasil!',
-                text: 'Data berhasil disimpan',
-                icon: 'success'
-            }).then(() => {
-                window.location.reload();
-            });
-        </script>";
-        
+        echo "<script>Swal.fire('Berhasil!', 'Data tersimpan', 'success')
+              .then(() => window.location.reload());</script>";
     } catch(Exception $e) {
         mysqli_rollback($connect);
-        
-        echo "<script>
-            Swal.fire({
-                title: 'Error!',
-                text: '".$e->getMessage()."',
-                icon: 'error'
-            });
-        </script>";
-        
-        error_log("Error in simpanSatuan: " . $e->getMessage());
+        echo "<script>Swal.fire('Error!', '".$e->getMessage()."', 'error');</script>";
     }
 }
 

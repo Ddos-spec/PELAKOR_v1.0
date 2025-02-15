@@ -227,7 +227,7 @@ $pelanggan = mysqli_fetch_assoc($query);
         // Tampilkan loading
         document.getElementById('daftarItem').innerHTML = '<div class="center"><div class="preloader-wrapper small active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>';
         
-        fetch('get_harga_satuan.php?id_agen=<?= $idAgen ?>&jenis=' + jenis)
+        fetch('get_harga_satuan.php?id_agen=<?= $idAgen ?>')
             .then(response => response.json())
             .then(data => {
                 if(data.length === 0) {
@@ -237,18 +237,26 @@ $pelanggan = mysqli_fetch_assoc($query);
                 
                 let html = '';
                 data.forEach(item => {
+                    let harga = parseInt(item.harga);
+                    // Sesuaikan harga berdasarkan jenis
+                    if(jenis === 'setrika') {
+                        harga = harga * 0.8;  // 80% dari harga normal
+                    } else if(jenis === 'komplit') {
+                        harga = harga * 1.5;  // 150% dari harga normal
+                    }
+                    
                     html += `
                     <div class="card-panel-item">
                         <div class="row">
                             <div class="col s7">
                                 <p>${item.nama_item}</p>
-                                <p class="grey-text">Rp ${parseInt(item.harga).toLocaleString()}</p>
+                                <p class="grey-text">Rp ${harga.toLocaleString()}</p>
                             </div>
                             <div class="col s5">
                                 <div class="input-field">
                                     <input type="number" name="item[${item.id_harga_satuan}]" 
                                            value="0" min="0" 
-                                           data-harga="${item.harga}"
+                                           data-harga="${harga}"
                                            onchange="hitungTotal()">
                                     <label>Jumlah</label>
                                 </div>
