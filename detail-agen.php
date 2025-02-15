@@ -37,25 +37,32 @@ $agen = mysqli_fetch_assoc($query);
             <ul>
                 <li>
                     <?php
+                        // Improved rating calculation
                         $temp = $agen["id_agen"];
-                        $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                        $totalStar = 0;
-                        $i = 0;
-                        while ($star = mysqli_fetch_assoc($queryStar)){
-                            // kalau belum kasi rating gak dihitung
-                            if ($star["rating"] != 0){
-                                $totalStar += $star["rating"];
-                                $i++;
-                                $fixStar = ceil($totalStar / $i);
-                            }
-                        }
-                            
-                        if ( $totalStar == 0 ) {
+                        $queryStar = mysqli_query($connect,"SELECT AVG(rating) as avg_rating, COUNT(*) as total_ratings 
+                                                          FROM transaksi 
+                                                          WHERE id_agen = '$temp' AND rating > 0");
+                        $ratingData = mysqli_fetch_assoc($queryStar);
+
+                        $fixStar = $ratingData['avg_rating'] ? ceil($ratingData['avg_rating']) : 0;
+                        $totalRatings = $ratingData['total_ratings'];
                     ?>
-                        <fieldset class="bintang"><span class="starImg star-0"></span></fieldset>
-                    <?php }else { ?>
-                        <fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset>
-                    <?php } ?>
+
+                    <div class="rating-section">
+                        <fieldset class="bintang">
+                            <span class="starImg star-<?= $fixStar ?>"></span>
+                        </fieldset>
+                        <?php if($totalRatings > 0): ?>
+                            <div class="rating-info">
+                                <span class="rating-number"><?= number_format($ratingData['avg_rating'], 1) ?></span>
+                                <span class="rating-count">(<?= $totalRatings ?> ulasan)</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="rating-info">
+                                <span class="grey-text">Belum ada ulasan</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </li>
                 <li>Alamat : <?= $agen["alamat"] . ", " . $agen["kota"] ?></li>
                 <li>No. HP : <?= $agen["telp"] ?></li>
@@ -100,4 +107,4 @@ $agen = mysqli_fetch_assoc($query);
 
     <?php include "footer.php"; ?>
 </body>
-</html> ▋
+</html>

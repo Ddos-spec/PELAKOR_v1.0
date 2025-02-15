@@ -63,72 +63,55 @@ h1 {
     color: #FFED85;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-/* OUTPUT */
+/* Base styles */
 .bintang {
-    width: 100px;
     border: none;
-    font-weight: bold;
-    font-size: 12px;
+    float: left;
 }
 
 .starImg {
     width: 100px;
-    height: 21px;
-    display: block;
-    background: url(/img/rating.png) 0 0 no-repeat; /* menggunakan path absolut */
+    height: 20px;
+    display: inline-block;
+    background: url(../../img/rating.png) 0 0 no-repeat;
+    background-size: auto 40px;
 }
 
-.star-0 {
-    background-position: -100px -0;
+/* Star rating positions */
+.star-0 { background-position: -125px 0; }
+.star-1 { background-position: -100px 0; }
+.star-2 { background-position: -75px 0; }
+.star-3 { background-position: -50px 0; }
+.star-4 { background-position: -25px 0; }
+.star-5 { background-position: 0 0; }
+
+/* Rating display components */
+.rating-display {
+    display: inline-block;
+    text-align: center;
+    margin: 10px 0;
 }
 
-.star-1 {
-    background-position: -81px -21px;
+.rating-display .bintang {
+    display: inline-block;
+    margin-bottom: 5px;
 }
 
-.star-2 {
-    background-position: -81px 0;
+.rating-section {
+    margin: 15px 0;
 }
 
-.star-3 {
-    background-position: -61px -21px;
+.rating-info {
+    margin-top: 5px;
+    font-size: 0.9em;
 }
 
-.star-4 {
-    background-position: -60px 0;
+.rating-number {
+    font-weight: bold;
+    color: #ffd700;
 }
 
-.star-5 {
-    background-position: -40px -21px;
-}
-
-.star-6 {
-    background-position: -40px 0;
-}
-
-.star-7 {
-    background-position: -21px -21px;
-}
-
-.star-8 {
-    background-position: -21px 0;
-}
-
-.star-9 {
-    background-position: 0 -21px;
-}
-
-.star-10 {
-    background-position: 0 0;
+.rating-count {
+    color: #666;
+    margin-left: 5px;
 }
