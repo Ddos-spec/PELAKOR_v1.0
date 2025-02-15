@@ -102,66 +102,46 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
                 <div id="listItemSatuan">
                     <!-- Template awal -->
                     <div class="row item-satuan" id="template-item" style="display: none;">
-                        <div class="col s4">
+                        <div class="col s5">
                             <div class="input-field">
-                                <input type="text" name="nama_item[]" required>
-                                <label>Nama Item</label>
+                                <input type="text" id="nama_item_template" name="nama_item[]" required>
+                                <label for="nama_item_template">Nama Item</label>
                             </div>
                         </div>
-                        <div class="col s3">
+                        <div class="col s5">
                             <div class="input-field">
-                                <select name="jenis[]" required>
-                                    <option value="cuci">Cuci</option>
-                                    <option value="setrika">Setrika</option>
-                                    <option value="komplit">Komplit</option>
-                                </select>
-                                <label>Jenis</label>
+                                <input type="number" id="harga_satuan_template" name="harga_satuan[]" required>
+                                <label for="harga_satuan_template">Harga (Rp)</label>
                             </div>
-                        </div>
-                        <div class="col s3">
-                            <div class="input-field">
-                                <input type="number" name="harga_satuan[]" required>
-                                <label>Harga (Rp)</label>
-                            </div>
-                        </div>
-                        <div class="col s2">
-                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
-                                <i class="material-icons">delete</i>
-                            </button>
                         </div>
                     </div>
 
                     <?php
                     $querySatuan = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = '$idAgen'");
+                    $counter = 0;
                     while($item = mysqli_fetch_assoc($querySatuan)):
+                        $counter++;
                     ?>
                     <div class="row item-satuan">
-                        <div class="col s4">
+                        <div class="col s5">
                             <div class="input-field">
-                                <input type="text" name="nama_item[]" value="<?= $item['nama_item'] ?>" required>
-                                <label>Nama Item</label>
+                                <input type="text" 
+                                       id="nama_item_<?= $counter ?>" 
+                                       name="nama_item[]" 
+                                       value="<?= $item['nama_item'] ?>" 
+                                       required>
+                                <label for="nama_item_<?= $counter ?>">Nama Item</label>
                             </div>
                         </div>
-                        <div class="col s3">
+                        <div class="col s5">
                             <div class="input-field">
-                                <select name="jenis[]" required>
-                                    <option value="cuci" <?= $item['jenis'] == 'cuci' ? 'selected' : '' ?>>Cuci</option>
-                                    <option value="setrika" <?= $item['jenis'] == 'setrika' ? 'selected' : '' ?>>Setrika</option>
-                                    <option value="komplit" <?= $item['jenis'] == 'komplit' ? 'selected' : '' ?>>Komplit</option>
-                                </select>
-                                <label>Jenis</label>
+                                <input type="number" 
+                                       id="harga_satuan_<?= $counter ?>" 
+                                       name="harga_satuan[]" 
+                                       value="<?= $item['harga'] ?>" 
+                                       required>
+                                <label for="harga_satuan_<?= $counter ?>">Harga (Rp)</label>
                             </div>
-                        </div>
-                        <div class="col s3">
-                            <div class="input-field">
-                                <input type="number" name="harga_satuan[]" value="<?= $item['harga'] ?>" required>
-                                <label>Harga (Rp)</label>
-                            </div>
-                        </div>
-                        <div class="col s2">
-                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
-                                <i class="material-icons">delete</i>
-                            </button>
                         </div>
                     </div>
                     <?php endwhile; ?>
@@ -228,17 +208,24 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
         newItem.style.display = 'block';
         newItem.removeAttribute('id');
         
-        console.log('Mereset nilai input');
-        newItem.querySelectorAll('input').forEach(input => {
-            input.value = '';
-        });
+        // Generate unique IDs
+        var timestamp = new Date().getTime();
+        var namaInput = newItem.querySelector('input[name="nama_item[]"]');
+        var hargaInput = newItem.querySelector('input[name="harga_satuan[]"]');
+        var namaLabel = newItem.querySelector('label[for="nama_item_template"]');
+        var hargaLabel = newItem.querySelector('label[for="harga_satuan_template"]');
+        
+        // Set new IDs
+        namaInput.id = 'nama_item_' + timestamp;
+        hargaInput.id = 'harga_satuan_' + timestamp;
+        namaLabel.setAttribute('for', 'nama_item_' + timestamp);
+        hargaLabel.setAttribute('for', 'harga_satuan_' + timestamp);
+        
+        // Reset values
+        namaInput.value = '';
+        hargaInput.value = '';
         
         document.getElementById('listItemSatuan').appendChild(newItem);
-        
-        // Inisialisasi select pada item baru
-        var selects = newItem.querySelectorAll('select');
-        M.FormSelect.init(selects);
-        
         M.updateTextFields();
         console.log('Item baru ditambahkan');
     }
