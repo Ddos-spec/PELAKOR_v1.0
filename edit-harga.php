@@ -20,6 +20,20 @@ $komplit = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen'
 $komplit = mysqli_fetch_assoc($komplit);
 $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Log all requests
+error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("POST Data: " . print_r($_POST, true));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("Raw POST data: " . file_get_contents('php://input'));
+    error_log("POST array: " . print_r($_POST, true));
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -98,19 +112,26 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
                     </button>
                 </div>
             </div>
-            <form action="" method="post" id="formHargaSatuan">
+            <form action="" method="post" id="formHargaSatuan" novalidate>
+                <input type="hidden" name="form_type" value="harga_satuan">
                 <div id="listItemSatuan">
                     <!-- Template awal -->
                     <div class="row item-satuan" id="template-item" style="display: none;">
                         <div class="col s5">
                             <div class="input-field">
-                                <input type="text" id="nama_item_template" name="nama_item[]" required>
+                                <input type="text" 
+                                       id="nama_item_template" 
+                                       name="nama_item[]"
+                                       class="validate">
                                 <label for="nama_item_template">Nama Item</label>
                             </div>
                         </div>
                         <div class="col s5">
                             <div class="input-field">
-                                <input type="number" id="harga_satuan_template" name="harga_satuan[]" required>
+                                <input type="number" 
+                                       id="harga_satuan_template" 
+                                       name="harga_satuan[]"
+                                       class="validate">
                                 <label for="harga_satuan_template">Harga (Rp)</label>
                             </div>
                         </div>
@@ -176,25 +197,72 @@ $hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
             tambahItemSatuan();
         }
 
-        // Form validation
+        var tabs = document.querySelectorAll('.tabs');
+        var tabsInstance = M.Tabs.init(tabs, {
+            onShow: function(tab) {
+                // Save active tab to localStorage
+                localStorage.setItem('activeTab', tab.id);
+            }
+        });
+        
+        // Restore active tab after refresh
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            var instance = M.Tabs.getInstance(tabs[0]);
+            instance.select(activeTab);
+        }
+
+        // Improved form validation
         document.getElementById('formHargaSatuan').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default submission first
+            e.preventDefault();
             
             const items = document.querySelectorAll('.item-satuan:not(#template-item)');
             let isValid = true;
+            let formData = new FormData(this);
+            
+            // Ensure form_type and simpanSatuan are sent
+            formData.append('simpanSatuan', '1');
             
             items.forEach((item, index) => {
                 const nama = item.querySelector('[name="nama_item[]"]');
                 const harga = item.querySelector('[name="harga_satuan[]"]');
                 
-                if(!nama.value || !harga.value || harga.value <= 0) {
+                if(!nama.value.trim()) {
                     isValid = false;
-                    M.toast({html: `Item ke-${index + 1} tidak lengkap atau tidak valid`});
+                    M.toast({html: `Nama item ke-${index + 1} tidak boleh kosong`});
+                }
+                
+                if(!harga.value || parseFloat(harga.value) <= 0) {
+                    isValid = false;
+                    M.toast({html: `Harga item ke-${index + 1} harus lebih dari 0`});
                 }
             });
             
             if(isValid) {
-                this.submit(); // Submit form if valid
+                // Submit form using AJAX
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    if(html.includes('Berhasil')) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Data tersimpan',
+                            icon: 'success'
+                        }).then(() => {
+                            window.location.href = window.location.href + '#hargaSatuan';
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error!', 'Gagal menyimpan data', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+                });
             }
         });
     });
@@ -350,6 +418,13 @@ if (isset($_POST["simpanKiloan"])) {
 }
 
 if (isset($_POST["simpanSatuan"])) {
+    error_log("Received POST data for harga satuan: " . print_r($_POST, true));
+    
+    if(!isset($_POST["nama_item"]) || !isset($_POST["harga_satuan"])) {
+        echo json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']);
+        exit;
+    }
+    
     $nama_items = $_POST["nama_item"];
     $harga_satuans = $_POST["harga_satuan"];
     
@@ -358,25 +433,38 @@ if (isset($_POST["simpanSatuan"])) {
     try {
         mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
         
+        $inserted = false;
         foreach($nama_items as $i => $nama) {
-            $nama = htmlspecialchars($nama);
-            $harga = htmlspecialchars($harga_satuans[$i]);
+            if(empty(trim($nama))) continue;
+            
+            $nama = mysqli_real_escape_string($connect, $nama);
+            $harga = (int)$harga_satuans[$i];
+            
+            if($harga <= 0) continue;
             
             $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
                      VALUES ('$idAgen', '$nama', '$harga')";
-                     
-            if(!mysqli_query($connect, $query)) {
+            
+            if(mysqli_query($connect, $query)) {
+                $inserted = true;
+            } else {
                 throw new Exception(mysqli_error($connect));
             }
         }
         
+        if(!$inserted) {
+            throw new Exception("Tidak ada data valid untuk disimpan");
+        }
+        
         mysqli_commit($connect);
-        echo "<script>Swal.fire('Berhasil!', 'Data tersimpan', 'success')
-              .then(() => window.location.reload());</script>";
+        echo "<script>Swal.fire('Berhasil!', 'Data tersimpan', 'success');</script>";
+        
     } catch(Exception $e) {
         mysqli_rollback($connect);
-        echo "<script>Swal.fire('Error!', '".$e->getMessage()."', 'error');</script>";
+        error_log("Error saving harga satuan: " . $e->getMessage());
+        echo "<script>Swal.fire('Error!', '" . addslashes($e->getMessage()) . "', 'error');</script>";
     }
+    exit;
 }
 
 ?>

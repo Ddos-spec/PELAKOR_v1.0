@@ -54,7 +54,7 @@ $agen = mysqli_fetch_assoc($result);
         </div>
         <!-- end term -->
 
-        <!-- Updated price section -->
+        <!-- Updated price setup section -->
         <div class="col s6 offset-s1">
             <div class="card">
                 <div class="card-content">
@@ -65,6 +65,7 @@ $agen = mysqli_fetch_assoc($result);
                         <li class="tab col s6"><a href="#setupSatuan">Harga Satuan</a></li>
                     </ul>
 
+                    <!-- Existing kiloan form -->
                     <div id="setupKiloan">
                         <form action="" method="post">
                             <div class="input-field">
@@ -87,6 +88,7 @@ $agen = mysqli_fetch_assoc($result);
                         </form>
                     </div>
 
+                    <!-- Updated satuan form -->
                     <div id="setupSatuan">
                         <form action="" method="post" id="formSetupSatuan">
                             <div class="row">
@@ -97,6 +99,7 @@ $agen = mysqli_fetch_assoc($result);
                                 </div>
                             </div>
                             <div id="listItemSatuan">
+                                <!-- Item pertama -->
                                 <div class="row item-satuan">
                                     <div class="col s5">
                                         <div class="input-field">
@@ -106,7 +109,7 @@ $agen = mysqli_fetch_assoc($result);
                                     </div>
                                     <div class="col s5">
                                         <div class="input-field">
-                                            <input type="number" name="harga_satuan[]" required>
+                                            <input type="number" name="harga_satuan[]" min="0" required>
                                             <label>Harga (Rp)</label>
                                         </div>
                                     </div>
@@ -132,28 +135,28 @@ $agen = mysqli_fetch_assoc($result);
     <?php include 'footer.php'; ?>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var tabs = document.querySelectorAll('.tabs');
-            M.Tabs.init(tabs);
+    document.addEventListener('DOMContentLoaded', function() {
+        var tabs = document.querySelectorAll('.tabs');
+        M.Tabs.init(tabs);
+    });
+
+    function tambahItemSatuan() {
+        var template = document.querySelector('.item-satuan').cloneNode(true);
+        template.querySelectorAll('input').forEach(input => {
+            input.value = '';
         });
+        document.getElementById('listItemSatuan').appendChild(template);
+        M.updateTextFields();
+    }
 
-        function tambahItemSatuan() {
-            var template = document.querySelector('.item-satuan').cloneNode(true);
-            template.querySelectorAll('input').forEach(input => {
-                input.value = '';
-            });
-            document.getElementById('listItemSatuan').appendChild(template);
-            M.updateTextFields();
+    function hapusItem(btn) {
+        var items = document.querySelectorAll('.item-satuan');
+        if(items.length > 1) {
+            btn.closest('.item-satuan').remove();
+        } else {
+            M.toast({html: 'Minimal harus ada 1 item!'});
         }
-
-        function hapusItem(btn) {
-            var items = document.querySelectorAll('.item-satuan');
-            if(items.length > 1) {
-                btn.closest('.item-satuan').remove();
-            } else {
-                M.toast({html: 'Minimal harus ada 1 item!'});
-            }
-        }
+    }
     </script>
 </body>
 </html>
@@ -231,18 +234,27 @@ if(isset($_POST["setupSatuan"])) {
     
     $success = true;
     foreach($nama_items as $i => $nama) {
-        $harga = $harga_satuans[$i];
-        $result = mysqli_query($connect, "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
-                                        VALUES ('$idAgen', '$nama', '$harga')");
-        if(!$result) {
+        $nama = htmlspecialchars($nama);
+        $harga = (int)$harga_satuans[$i];
+        
+        $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
+                 VALUES ('$idAgen', '$nama', '$harga')";
+        if(!mysqli_query($connect, $query)) {
             $success = false;
             break;
         }
     }
     
     if($success) {
-        echo "<script>Swal.fire('Berhasil','Data harga satuan berhasil disimpan','success')
-            .then(() => window.location='index.php');</script>";
+        echo "<script>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data harga berhasil disimpan',
+                icon: 'success'
+            }).then(() => {
+                window.location = 'index.php';
+            });
+        </script>";
     }
 }
 ?>
