@@ -86,7 +86,7 @@ h1 {
     width: 100px;
     height: 21px;
     display: block;
-    background: url(../img/rating.png) 0 0 no-repeat;
+    background: url(/img/rating.png) 0 0 no-repeat; /* menggunakan path absolut */
 }
 
 .star-0 {
