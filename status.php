@@ -212,6 +212,31 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <form action="" method="post" class="status-form">
+                                            <input type="hidden" name="id_cucian" value="<?= $pesanan['id_cucian'] ?>">
+                                            <div class="input-field">
+                                                <select name="status_cucian" required>
+                                                    <option value="Sedang di Cuci">Sedang di Cuci</option>
+                                                    <option value="Sedang di Jemur">Sedang di Jemur</option>
+                                                    <option value="Sedang di Setrika">Sedang di Setrika</option>
+                                                    <option value="Pengantaran">Pengantaran</option>
+                                                    <option value="Selesai">Selesai</option>
+                                                </select>
+                                                <label>Update Status</label>
+                                            </div>
+                                            <div class="input-field">
+                                                <textarea name="catatan_status" class="materialize-textarea"></textarea>
+                                                <label>Catatan Status</label>
+                                            </div>
+                                            <button class="btn waves-effect waves-light" type="submit" name="updateStatus">
+                                                Update
+                                                <i class="material-icons right">send</i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         <?php endwhile; ?>
                     </div>
@@ -607,4 +632,34 @@ if (isset($_POST["simpanStatus"])) {
     // ...rest of existing code...
 }
 
+if (isset($_POST["updateStatus"])) {
+    $idCucian = $_POST["id_cucian"];
+    $statusBaru = $_POST["status_cucian"];
+    $catatan = htmlspecialchars($_POST["catatan_status"]);
+    $timestamp = date("Y-m-d H:i:s");
+
+    mysqli_begin_transaction($connect);
+    try {
+        // Update status
+        mysqli_query($connect, "UPDATE cucian SET 
+            status_cucian = '$statusBaru',
+            catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[$timestamp] $statusBaru: $catatan')
+            WHERE id_cucian = '$idCucian'");
+
+        // Jika status Selesai, pindahkan ke transaksi
+        if ($statusBaru === 'Selesai') {
+            // ... kode untuk memindahkan ke transaksi ...
+            echo "<script>window.location = 'transaksi.php';</script>";
+        } else {
+            echo "<script>window.location = 'status.php';</script>";
+        }
+
+        mysqli_commit($connect);
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>
+            Swal.fire('Error!', '".$e->getMessage()."', 'error');
+        </script>";
+    }
+}
 ?>

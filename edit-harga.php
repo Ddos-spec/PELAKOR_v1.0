@@ -105,77 +105,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Harga Satuan -->
         <div id="hargaSatuan">
-            <div class="row">
-                <div class="col s12">
-                    <button type="button" class="btn blue" onclick="tambahItemSatuan()">
-                        <i class="material-icons left">add</i>Tambah Item
-                    </button>
-                </div>
-            </div>
-            <form action="" method="post" id="formHargaSatuan" novalidate>
-                <input type="hidden" name="form_type" value="harga_satuan">
-                <div id="listItemSatuan">
-                    <!-- Template awal -->
-                    <div class="row item-satuan" id="template-item" style="display: none;">
-                        <div class="col s5">
+            <form action="" method="post" id="formHargaSatuan">
+                <?php
+                $default_items = [
+                    'Baju' => 'Pakaian Atas',
+                    'Celana' => 'Pakaian Bawah',
+                    'Jaket/Sweater' => 'Outerwear',
+                    'Pakaian Khusus' => 'Special Care',
+                    'Selimut' => 'Home Items',
+                    'Karpet' => 'Home Items'
+                ];
+                
+                foreach($default_items as $item => $kategori):
+                    $query = mysqli_query($connect, "SELECT * FROM harga_satuan 
+                                                   WHERE id_agen = '$idAgen' 
+                                                   AND nama_item = '$item'");
+                    $data = mysqli_fetch_assoc($query);
+                    $harga = isset($data['harga']) ? $data['harga'] : 0;
+                ?>
+                    <div class="row">
+                        <div class="col s12">
                             <div class="input-field">
-                                <input type="text" 
-                                       id="nama_item_template" 
-                                       name="nama_item[]"
-                                       class="validate">
-                                <label for="nama_item_template">Nama Item</label>
-                            </div>
-                        </div>
-                        <div class="col s5">
-                            <div class="input-field">
-                                <input type="number" 
-                                       id="harga_satuan_template" 
-                                       name="harga_satuan[]"
-                                       class="validate">
-                                <label for="harga_satuan_template">Harga (Rp)</label>
-                            </div>
-                        </div>
-                        <div class="col s2">
-                            <button type="button" class="btn-floating red btn-hapus" onclick="hapusItem(this)">
-                                <i class="material-icons">delete</i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <?php
-                    $querySatuan = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = '$idAgen'");
-                    $counter = 0;
-                    while($item = mysqli_fetch_assoc($querySatuan)):
-                        $counter++;
-                    ?>
-                    <div class="row item-satuan">
-                        <div class="col s5">
-                            <div class="input-field">
-                                <input type="text" 
-                                       id="nama_item_<?= $counter ?>" 
-                                       name="nama_item[]" 
-                                       value="<?= $item['nama_item'] ?>" 
-                                       required>
-                                <label for="nama_item_<?= $counter ?>">Nama Item</label>
-                            </div>
-                        </div>
-                        <div class="col s5">
-                            <div class="input-field">
-                                <input type="number" 
-                                       id="harga_satuan_<?= $counter ?>" 
-                                       name="harga_satuan[]" 
-                                       value="<?= $item['harga'] ?>" 
-                                       required>
-                                <label for="harga_satuan_<?= $counter ?>">Harga (Rp)</label>
+                                <input type="number" name="harga[<?= $item ?>]" value="<?= $harga ?>" required>
+                                <label><?= $item ?> (<?= $kategori ?>)</label>
                             </div>
                         </div>
                     </div>
-                    <?php endwhile; ?>
-                </div>
-
+                <?php endforeach; ?>
+                
                 <div class="center">
                     <button class="btn-large blue darken-2" type="submit" name="simpanSatuan">
-                        Simpan Harga Satuan
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>
@@ -417,54 +377,48 @@ if (isset($_POST["simpanKiloan"])) {
     }
 }
 
-if (isset($_POST["simpanSatuan"])) {
-    error_log("Received POST data for harga satuan: " . print_r($_POST, true));
-    
-    if(!isset($_POST["nama_item"]) || !isset($_POST["harga_satuan"])) {
-        echo json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']);
-        exit;
-    }
-    
-    $nama_items = $_POST["nama_item"];
-    $harga_satuans = $_POST["harga_satuan"];
+if(isset($_POST["simpanSatuan"])) {
+    $harga_items = $_POST["harga"];
     
     mysqli_begin_transaction($connect);
-    
     try {
+        // Debug
+        error_log("Mencoba menyimpan harga satuan untuk agen: " . $idAgen);
+        error_log("Data yang akan disimpan: " . print_r($harga_items, true));
+        
+        // Hapus data lama
         mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
         
-        $inserted = false;
-        foreach($nama_items as $i => $nama) {
-            if(empty(trim($nama))) continue;
-            
+        foreach($harga_items as $nama => $harga) {
             $nama = mysqli_real_escape_string($connect, $nama);
-            $harga = (int)$harga_satuans[$i];
-            
-            if($harga <= 0) continue;
+            $harga = (int)$harga;
             
             $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
                      VALUES ('$idAgen', '$nama', '$harga')";
             
-            if(mysqli_query($connect, $query)) {
-                $inserted = true;
-            } else {
+            if(!mysqli_query($connect, $query)) {
                 throw new Exception(mysqli_error($connect));
             }
         }
         
-        if(!$inserted) {
-            throw new Exception("Tidak ada data valid untuk disimpan");
-        }
-        
         mysqli_commit($connect);
-        echo "<script>Swal.fire('Berhasil!', 'Data tersimpan', 'success');</script>";
+        echo "<script>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data harga satuan berhasil disimpan',
+                icon: 'success'
+            }).then(() => {
+                window.location.reload();
+            });
+        </script>";
         
     } catch(Exception $e) {
         mysqli_rollback($connect);
-        error_log("Error saving harga satuan: " . $e->getMessage());
-        echo "<script>Swal.fire('Error!', '" . addslashes($e->getMessage()) . "', 'error');</script>";
+        error_log("Error saat menyimpan harga satuan: " . $e->getMessage());
+        echo "<script>
+            Swal.fire('Error!', '".$e->getMessage()."', 'error');
+        </script>";
     }
-    exit;
 }
 
 ?>

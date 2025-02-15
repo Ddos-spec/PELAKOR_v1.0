@@ -91,35 +91,27 @@ $agen = mysqli_fetch_assoc($result);
                     <!-- Updated satuan form -->
                     <div id="setupSatuan">
                         <form action="" method="post" id="formSetupSatuan">
-                            <div class="row">
-                                <div class="col s12">
-                                    <button type="button" class="btn blue" onclick="tambahItemSatuan()">
-                                        <i class="material-icons left">add</i>Tambah Item
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="listItemSatuan">
-                                <!-- Item pertama -->
-                                <div class="row item-satuan">
-                                    <div class="col s5">
+                            <?php
+                            $default_items = [
+                                'Baju' => 'Pakaian Atas',
+                                'Celana' => 'Pakaian Bawah',
+                                'Jaket/Sweater' => 'Outerwear',
+                                'Pakaian Khusus' => 'Special Care',
+                                'Selimut' => 'Home Items',
+                                'Karpet' => 'Home Items'
+                            ];
+                            
+                            foreach($default_items as $item => $kategori): ?>
+                                <div class="row">
+                                    <div class="col s12">
                                         <div class="input-field">
-                                            <input type="text" name="nama_item[]" required>
-                                            <label>Nama Item</label>
+                                            <input type="number" name="harga[<?= $item ?>]" required>
+                                            <label><?= $item ?> (<?= $kategori ?>)</label>
                                         </div>
                                     </div>
-                                    <div class="col s5">
-                                        <div class="input-field">
-                                            <input type="number" name="harga_satuan[]" min="0" required>
-                                            <label>Harga (Rp)</label>
-                                        </div>
-                                    </div>
-                                    <div class="col s2">
-                                        <button type="button" class="btn-floating red" onclick="hapusItem(this)">
-                                            <i class="material-icons">delete</i>
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
+                            <?php endforeach; ?>
+                            
                             <div class="center">
                                 <button class="btn-large blue darken-2" type="submit" name="setupSatuan">
                                     Simpan & Lanjutkan
@@ -229,31 +221,34 @@ if(isset($_POST["setupKiloan"])) {
 }
 
 if(isset($_POST["setupSatuan"])) {
-    $nama_items = $_POST["nama_item"];
-    $harga_satuans = $_POST["harga_satuan"];
+    $harga_items = $_POST["harga"];
     
-    $success = true;
-    foreach($nama_items as $i => $nama) {
-        $nama = htmlspecialchars($nama);
-        $harga = (int)$harga_satuans[$i];
+    mysqli_begin_transaction($connect);
+    try {
+        mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
         
-        $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
-                 VALUES ('$idAgen', '$nama', '$harga')";
-        if(!mysqli_query($connect, $query)) {
-            $success = false;
-            break;
+        foreach($harga_items as $nama => $harga) {
+            $nama = mysqli_real_escape_string($connect, $nama);
+            $harga = (int)$harga;
+            
+            $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
+                     VALUES ('$idAgen', '$nama', '$harga')";
+                     
+            if(!mysqli_query($connect, $query)) {
+                throw new Exception(mysqli_error($connect));
+            }
         }
-    }
-    
-    if($success) {
+        
+        mysqli_commit($connect);
         echo "<script>
-            Swal.fire({
-                title: 'Berhasil!',
-                text: 'Data harga berhasil disimpan',
-                icon: 'success'
-            }).then(() => {
-                window.location = 'index.php';
-            });
+            Swal.fire('Berhasil!', 'Data harga berhasil disimpan', 'success')
+            .then(() => window.location = 'index.php');
+        </script>";
+        
+    } catch(Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>
+            Swal.fire('Error!', '".$e->getMessage()."', 'error');
         </script>";
     }
 }

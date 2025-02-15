@@ -221,56 +221,88 @@ $pelanggan = mysqli_fetch_assoc($query);
 
         // Load initial items for satuan
         updateDaftarItem('cuci');
+
+        // Add form validation
+        document.getElementById('formSatuan').onsubmit = function(e) {
+            let totalItems = 0;
+            const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
+            inputs.forEach(input => totalItems += parseInt(input.value));
+            
+            if(totalItems === 0) {
+                e.preventDefault();
+                Swal.fire('Error', 'Minimal pesan 1 item', 'error');
+            }
+        };
     });
 
     function updateDaftarItem(jenis) {
-        // Tampilkan loading
-        document.getElementById('daftarItem').innerHTML = '<div class="center"><div class="preloader-wrapper small active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>';
-        
+        document.getElementById('daftarItem').innerHTML = 
+            '<div class="progress"><div class="indeterminate"></div></div>';
+            
         fetch('get_harga_satuan.php?id_agen=<?= $idAgen ?>')
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Data received:', data);
+                
+                if(!data || data.error) {
+                    throw new Error(data.error || 'Data tidak valid');
+                }
+                
                 if(data.length === 0) {
-                    document.getElementById('daftarItem').innerHTML = '<p class="center">Tidak ada item yang tersedia</p>';
+                    document.getElementById('daftarItem').innerHTML = 
+                        '<div class="card-panel red lighten-4">'+
+                        'Harga satuan belum diset oleh agen</div>';
                     return;
                 }
                 
+                const default_items = {
+                    'Baju': 'Pakaian Atas',
+                    'Celana': 'Pakaian Bawah',
+                    'Jaket/Sweater': 'Outerwear',
+                    'Pakaian Khusus': 'Special Care',
+                    'Selimut': 'Home Items',
+                    'Karpet': 'Home Items'
+                };
+                
                 let html = '';
                 data.forEach(item => {
-                    let harga = parseInt(item.harga);
-                    // Sesuaikan harga berdasarkan jenis
-                    if(jenis === 'setrika') {
-                        harga = harga * 0.8;  // 80% dari harga normal
-                    } else if(jenis === 'komplit') {
-                        harga = harga * 1.5;  // 150% dari harga normal
-                    }
-                    
-                    html += `
-                    <div class="card-panel-item">
-                        <div class="row">
-                            <div class="col s7">
-                                <p>${item.nama_item}</p>
-                                <p class="grey-text">Rp ${harga.toLocaleString()}</p>
-                            </div>
-                            <div class="col s5">
-                                <div class="input-field">
-                                    <input type="number" name="item[${item.id_harga_satuan}]" 
-                                           value="0" min="0" 
-                                           data-harga="${harga}"
-                                           onchange="hitungTotal()">
-                                    <label>Jumlah</label>
+                    if(default_items.hasOwnProperty(item.nama_item)) {
+                        let harga = parseInt(item.harga);
+                        if(jenis === 'setrika') harga *= 0.8;
+                        if(jenis === 'komplit') harga *= 1.5;
+                        
+                        html += `
+                        <div class="card-panel-item">
+                            <div class="row">
+                                <div class="col s7">
+                                    <p>${item.nama_item}</p>
+                                    <p class="grey-text">(${default_items[item.nama_item]})</p>
+                                    <p class="grey-text">Rp ${harga.toLocaleString()}</p>
+                                </div>
+                                <div class="col s5">
+                                    <div class="input-field">
+                                        <input type="number" name="item[${item.id_harga_satuan}]" 
+                                               value="0" min="0" 
+                                               data-harga="${harga}"
+                                               onchange="hitungTotal()">
+                                        <label>Jumlah</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>`;
+                        </div>`;
+                    }
                 });
                 document.getElementById('daftarItem').innerHTML = html;
                 M.updateTextFields();
-                hitungTotal();
             })
             .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('daftarItem').innerHTML = '<p class="center red-text">Error mengambil data</p>';
+                console.error('Fetch error:', error);
+                document.getElementById('daftarItem').innerHTML = 
+                    '<div class="card-panel red lighten-4">'+
+                    'Gagal memuat data harga: ' + error.message + '</div>';
             });
     }
 
@@ -282,6 +314,85 @@ $pelanggan = mysqli_fetch_assoc($query);
         });
         document.getElementById('totalHarga').textContent = 'Total: Rp ' + total.toLocaleString();
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // ...existing initialization code...
+
+        // Form submission handlers
+        document.getElementById('formKiloan').onsubmit = function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Konfirmasi Pesanan',
+                html: `
+                    <div class="left-align">
+                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
+                        <p><b>Estimasi Item:</b> ${document.getElementById('estimasiItem').value || '-'}</p>
+                        <p><b>Catatan:</b> ${document.getElementById('catatanKiloan').value || '-'}</p>
+                        <p><b>Alamat:</b> ${document.getElementById('alamat').value}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pesan Sekarang',
+                cancelButtonText: 'Periksa Kembali',
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#ff5252',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        };
+
+        document.getElementById('formSatuan').onsubmit = function(e) {
+            e.preventDefault();
+            
+            let totalItems = 0;
+            const items = [];
+            const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
+            
+            inputs.forEach(input => {
+                const qty = parseInt(input.value);
+                totalItems += qty;
+                if (qty > 0) {
+                    const itemName = input.closest('.card-panel-item').querySelector('p').textContent;
+                    items.push(`${qty}x ${itemName}`);
+                }
+            });
+            
+            if(totalItems === 0) {
+                Swal.fire('Error', 'Minimal pesan 1 item', 'error');
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Konfirmasi Pesanan',
+                html: `
+                    <div class="left-align">
+                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
+                        <p><b>Item:</b></p>
+                        <ul>
+                            ${items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                        <p><b>Total:</b> ${document.getElementById('totalHarga').textContent}</p>
+                        <p><b>Catatan:</b> ${document.getElementById('catatanSatuan').value || '-'}</p>
+                        <p><b>Alamat:</b> ${document.getElementById('alamat').value}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pesan Sekarang',
+                cancelButtonText: 'Periksa Kembali',
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#ff5252',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        };
+    });
     </script>
 </body>
 </html>
@@ -301,7 +412,11 @@ if (isset($_POST["pesanKiloan"])) {
     if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
-                Swal.fire('Pesanan Berhasil Dibuat','Silahkan Pergi Ke Halaman Status Cucian','success').then(function(){
+                Swal.fire({
+                    title: 'Pesanan Berhasil Dibuat',
+                    text: 'Silahkan menunggu konfirmasi dari agen',
+                    icon: 'success'
+                }).then(function() {
                     window.location = 'status.php';
                 });
             </script>
@@ -318,11 +433,15 @@ if (isset($_POST["pesanSatuan"])) {
     $tgl = date("Y-m-d H:i:s");
     $tipe_layanan = "satuan";
     
-    // Insert main order
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
-                                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
+    mysqli_begin_transaction($connect);
+    try {
+        // Insert main order
+        $query = mysqli_query($connect, "INSERT INTO cucian 
+            (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
+            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
 
-    if (mysqli_affected_rows($connect) > 0) {
+        if (!$query) throw new Exception(mysqli_error($connect));
+        
         $cucian_id = mysqli_insert_id($connect);
         $total_items = 0;
         
@@ -330,28 +449,30 @@ if (isset($_POST["pesanSatuan"])) {
         foreach($_POST["item"] as $id_harga_satuan => $qty) {
             if ($qty > 0) {
                 $total_items += $qty;
-                // Get item price
-                $q = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
-                $harga = mysqli_fetch_assoc($q)['harga'];
-                $subtotal = $qty * $harga;
-                
-                mysqli_query($connect, "INSERT INTO detail_cucian (id_cucian, id_harga_satuan, jumlah, subtotal) 
-                                      VALUES ($cucian_id, $id_harga_satuan, $qty, $subtotal)");
+                mysqli_query($connect, "INSERT INTO detail_cucian 
+                    (id_cucian, id_harga_satuan, jumlah) 
+                    VALUES ($cucian_id, $id_harga_satuan, $qty)");
             }
         }
         
         // Update total items
         mysqli_query($connect, "UPDATE cucian SET total_item = $total_items WHERE id_cucian = $cucian_id");
+        mysqli_commit($connect);
 
-        echo "
-            <script>
-                Swal.fire('Pesanan Berhasil Dibuat','Silahkan Pergi Ke Halaman Status Cucian','success').then(function(){
-                    window.location = 'status.php';
-                });
-            </script>
-        ";
-    } else {
-        echo mysqli_error($connect);
+        echo "<script>
+            Swal.fire({
+                title: 'Pesanan Berhasil!',
+                text: 'Pesanan akan diproses oleh agen',
+                icon: 'success'
+            }).then(() => {
+                window.location = 'status.php';
+            });
+        </script>";
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>
+            Swal.fire('Error!', '".$e->getMessage()."', 'error');
+        </script>";
     }
 }
 ?>

@@ -122,6 +122,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Tanggal Selesai</td>
                     <td style="font-weight:bold">Rating</td>
                     <td style="font-weight:bold">Komentar</td>
+                    <td style="font-weight:bold">Invoice</td>
                 </tr>
                 <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -156,6 +157,12 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
+                    <td>
+                        <button class="btn blue waves-effect waves-light btn-small" 
+                                onclick="cetakInvoice(<?= $transaksi['kode_transaksi'] ?>)">
+                            <i class="material-icons">receipt</i>
+                        </button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -240,6 +247,16 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <?php endif; ?>
     </div>
     <?php include "footer.php"; ?>
+    <script>
+    function cetakInvoice(kodeTransaksi) {
+        // Placeholder untuk fungsi cetak invoice
+        Swal.fire({
+            title: 'Cetak Invoice',
+            text: 'Fungsi cetak invoice akan diimplementasikan',
+            icon: 'info'
+        });
+    }
+    </script>
 </body>
 </html>
 
