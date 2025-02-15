@@ -1,22 +1,24 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// cek apakah sudah login sebagai agen
 cekAgen();
 
-// mengambil id agen di session
 $idAgen = $_SESSION["agen"];
 
-// mengambil data harga pada db
+// Improved data fetching with default values
 $cuci = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'cuci'");
 $cuci = mysqli_fetch_assoc($cuci);
+$hargaCuci = isset($cuci['harga']) ? $cuci['harga'] : 0;
+
 $setrika = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'setrika'");
 $setrika = mysqli_fetch_assoc($setrika);
+$hargaSetrika = isset($setrika['harga']) ? $setrika['harga'] : 0;
+
 $komplit = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'komplit'");
 $komplit = mysqli_fetch_assoc($komplit);
+$hargaKomplit = isset($komplit['harga']) ? $komplit['harga'] : 0;
 
 ?>
 
@@ -61,25 +63,30 @@ $komplit = mysqli_fetch_assoc($komplit);
 
         <!-- Harga Kiloan -->
         <div id="hargaKiloan">
-            <form action="" method="post">
-                <div class="input-field">
-                    <input type="number" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
-                    <label for="cuci">Cuci (Rp/Kg)</label>
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Harga Layanan Kiloan</span>
+                    <form action="" method="post">
+                        <div class="input-field">
+                            <input type="number" id="cuci" name="cuci" value="<?= $hargaCuci ?>">
+                            <label for="cuci">Cuci (Rp/Kg)</label>
+                        </div>
+                        <div class="input-field">
+                            <input type="number" id="setrika" name="setrika" value="<?= $hargaSetrika ?>">
+                            <label for="setrika">Setrika (Rp/Kg)</label>
+                        </div>
+                        <div class="input-field">
+                            <input type="number" id="komplit" name="komplit" value="<?= $hargaKomplit ?>">
+                            <label for="komplit">Cuci + Setrika (Rp/Kg)</label>
+                        </div>
+                        <div class="center">
+                            <button class="btn-large blue darken-2" type="submit" name="simpanKiloan">
+                                Simpan Harga Kiloan
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="input-field">
-                    <input type="number" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
-                    <label for="setrika">Setrika (Rp/Kg)</label>
-                </div>
-                <div class="input-field">
-                    <input type="number" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
-                    <label for="komplit">Cuci + Setrika (Rp/Kg)</label>
-                </div>
-                <div class="center">
-                    <button class="btn-large blue darken-2" type="submit" name="simpanKiloan">
-                        Simpan Harga Kiloan
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
 
         <!-- Harga Satuan -->
@@ -263,8 +270,58 @@ function ubahHarga($data){
 
 // jika user menekan tombol simpan harga
 if (isset($_POST["simpanKiloan"])) {
-    if (ubahHarga($_POST) > 0) {
-        echo "<script>Swal.fire('Berhasil','Harga kiloan berhasil diupdate','success');</script>";
+    // Check if data exists
+    $check = mysqli_query($connect, "SELECT COUNT(*) as count FROM harga WHERE id_agen = '$idAgen'");
+    $row = mysqli_fetch_assoc($check);
+    
+    if($row['count'] == 0) {
+        // Insert new data
+        $hargaCuci = htmlspecialchars($_POST["cuci"]);
+        $hargaSetrika = htmlspecialchars($_POST["setrika"]);
+        $hargaKomplit = htmlspecialchars($_POST["komplit"]);
+        
+        validasiHarga($hargaCuci);
+        validasiHarga($hargaSetrika);
+        validasiHarga($hargaKomplit);
+        
+        $queries = [
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('cuci', '$idAgen', '$hargaCuci')",
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('setrika', '$idAgen', '$hargaSetrika')",
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('komplit', '$idAgen', '$hargaKomplit')"
+        ];
+        
+        $success = true;
+        foreach($queries as $query) {
+            if(!mysqli_query($connect, $query)) {
+                $success = false;
+                break;
+            }
+        }
+        
+        if($success) {
+            echo "<script>
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Harga berhasil disimpan',
+                    icon: 'success'
+                }).then(() => {
+                    window.location.reload();
+                });
+            </script>";
+        }
+    } else {
+        // Update existing data
+        if (ubahHarga($_POST) > 0) {
+            echo "<script>
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Harga berhasil diupdate',
+                    icon: 'success'
+                }).then(() => {
+                    window.location.reload();
+                });
+            </script>";
+        }
     }
 }
 
