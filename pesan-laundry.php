@@ -122,13 +122,7 @@ $pelanggan = mysqli_fetch_assoc($query);
                         <form action="" method="post" id="formKiloan">
                             <input type="hidden" name="tipe_layanan" value="kiloan">
                             <div class="row">
-                                <div class="col s12 m6">
-                                    <div class="input-field">
-                                        <input type="number" name="berat" id="beratKiloan" min="1" value="1" required>
-                                        <label for="beratKiloan">Berat (Kg)</label>
-                                    </div>
-                                </div>
-                                <div class="col s12 m6">
+                                <div class="col s12">
                                     <p>Jenis Layanan</p>
                                     <?php
                                     $queryHarga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen'");
@@ -143,10 +137,18 @@ $pelanggan = mysqli_fetch_assoc($query);
                                     }
                                     ?>
                                 </div>
-                            </div>
-                            <div class="input-field">
-                                <textarea class="materialize-textarea" name="catatan" id="catatanKiloan"></textarea>
-                                <label for="catatanKiloan">Catatan</label>
+                                <div class="col s12">
+                                    <div class="input-field">
+                                        <textarea class="materialize-textarea" name="estimasi_item" id="estimasiItem" placeholder="Contoh: 3 baju, 2 celana, 4 kaos"></textarea>
+                                        <label for="estimasiItem">Estimasi Item (Opsional)</label>
+                                    </div>
+                                </div>
+                                <div class="col s12">
+                                    <div class="input-field">
+                                        <textarea class="materialize-textarea" name="catatan" id="catatanKiloan"></textarea>
+                                        <label for="catatanKiloan">Catatan</label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="center">
                                 <button class="btn-large waves-effect waves-light blue darken-2" type="submit" name="pesanKiloan">
@@ -269,12 +271,12 @@ if (isset($_POST["pesanKiloan"])) {
     $alamat = htmlspecialchars($_POST["alamat"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
+    $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
     $tgl = date("Y-m-d H:i:s");
-    $berat = htmlspecialchars($_POST["berat"]);
     $tipe_layanan = "kiloan";
 
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, berat, alamat, catatan, status_cucian, tipe_layanan) 
-                                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', $berat, '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
+    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, estimasi_item, alamat, catatan, status_cucian, tipe_layanan) 
+                                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
 
     if (mysqli_affected_rows($connect) > 0) {
         echo "

@@ -229,6 +229,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             <div id="modalBerat<?= $pesanan['id_cucian'] ?>" class="modal">
                 <div class="modal-content">
                     <h4>Konfirmasi Berat Cucian #<?= $pesanan['id_cucian'] ?></h4>
+                    <div class="row">
+                        <div class="col s12">
+                            <p><b>Pelanggan:</b> <?= $pesanan['nama_pelanggan'] ?></p>
+                            <p><b>Jenis:</b> <?= ucfirst($pesanan['jenis']) ?></p>
+                            <?php if(!empty($pesanan['estimasi_item'])): ?>
+                            <p><b>Estimasi Item:</b> <?= $pesanan['estimasi_item'] ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                     <form action="" method="post" id="formBerat<?= $pesanan['id_cucian'] ?>">
                         <input type="hidden" name="id_cucian" value="<?= $pesanan['id_cucian'] ?>">
                         <input type="hidden" name="jenis" value="<?= $pesanan['jenis'] ?>">
@@ -254,6 +263,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button class="btn waves-effect waves-light red modal-close">Batal</button>
                     <button class="btn waves-effect waves-light green" 
                             onclick="document.getElementById('formBerat<?= $pesanan['id_cucian'] ?>').submit()">
                         Konfirmasi <i class="material-icons right">check</i>
@@ -539,16 +549,21 @@ if (isset($_POST["simpanBerat"])){
 
     $berat = htmlspecialchars($_POST["berat"]);
     $idCucian = $_POST["id_cucian"];
-
+    $catatan_berat = htmlspecialchars($_POST["catatan_berat"]);
+    
     // validasi 
     validasiBerat($berat);
 
-    mysqli_query($connect, "UPDATE cucian SET berat = $berat WHERE id_cucian = $idCucian");
+    mysqli_query($connect, "UPDATE cucian 
+                          SET berat = $berat,
+                              catatan_berat = '$catatan_berat',
+                              status_cucian = 'Sedang di Cuci'
+                          WHERE id_cucian = $idCucian");
 
     if (mysqli_affected_rows($connect) > 0){
         echo "
             <script>
-                Swal.fire('Data Berhasil Di Ubah','','success').then(function() {
+                Swal.fire('Berat Berhasil Dikonfirmasi','Pesanan akan diproses','success').then(function() {
                     window.location = 'status.php';
                 });
             </script>
