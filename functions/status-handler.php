@@ -190,6 +190,24 @@ function handleAcceptOrder($connect, $idCucian, $catatan = '') {
 }
 
 // Helper functions
+function hitungTotalBayar($connect, $idCucian) {
+    $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
+    $cucian = mysqli_fetch_assoc($query);
+    
+    if($cucian['tipe_layanan'] == 'kiloan') {
+        $qHarga = mysqli_query($connect, "SELECT harga FROM harga 
+                                        WHERE id_agen = '{$cucian['id_agen']}' 
+                                        AND jenis = '{$cucian['jenis']}'");
+        $harga = mysqli_fetch_assoc($qHarga)['harga'];
+        return $cucian['berat'] * $harga;
+    } else {
+        $qTotal = mysqli_query($connect, "SELECT SUM(subtotal) as total 
+                                        FROM detail_cucian 
+                                        WHERE id_cucian = $idCucian");
+        return mysqli_fetch_assoc($qTotal)['total'];
+    }
+}
+
 function calculateSatuanTotal($connect, $idCucian) {
     $query = mysqli_query($connect, "SELECT SUM(subtotal) as total 
         FROM detail_cucian WHERE id_cucian = $idCucian");

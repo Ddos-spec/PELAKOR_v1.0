@@ -1,11 +1,10 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
+include 'functions/status-handler.php';
 
 cekBelumLogin();
-
 
 // sesuaikan dengan jenis login
 if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
@@ -31,10 +30,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     ";
 }
 
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -193,11 +189,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                                         <p><b>ID:</b> <?= $pesanan['id_cucian'] ?></p>
                                         <p><b>Pelanggan:</b> <?= $pesanan['nama_pelanggan'] ?></p>
                                         <p><b>Tipe:</b> <?= ucfirst($pesanan['tipe_layanan']) ?></p>
+                                        <?php if($pesanan['tipe_layanan'] == 'kiloan'): ?>
+                                            <p><b>Berat:</b> <?= $pesanan['berat'] ?> kg</p>
+                                            <p><b>Total:</b> Rp <?= number_format(hitungTotalBayar($connect, $pesanan['id_cucian']), 0, ',', '.') ?></p>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="col s12 m8">
                                         <div class="status-timeline">
                                             <?php 
-                                            $statusList = ['Penjemputan', 'Sedang di Cuci', 'Sedang Di Jemur', 'Sedang di Setrika', 'Pengantaran'];
+                                            $statusList = ['Penjemputan', 'Sedang di Cuci', 'Sedang Di Jemur', 'Sedang di Setrika', 'Pengantaran', 'Selesai'];
                                             $currentStatus = array_search($pesanan['status_cucian'], $statusList);
                                             foreach($statusList as $index => $status): 
                                             ?>
@@ -212,38 +212,19 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                                                 <input type="hidden" name="id_cucian" value="<?= $pesanan['id_cucian'] ?>">
                                                 <select name="status_cucian" class="browser-default" style="width: auto; display: inline-block; margin-right: 10px;">
                                                     <?php foreach($statusList as $status): ?>
-                                                        <option value="<?= $status ?>" <?= ($status == $pesanan['status_cucian']) ? 'selected' : '' ?>><?= $status ?></option>
+                                                        <?php if($status != 'Penjemputan'): ?>
+                                                            <option value="<?= $status ?>" <?= ($status == $pesanan['status_cucian']) ? 'selected' : '' ?>><?= $status ?></option>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
-                                                    <option value="Selesai">Selesai</option>
                                                 </select>
-                                                <button class="btn" type="submit" name="updateStatus">Update</button>
+                                                <div class="input-field" style="margin: 10px 0;">
+                                                    <textarea name="catatan_status" class="materialize-textarea" placeholder="Catatan status (opsional)"></textarea>
+                                                </div>
+                                                <button class="btn waves-effect waves-light" type="submit" name="updateStatus">
+                                                    Update Status <i class="material-icons right">send</i>
+                                                </button>
                                             </form>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col s12">
-                                        <form action="" method="post" class="status-form">
-                                            <input type="hidden" name="id_cucian" value="<?= $pesanan['id_cucian'] ?>">
-                                            <div class="input-field">
-                                                <select name="status_cucian" required>
-                                                    <option value="Sedang di Cuci">Sedang di Cuci</option>
-                                                    <option value="Sedang di Jemur">Sedang di Jemur</option>
-                                                    <option value="Sedang di Setrika">Sedang di Setrika</option>
-                                                    <option value="Pengantaran">Pengantaran</option>
-                                                    <option value="Selesai">Selesai</option>
-                                                </select>
-                                                <label>Update Status</label>
-                                            </div>
-                                            <div class="input-field">
-                                                <textarea name="catatan_status" class="materialize-textarea"></textarea>
-                                                <label>Catatan Status</label>
-                                            </div>
-                                            <button class="btn waves-effect waves-light" type="submit" name="updateStatus">
-                                                Update
-                                                <i class="material-icons right">send</i>
-                                            </button>
-                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -375,32 +356,25 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         ?>
 
         <style>
-        /* Add the CSS for timeline here */
         .status-timeline {
             display: flex;
             justify-content: space-between;
             margin: 20px 0;
         }
-
         .timeline-step {
             text-align: center;
             position: relative;
             flex: 1;
         }
-
-        /* ...rest of the CSS... */
         .preloader-wrapper {
             display: none;
         }
-        
         .loading .preloader-wrapper {
             display: inline-block;
         }
-
         .btn-loading {
             position: relative;
         }
-
         .btn-loading .preloader-wrapper {
             position: absolute;
             top: 50%;
@@ -408,19 +382,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             margin-top: -12px;
             margin-left: -12px;
         }
-
         .btn-loading span {
             visibility: hidden;
         }
-
         .timeline-step.done {
             color: #4CAF50;
         }
-
         .timeline-step.active {
             color: #2196F3;
         }
-
         .timeline-note {
             margin-top: 10px;
             font-size: 0.9em;
@@ -442,7 +412,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 
             // Check for new orders periodically
             checkNewOrders();
-            setInterval(checkNewOrders, 30000); // Check every 30 seconds
+            setInterval(checkNewOrders, 30000);
         });
 
         function updateHarga(idCucian) {
@@ -486,7 +456,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </script>
 
         <?php
-        // Helper function for status icons
         function getStatusIcon($status) {
             switch($status) {
                 case 'Penjemputan': return 'local_shipping';
@@ -529,7 +498,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
-                    
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -541,171 +509,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 </html>
 
 <?php
-
-
-// STATUS CUCIAN
-if ( isset($_POST["simpanStatus"]) ){
-
-    // ambil data method post
-    $statusCucian = $_POST["status_cucian"];
-    $idCucian = $_POST["id_cucian"];
-
-    // cari data
-    $query = mysqli_query($connect, "SELECT * FROM cucian INNER JOIN harga ON harga.jenis = cucian.jenis WHERE id_cucian = $idCucian");
-    $cucian = mysqli_fetch_assoc($query);
-    $status = "Selesai";
-    // kalau status selesai
-    if ( $statusCucian == $status){
-
-        // isi data di tabel transaksi
-        $tglMulai = $cucian["tgl_mulai"];
-        $tglSelesai = date("Y-m-d H:i:s");
-        $totalBayar = $cucian["berat"] * $cucian["harga"];
-        $idCucian = $cucian["id_cucian"];
-        $idPelanggan = $cucian["id_pelanggan"];
-        // masukkan ke tabel transaksi
-        mysqli_query($connect,"INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) VALUES ($idCucian, $idAgen, $idPelanggan, '$tglMulai', '$tglSelesai', $totalBayar, 0)");
-        if (mysqli_affected_rows($connect) == 0){
-            echo mysqli_error($connect);
-        }
-    }
-
-    mysqli_query($connect, "UPDATE cucian SET status_cucian = '$statusCucian' WHERE id_cucian = '$idCucian'");
-    if (mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Status Berhasil Di Ubah','','success').then(function() {
-                    window.location = 'status.php';
-                });
-            </script>   
-        ";
-    }
-
-    
-}
-
-// total berat
-if (isset($_POST["simpanBerat"])){
-
-    $berat = htmlspecialchars($_POST["berat"]);
-    $idCucian = $_POST["id_cucian"];
-    $catatan_berat = htmlspecialchars($_POST["catatan_berat"]);
-    
-    // validasi 
-    validasiBerat($berat);
-
-    mysqli_query($connect, "UPDATE cucian 
-                          SET berat = $berat,
-                              catatan_berat = '$catatan_berat',
-                              status_cucian = 'Sedang di Cuci'
-                          WHERE id_cucian = $idCucian");
-
-    if (mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Berat Berhasil Dikonfirmasi','Pesanan akan diproses','success').then(function() {
-                    window.location = 'status.php';
-                });
-            </script>
-        ";
-    }
-
-    
-
-}
-
-// Add new functions for handling status changes
-if (isset($_POST["terimaOrder"])) {
-    $idCucian = $_POST["id_cucian"];
-    $catatan = htmlspecialchars($_POST["catatan_terima"] ?? '');
-    
-    mysqli_query($connect, "UPDATE cucian SET 
-                          status_cucian = 'Sedang di Cuci',
-                          catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[" . date('Y-m-d H:i:s') . "] Pesanan diterima: $catatan')
-                          WHERE id_cucian = '$idCucian'");
-                          
-    if (mysqli_affected_rows($connect) > 0) {
-        echo "
-            <script>
-                Swal.fire('Pesanan Diterima','Pesanan akan diproses','success').then(function() {
-                    window.location = 'status.php';
-                });
-            </script>
-        ";
-    }
-}
-
-// Modify existing simpanStatus to include notes
-if (isset($_POST["simpanStatus"])) {
-    // ...existing code...
-    $catatan = htmlspecialchars($_POST["catatan_status"] ?? '');
-    
-    mysqli_query($connect, "UPDATE cucian SET 
-                          status_cucian = '$statusCucian',
-                          catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[" . date('Y-m-d H:i:s') . "] $statusCucian: $catatan')
-                          WHERE id_cucian = '$idCucian'");
-    // ...rest of existing code...
-}
-
-if (isset($_POST["updateStatus"])) {
-    $idCucian = $_POST["id_cucian"];
-    $statusBaru = $_POST["status_cucian"];
-    $catatan = htmlspecialchars($_POST["catatan_status"]);
-    $timestamp = date("Y-m-d H:i:s");
-
-    mysqli_begin_transaction($connect);
-    try {
-        // Update status
-        mysqli_query($connect, "UPDATE cucian SET 
-            status_cucian = '$statusBaru',
-            catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[$timestamp] $statusBaru: $catatan')
-            WHERE id_cucian = '$idCucian'");
-
-        // Jika status Selesai, pindahkan ke transaksi
-        if ($statusBaru === 'Selesai') {
-            // ... kode untuk memindahkan ke transaksi ...
-            echo "<script>window.location = 'transaksi.php';</script>";
-        } else {
-            echo "<script>window.location = 'status.php';</script>";
-        }
-
-        mysqli_commit($connect);
-    } catch (Exception $e) {
-        mysqli_rollback($connect);
-        echo "<script>
-            Swal.fire('Error!', '".$e->getMessage()."', 'error');
-        </script>";
-    }
-}
-
-// ...existing code...
-
-// STATUS HANDLING
-if (isset($_POST["simpanStatus"])) {
-    try {
-        $statusCucian = htmlspecialchars($_POST["status_cucian"]);
-        $idCucian = (int)$_POST["id_cucian"];
-        $catatan = htmlspecialchars($_POST["catatan"] ?? '');
-        
-        $result = handleStatusUpdate($connect, $idCucian, $statusCucian, $catatan, $idAgen);
-        
-        if (isset($result['redirect'])) {
-            echo "<script>
-                Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
-                .then(() => window.location = '{$result['redirect']}');
-            </script>";
-        } else {
-            echo "<script>
-                Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
-                .then(() => window.location.reload());
-            </script>";
-        }
-    } catch (Exception $e) {
-        echo "<script>
-            Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
-        </script>";
-    }
-}
 
 if (isset($_POST["terimaOrder"])) {
     try {
@@ -733,19 +536,49 @@ if (isset($_POST["updateStatus"])) {
         $statusBaru = htmlspecialchars($_POST["status_cucian"]);
         $catatan = htmlspecialchars($_POST["catatan_status"] ?? '');
         
-        $result = handleStatusUpdate($connect, $idCucian, $statusBaru, $catatan, $idAgen);
+        mysqli_begin_transaction($connect);
         
-        if (isset($result['redirect'])) {
-            echo "<script>window.location = '{$result['redirect']}';</script>";
-        } else if (isset($result['error'])) {
-            throw new Exception($result['error']);
+        // Update status cucian
+        mysqli_query($connect, "UPDATE cucian SET 
+            status_cucian = '$statusBaru',
+            catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[" . date('Y-m-d H:i:s') . "] $statusBaru: $catatan')
+            WHERE id_cucian = '$idCucian'");
+            
+        // Jika status Selesai
+        if ($statusBaru === 'Selesai') {
+            $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
+            $dataCucian = mysqli_fetch_assoc($cucian);
+            
+            $totalBayar = hitungTotalBayar($connect, $idCucian);
+            
+            // Insert ke tabel transaksi
+            $result = mysqli_query($connect, "INSERT INTO transaksi 
+                (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, rating) 
+                VALUES (
+                    $idCucian,
+                    {$dataCucian['id_agen']},
+                    {$dataCucian['id_pelanggan']},
+                    '{$dataCucian['tgl_mulai']}',
+                    NOW(),
+                    $totalBayar,
+                    0
+                )");
+
+            if (!$result) {
+                throw new Exception(mysqli_error($connect));
+            }
+            
+            mysqli_commit($connect);
+            echo "<script>window.location = 'transaksi.php';</script>";
         } else {
+            mysqli_commit($connect);
             echo "<script>
                 Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
                 .then(() => window.location = 'status.php');
             </script>";
         }
     } catch (Exception $e) {
+        mysqli_rollback($connect);
         echo "<script>
             Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
         </script>";
@@ -771,5 +604,4 @@ if (isset($_POST["simpanBerat"])) {
     }
 }
 
-// ...existing code...
 ?>
