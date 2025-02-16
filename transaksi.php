@@ -4,6 +4,7 @@
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
+include 'functions/status-handler.php';
 
 cekBelumLogin();
 
@@ -264,34 +265,50 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 
 
 // jika pelanggan rating
-if ( isset($_POST["simpanRating"]) ){
-
+if (isset($_POST["simpanRating"])) {
     $rating = $_POST["rating"];
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_query($connect, "UPDATE transaksi SET rating = $rating WHERE kode_transaksi = $kodeTransaksiRating");
-    echo "
-        <script>
-            Swal.fire('Penilaian Berhasil','Rating Berhasil Di Tambahkan','success').then(function() {
-                window.location = 'transaksi.php';
-            });
-        </script>
-    ";
+    mysqli_begin_transaction($connect);
+    try {
+        mysqli_query($connect, "UPDATE transaksi SET rating = $rating WHERE kode_transaksi = $kodeTransaksiRating");
+        
+        if (mysqli_affected_rows($connect) == 0) {
+            throw new Exception("Rating gagal disimpan");
+        }
+
+        mysqli_commit($connect);
+        echo "<script>
+            Swal.fire('Penilaian Berhasil','Rating Berhasil Di Tambahkan','success')
+            .then(() => window.location = 'transaksi.php');
+        </script>";
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
+    }
 }
 
-if ( isset($_POST["kirimKomentar"])){
-
+if (isset($_POST["kirimKomentar"])) {
     $komentar = htmlspecialchars($_POST["komentar"]);
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_query($connect, "UPDATE transaksi SET komentar = '$komentar' WHERE kode_transaksi = $kodeTransaksiRating");
-    echo "
-        <script>
-            Swal.fire('Penilaian Berhasil','Feedback Berhasil Di Tambahkan','success').then(function() {
-                window.location = 'transaksi.php';
-            });
-        </script>
-    ";
+    mysqli_begin_transaction($connect);
+    try {
+        mysqli_query($connect, "UPDATE transaksi SET komentar = '$komentar' WHERE kode_transaksi = $kodeTransaksiRating");
+        
+        if (mysqli_affected_rows($connect) == 0) {
+            throw new Exception("Komentar gagal disimpan");
+        }
+
+        mysqli_commit($connect);
+        echo "<script>
+            Swal.fire('Penilaian Berhasil','Feedback Berhasil Di Tambahkan','success')
+            .then(() => window.location = 'transaksi.php');
+        </script>";
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>"; 
+    }
 }
 
 ?>

@@ -677,4 +677,99 @@ if (isset($_POST["updateStatus"])) {
         </script>";
     }
 }
+
+// ...existing code...
+
+// STATUS HANDLING
+if (isset($_POST["simpanStatus"])) {
+    try {
+        $statusCucian = htmlspecialchars($_POST["status_cucian"]);
+        $idCucian = (int)$_POST["id_cucian"];
+        $catatan = htmlspecialchars($_POST["catatan"] ?? '');
+        
+        $result = handleStatusUpdate($connect, $idCucian, $statusCucian, $catatan, $idAgen);
+        
+        if (isset($result['redirect'])) {
+            echo "<script>
+                Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
+                .then(() => window.location = '{$result['redirect']}');
+            </script>";
+        } else {
+            echo "<script>
+                Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
+                .then(() => window.location.reload());
+            </script>";
+        }
+    } catch (Exception $e) {
+        echo "<script>
+            Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
+        </script>";
+    }
+}
+
+if (isset($_POST["terimaOrder"])) {
+    try {
+        $idCucian = (int)$_POST["id_cucian"];
+        $catatan = htmlspecialchars($_POST["catatan_terima"] ?? '');
+        
+        if(handleAcceptOrder($connect, $idCucian, $catatan)) {
+            echo "<script>
+                Swal.fire('Pesanan Diterima', 'Pesanan akan diproses', 'success')
+                .then(() => window.location = 'status.php');
+            </script>";
+        } else {
+            throw new Exception("Gagal menerima pesanan");
+        }
+    } catch (Exception $e) {
+        echo "<script>
+            Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
+        </script>";
+    }
+}
+
+if (isset($_POST["updateStatus"])) {
+    try {
+        $idCucian = (int)$_POST["id_cucian"];
+        $statusBaru = htmlspecialchars($_POST["status_cucian"]);
+        $catatan = htmlspecialchars($_POST["catatan_status"] ?? '');
+        
+        $result = handleStatusUpdate($connect, $idCucian, $statusBaru, $catatan, $idAgen);
+        
+        if (isset($result['redirect'])) {
+            echo "<script>window.location = '{$result['redirect']}';</script>";
+        } else if (isset($result['error'])) {
+            throw new Exception($result['error']);
+        } else {
+            echo "<script>
+                Swal.fire('Berhasil!', 'Status berhasil diupdate', 'success')
+                .then(() => window.location = 'status.php');
+            </script>";
+        }
+    } catch (Exception $e) {
+        echo "<script>
+            Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
+        </script>";
+    }
+}
+
+if (isset($_POST["simpanBerat"])) {
+    try {
+        $berat = (float)$_POST["berat"];
+        $idCucian = (int)$_POST["id_cucian"]; 
+        $catatan_berat = htmlspecialchars($_POST["catatan_berat"]);
+        
+        if(handleWeightUpdate($connect, $berat, $idCucian, $catatan_berat)) {
+            echo "<script>
+                Swal.fire('Berat Berhasil Dikonfirmasi', 'Pesanan akan diproses', 'success')
+                .then(() => window.location = 'status.php');
+            </script>";
+        }
+    } catch (Exception $e) {
+        echo "<script>
+            Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
+        </script>";
+    }
+}
+
+// ...existing code...
 ?>

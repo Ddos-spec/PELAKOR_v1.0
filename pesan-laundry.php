@@ -89,16 +89,16 @@ $pelanggan = mysqli_fetch_assoc($query);
                     <div class="card-content">
                         <span class="card-title">Data Penerima</span>
                         <div class="input-field">
-                            <input id="nama" type="text" disabled value="<?= $pelanggan['nama'] ?>">
-                            <label for="nama">Nama Penerima</label>
+                            <input id="nama_penerima" type="text" disabled value="<?= $pelanggan['nama'] ?>">
+                            <label for="nama_penerima">Nama Penerima</label>
                         </div>
                         <div class="input-field">
-                            <input id="telp" type="text" disabled value="<?= $pelanggan['telp'] ?>">
-                            <label for="telp">No Telp</label>
+                            <input id="telp_penerima" type="text" disabled value="<?= $pelanggan['telp'] ?>">
+                            <label for="telp_penerima">No Telp</label>
                         </div>
                         <div class="input-field">
-                            <textarea class="materialize-textarea" name="alamat" id="alamat"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
-                            <label for="alamat">Alamat</label>
+                            <textarea id="alamat_penerima" class="materialize-textarea" name="alamat"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
+                            <label for="alamat_penerima">Alamat</label>
                         </div>
                     </div>
                 </div>
@@ -139,14 +139,14 @@ $pelanggan = mysqli_fetch_assoc($query);
                                 </div>
                                 <div class="col s12">
                                     <div class="input-field">
-                                        <textarea class="materialize-textarea" name="estimasi_item" id="estimasiItem" placeholder="Contoh: 3 baju, 2 celana, 4 kaos"></textarea>
-                                        <label for="estimasiItem">Estimasi Item (Opsional)</label>
+                                        <textarea id="estimasi_item" class="materialize-textarea" name="estimasi_item" placeholder="Contoh: 3 baju, 2 celana, 4 kaos"></textarea>
+                                        <label for="estimasi_item">Estimasi Item (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col s12">
                                     <div class="input-field">
-                                        <textarea class="materialize-textarea" name="catatan" id="catatanKiloan"></textarea>
-                                        <label for="catatanKiloan">Catatan</label>
+                                        <textarea id="catatan_kiloan" class="materialize-textarea" name="catatan"></textarea>
+                                        <label for="catatan_kiloan">Catatan</label>
                                     </div>
                                 </div>
                             </div>
@@ -193,8 +193,8 @@ $pelanggan = mysqli_fetch_assoc($query);
                             </div>
 
                             <div class="input-field">
-                                <textarea class="materialize-textarea" name="catatan" id="catatanSatuan"></textarea>
-                                <label for="catatanSatuan">Catatan</label>
+                                <textarea id="catatan_satuan" class="materialize-textarea" name="catatan"></textarea>
+                                <label for="catatan_satuan">Catatan</label>
                             </div>
 
                             <div class="center">
@@ -403,26 +403,30 @@ if (isset($_POST["pesanKiloan"])) {
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
-    $tgl = date("Y-m-d H:i:s");
+    $tgl = date("Y-m-d"); 
     $tipe_layanan = "kiloan";
 
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, estimasi_item, alamat, catatan, status_cucian, tipe_layanan) 
-                                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
+    mysqli_begin_transaction($connect);
+    try {
+        $query = "INSERT INTO cucian 
+                  (id_agen, id_pelanggan, tgl_mulai, jenis, estimasi_item, alamat, catatan, status_cucian, tipe_layanan) 
+                  VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+        
+        if (!mysqli_query($connect, $query)) {
+            throw new Exception("Error creating order: " . mysqli_error($connect));
+        }
 
-    if (mysqli_affected_rows($connect) > 0) {
-        echo "
-            <script>
-                Swal.fire({
-                    title: 'Pesanan Berhasil Dibuat',
-                    text: 'Silahkan menunggu konfirmasi dari agen',
-                    icon: 'success'
-                }).then(function() {
-                    window.location = 'status.php';
-                });
-            </script>
-        ";
-    } else {
-        echo mysqli_error($connect);
+        mysqli_commit($connect);
+        echo "<script>
+            Swal.fire({
+                title: 'Pesanan Berhasil!',
+                text: 'Menunggu konfirmasi agen',
+                icon: 'success'
+            }).then(() => window.location = 'status.php');
+        </script>";
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
 }
 
@@ -430,64 +434,56 @@ if (isset($_POST["pesanSatuan"])) {
     $alamat = htmlspecialchars($_POST["alamat"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
-    $tgl = date("Y-m-d H:i:s");
+    $tgl = date("Y-m-d");
     $tipe_layanan = "satuan";
     
     mysqli_begin_transaction($connect);
     try {
-        error_log("Processing satuan order for agen_id: " . $idAgen);
-        
         // Insert main order
         $query = "INSERT INTO cucian 
-            (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
-            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+                  (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
+                  VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
         
-        error_log("Main order query: " . $query);
         if (!mysqli_query($connect, $query)) {
-            throw new Exception("Error inserting cucian: " . mysqli_error($connect));
+            throw new Exception("Error creating order: " . mysqli_error($connect));
         }
         
         $cucian_id = mysqli_insert_id($connect);
         $total_items = 0;
         
-        // Process each item
+        // Process items with price adjustments
         foreach($_POST["item"] as $id_harga_satuan => $qty) {
             if ($qty > 0) {
                 $total_items += $qty;
-                // Get item price
                 $q = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
-                $harga = mysqli_fetch_assoc($q)['harga'];
+                $baseHarga = mysqli_fetch_assoc($q)['harga'];
+                
+                // Apply price adjustments
+                $harga = $baseHarga;
+                if($jenis === 'setrika') $harga *= 0.8;
+                if($jenis === 'komplit') $harga *= 1.5;
+                
                 $subtotal = $qty * $harga;
                 
-                $detailQuery = "INSERT INTO detail_cucian 
+                mysqli_query($connect, "INSERT INTO detail_cucian 
                     (id_cucian, id_harga_satuan, jumlah, subtotal) 
-                    VALUES ($cucian_id, $id_harga_satuan, $qty, $subtotal)";
-                
-                error_log("Detail insert query: " . $detailQuery);
-                if (!mysqli_query($connect, $detailQuery)) {
-                    throw new Exception("Error inserting detail: " . mysqli_error($connect));
-                }
+                    VALUES ($cucian_id, $id_harga_satuan, $qty, $subtotal)");
             }
         }
 
-        // Update total items
         mysqli_query($connect, "UPDATE cucian SET total_item = $total_items WHERE id_cucian = $cucian_id");
         mysqli_commit($connect);
 
         echo "<script>
             Swal.fire({
                 title: 'Pesanan Berhasil!',
-                text: 'Pesanan akan diproses oleh agen',
+                text: 'Menunggu konfirmasi agen',
                 icon: 'success'
-            }).then(() => {
-                window.location = 'status.php';
-            });
+            }).then(() => window.location = 'status.php');
         </script>";
     } catch (Exception $e) {
         mysqli_rollback($connect);
-        echo "<script>
-            Swal.fire('Error!', '".$e->getMessage()."', 'error');
-        </script>";
+        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
 }
 ?>
