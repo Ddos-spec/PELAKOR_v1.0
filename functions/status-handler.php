@@ -41,12 +41,23 @@ function handleCompleteStatus($connect, $idCucian, $idAgen) {
 
 function validateStatusTransition($currentStatus, $newStatus) {
     $allowedTransitions = [
-        'Penjemputan' => ['Sedang di Cuci'],
+        'Penjemputan' => ['Sedang di Cuci'], // For satuan
         'Sedang di Cuci' => ['Sedang di Jemur'],
         'Sedang di Jemur' => ['Sedang di Setrika'],
         'Sedang di Setrika' => ['Pengantaran'],
         'Pengantaran' => ['Selesai']
     ];
+    
+    // Special case - allow direct transition to Selesai from any status
+    // This is needed for error handling and admin overrides
+    if ($newStatus === 'Selesai') {
+        return true;
+    }
+    
+    // Special case - weight update for kiloan orders
+    if ($currentStatus === 'Penjemputan' && $newStatus === 'Sedang di Cuci') {
+        return true;
+    }
     
     if (!isset($allowedTransitions[$currentStatus]) || 
         !in_array($newStatus, $allowedTransitions[$currentStatus])) {
@@ -181,12 +192,31 @@ function handleWeightUpdate($connect, $berat, $idCucian, $catatan_berat) {
 function handleAcceptOrder($connect, $idCucian, $catatan = '') {
     $timestamp = date("Y-m-d H:i:s");
     
-    mysqli_query($connect, "UPDATE cucian SET 
-        status_cucian = 'Sedang di Cuci',
-        catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[$timestamp] Pesanan diterima: $catatan')
-        WHERE id_cucian = '$idCucian'");
+    // Check order type
+    $query = mysqli_query($connect, "SELECT tipe_layanan FROM cucian WHERE id_cucian = '$idCucian'");
+    $cucian = mysqli_fetch_assoc($query);
+    
+    // For kiloan orders, keep status as Penjemputan until weight is confirmed
+    $newStatus = ($cucian['tipe_layanan'] == 'kiloan') ? 'Penjemputan' : 'Sedang di Cuci';
+    
+    mysqli_begin_transaction($connect);
+    try {
+        mysqli_query($connect, "UPDATE cucian SET 
+            status_cucian = '$newStatus',
+            catatan_proses = CONCAT(IFNULL(catatan_proses, ''), '\n[$timestamp] Pesanan diterima: $catatan')
+            WHERE id_cucian = '$idCucian'");
         
-    return mysqli_affected_rows($connect) > 0;
+        if (mysqli_affected_rows($connect) <= 0) {
+            throw new Exception("Gagal memperbarui status pesanan");
+        }
+        
+        mysqli_commit($connect);
+        return true;
+    } catch (Exception $e) {
+        mysqli_rollback($connect);
+        error_log("Error accepting order: " . $e->getMessage());
+        return false;
+    }
 }
 
 // Helper functions

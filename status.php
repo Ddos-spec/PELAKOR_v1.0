@@ -94,7 +94,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             error_log("ID Agen: " . $idAgen);
             
             // Query untuk pesanan baru
-            $queryStr = "SELECT c.*, p.nama as nama_pelanggan 
+            $queryStr = "SELECT c.*, p.nama as nama_pelanggan, p.telp, p.alamat, p.kota
                       FROM cucian c 
                       JOIN pelanggan p ON c.id_pelanggan = p.id_pelanggan 
                       WHERE c.id_agen = $idAgen 
@@ -247,6 +247,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <div class="row">
                         <div class="col s12">
                             <p><b>Pelanggan:</b> <?= $pesanan['nama_pelanggan'] ?></p>
+                            <p><b>No. Telp:</b> <?= $pesanan['telp'] ?></p>
+                            <p><b>Alamat:</b> <?= $pesanan['alamat'] . ", " . $pesanan['kota'] ?></p>
                             <p><b>Jenis:</b> <?= ucfirst($pesanan['jenis']) ?></p>
                             <?php if(!empty($pesanan['estimasi_item'])): ?>
                             <p><b>Estimasi Item:</b> <?= $pesanan['estimasi_item'] ?></p>
@@ -290,6 +292,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             <div id="modalDetailSatuan<?= $pesanan['id_cucian'] ?>" class="modal">
                 <div class="modal-content">
                     <h4>Detail Pesanan Satuan #<?= $pesanan['id_cucian'] ?></h4>
+                    <div class="section">
+                        <p><b>Pelanggan:</b> <?= $pesanan['nama_pelanggan'] ?></p>
+                        <p><b>No. Telp:</b> <?= $pesanan['telp'] ?></p>
+                        <p><b>Alamat:</b> <?= $pesanan['alamat'] . ", " . $pesanan['kota'] ?></p>
+                    </div>
                     <?php
                     $queryDetail = "SELECT d.*, h.nama_item, h.harga 
                                    FROM detail_cucian d 
@@ -515,15 +522,29 @@ if (isset($_POST["terimaOrder"])) {
         $idCucian = (int)$_POST["id_cucian"];
         $catatan = htmlspecialchars($_POST["catatan_terima"] ?? '');
         
+        // Get order type
+        $query = mysqli_query($connect, "SELECT tipe_layanan FROM cucian WHERE id_cucian = '$idCucian'");
+        $cucian = mysqli_fetch_assoc($query);
+        
+        error_log("Accepting order #$idCucian of type {$cucian['tipe_layanan']}");
+        
         if(handleAcceptOrder($connect, $idCucian, $catatan)) {
+            $message = ($cucian['tipe_layanan'] == 'kiloan') 
+                ? 'Pesanan diterima. Silahkan input berat cucian.'
+                : 'Pesanan diterima dan akan diproses';
+                
             echo "<script>
-                Swal.fire('Pesanan Diterima', 'Pesanan akan diproses', 'success')
-                .then(() => window.location = 'status.php');
+                Swal.fire({
+                    title: 'Pesanan Diterima',
+                    text: '$message',
+                    icon: 'success'
+                }).then(() => window.location = 'status.php');
             </script>";
         } else {
             throw new Exception("Gagal menerima pesanan");
         }
     } catch (Exception $e) {
+        error_log("Error accepting order: " . $e->getMessage());
         echo "<script>
             Swal.fire('Error!', '". htmlspecialchars($e->getMessage()) ."', 'error');
         </script>";

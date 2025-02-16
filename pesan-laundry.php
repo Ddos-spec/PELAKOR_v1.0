@@ -1,7 +1,16 @@
 <?php
+// Add error logging at the start of the file
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', 'laundry_debug.log');
+
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
+
+// Start logging
+error_log("Starting pesan-laundry.php execution");
 
 cekPelanggan();
 
@@ -9,6 +18,7 @@ cekPelanggan();
 $idAgen = $_GET["id"];
 $query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
 $agen = mysqli_fetch_assoc($query);
+error_log("Retrieved agent data for ID: " . $idAgen);
 
 if (isset($_GET["jenis"])){
     $jenis = $_GET["jenis"];
@@ -20,6 +30,7 @@ if (isset($_GET["jenis"])){
 $idPelanggan = $_SESSION["pelanggan"];
 $query = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
 $pelanggan = mysqli_fetch_assoc($query);
+error_log("Retrieved customer data for ID: " . $idPelanggan);
 ?>
 
 <!DOCTYPE html>
@@ -46,12 +57,9 @@ $pelanggan = mysqli_fetch_assoc($query);
     </style>
 </head>
 <body>
-    <!-- header -->
     <?php include 'header.php' ?>
-    <!-- end header -->
 
     <div class="container">
-        <!-- Profil dan Data Diri -->
         <div class="row">
             <!-- Profil Agen -->
             <div class="col s12 m6">
@@ -97,7 +105,7 @@ $pelanggan = mysqli_fetch_assoc($query);
                             <label for="telp_penerima">No Telp</label>
                         </div>
                         <div class="input-field">
-                            <textarea id="alamat_penerima" class="materialize-textarea" name="alamat"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
+                            <textarea id="alamat_penerima" class="materialize-textarea" name="alamat_penerima"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
                             <label for="alamat_penerima">Alamat</label>
                         </div>
                     </div>
@@ -121,6 +129,7 @@ $pelanggan = mysqli_fetch_assoc($query);
                     <div id="kiloan" class="col s12">
                         <form action="" method="post" id="formKiloan">
                             <input type="hidden" name="tipe_layanan" value="kiloan">
+                            <input type="hidden" name="alamat_penerima" id="alamat_kiloan">
                             <div class="row">
                                 <div class="col s12">
                                     <p>Jenis Layanan</p>
@@ -163,6 +172,7 @@ $pelanggan = mysqli_fetch_assoc($query);
                     <div id="satuan" class="col s12">
                         <form action="" method="post" id="formSatuan">
                             <input type="hidden" name="tipe_layanan" value="satuan">
+                            <input type="hidden" name="alamat_penerima" id="alamat_satuan">
                             <div class="row">
                                 <div class="col s12">
                                     <p>Jenis Layanan</p>
@@ -210,18 +220,24 @@ $pelanggan = mysqli_fetch_assoc($query);
         </div>
     </div>
 
-    <!-- footer -->
     <?php include 'footer.php' ?>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tabs
         var tabs = document.querySelectorAll('.tabs');
         M.Tabs.init(tabs);
-
-        // Load initial items for satuan
         updateDaftarItem('cuci');
 
+        // Sync address across forms
+        document.getElementById('alamat_penerima').addEventListener('change', function() {
+            document.getElementById('alamat_kiloan').value = this.value;
+            document.getElementById('alamat_satuan').value = this.value;
+        });
+        
+        // Set initial address values
+        document.getElementById('alamat_kiloan').value = document.getElementById('alamat_penerima').value;
+        document.getElementById('alamat_satuan').value = document.getElementById('alamat_penerima').value;
+        
         // Add form validation
         document.getElementById('formSatuan').onsubmit = function(e) {
             let totalItems = 0;
@@ -232,6 +248,81 @@ $pelanggan = mysqli_fetch_assoc($query);
                 e.preventDefault();
                 Swal.fire('Error', 'Minimal pesan 1 item', 'error');
             }
+        };
+
+        // Form submission handlers
+        document.getElementById('formKiloan').onsubmit = function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Konfirmasi Pesanan',
+                html: `
+                    <div class="left-align">
+                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
+                        <p><b>Estimasi Item:</b> ${document.getElementById('estimasi_item').value || '-'}</p>
+                        <p><b>Catatan:</b> ${document.getElementById('catatan_kiloan').value || '-'}</p>
+                        <p><b>Alamat:</b> ${document.getElementById('alamat_penerima').value}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pesan Sekarang',
+                cancelButtonText: 'Periksa Kembali',
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#ff5252',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        };
+
+        document.getElementById('formSatuan').onsubmit = function(e) {
+            e.preventDefault();
+            
+            let totalItems = 0;
+            const items = [];
+            const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
+            
+            inputs.forEach(input => {
+                const qty = parseInt(input.value);
+                totalItems += qty;
+                if (qty > 0) {
+                    const itemName = input.closest('.card-panel-item').querySelector('p').textContent;
+                    items.push(`${qty}x ${itemName}`);
+                }
+            });
+            
+            if(totalItems === 0) {
+                Swal.fire('Error', 'Minimal pesan 1 item', 'error');
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Konfirmasi Pesanan',
+                html: `
+                    <div class="left-align">
+                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
+                        <p><b>Item:</b></p>
+                        <ul>
+                            ${items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                        <p><b>Total:</b> ${document.getElementById('totalHarga').textContent}</p>
+                        <p><b>Catatan:</b> ${document.getElementById('catatan_satuan').value || '-'}</p>
+                        <p><b>Alamat:</b> ${document.getElementById('alamat_penerima').value}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pesan Sekarang',
+                cancelButtonText: 'Periksa Kembali',
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#ff5252',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
         };
     });
 
@@ -314,97 +405,22 @@ $pelanggan = mysqli_fetch_assoc($query);
         });
         document.getElementById('totalHarga').textContent = 'Total: Rp ' + total.toLocaleString();
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // ...existing initialization code...
-
-        // Form submission handlers
-        document.getElementById('formKiloan').onsubmit = function(e) {
-            e.preventDefault();
-            
-            Swal.fire({
-                title: 'Konfirmasi Pesanan',
-                html: `
-                    <div class="left-align">
-                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
-                        <p><b>Estimasi Item:</b> ${document.getElementById('estimasiItem').value || '-'}</p>
-                        <p><b>Catatan:</b> ${document.getElementById('catatanKiloan').value || '-'}</p>
-                        <p><b>Alamat:</b> ${document.getElementById('alamat').value}</p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Pesan Sekarang',
-                cancelButtonText: 'Periksa Kembali',
-                confirmButtonColor: '#2196F3',
-                cancelButtonColor: '#ff5252',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.submit();
-                }
-            });
-        };
-
-        document.getElementById('formSatuan').onsubmit = function(e) {
-            e.preventDefault();
-            
-            let totalItems = 0;
-            const items = [];
-            const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
-            
-            inputs.forEach(input => {
-                const qty = parseInt(input.value);
-                totalItems += qty;
-                if (qty > 0) {
-                    const itemName = input.closest('.card-panel-item').querySelector('p').textContent;
-                    items.push(`${qty}x ${itemName}`);
-                }
-            });
-            
-            if(totalItems === 0) {
-                Swal.fire('Error', 'Minimal pesan 1 item', 'error');
-                return;
-            }
-            
-            Swal.fire({
-                title: 'Konfirmasi Pesanan',
-                html: `
-                    <div class="left-align">
-                        <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
-                        <p><b>Item:</b></p>
-                        <ul>
-                            ${items.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
-                        <p><b>Total:</b> ${document.getElementById('totalHarga').textContent}</p>
-                        <p><b>Catatan:</b> ${document.getElementById('catatanSatuan').value || '-'}</p>
-                        <p><b>Alamat:</b> ${document.getElementById('alamat').value}</p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Pesan Sekarang',
-                cancelButtonText: 'Periksa Kembali',
-                confirmButtonColor: '#2196F3',
-                cancelButtonColor: '#ff5252',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.submit();
-                }
-            });
-        };
-    });
     </script>
 </body>
 </html>
 
 <?php
 if (isset($_POST["pesanKiloan"])) {
-    $alamat = htmlspecialchars($_POST["alamat"]);
+    error_log("Processing kiloan order. POST data: " . json_encode($_POST));
+    
+    $alamat = htmlspecialchars($_POST["alamat_penerima"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
     $tgl = date("Y-m-d"); 
     $tipe_layanan = "kiloan";
+
+    error_log("Processed kiloan data - Address: $alamat, Type: $jenis, Date: $tgl");
 
     mysqli_begin_transaction($connect);
     try {
@@ -412,12 +428,18 @@ if (isset($_POST["pesanKiloan"])) {
                   (id_agen, id_pelanggan, tgl_mulai, jenis, estimasi_item, alamat, catatan, status_cucian, tipe_layanan) 
                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
         
+        error_log("Executing query: " . $query);
+        
         if (!mysqli_query($connect, $query)) {
             throw new Exception("Error creating order: " . mysqli_error($connect));
         }
 
+        $newOrderId = mysqli_insert_id($connect);
+        error_log("Successfully created kiloan order with ID: " . $newOrderId);
+
         mysqli_commit($connect);
         echo "<script>
+            console.log('Order created successfully, redirecting...');
             Swal.fire({
                 title: 'Pesanan Berhasil!',
                 text: 'Menunggu konfirmasi agen',
@@ -425,45 +447,53 @@ if (isset($_POST["pesanKiloan"])) {
             }).then(() => window.location = 'status.php');
         </script>";
     } catch (Exception $e) {
+        error_log("Error in kiloan order: " . $e->getMessage());
         mysqli_rollback($connect);
         echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
 }
 
 if (isset($_POST["pesanSatuan"])) {
-    $alamat = htmlspecialchars($_POST["alamat"]);
+    error_log("Processing satuan order. POST data: " . json_encode($_POST));
+    
+    $alamat = htmlspecialchars($_POST["alamat_penerima"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $tgl = date("Y-m-d");
     $tipe_layanan = "satuan";
     
+    error_log("Processed satuan data - Address: $alamat, Type: $jenis, Date: $tgl");
+
     mysqli_begin_transaction($connect);
     try {
-        // Insert main order
         $query = "INSERT INTO cucian 
                   (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
                   VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+        
+        error_log("Executing main query: " . $query);
         
         if (!mysqli_query($connect, $query)) {
             throw new Exception("Error creating order: " . mysqli_error($connect));
         }
         
         $cucian_id = mysqli_insert_id($connect);
+        error_log("Created main order with ID: " . $cucian_id);
+        
         $total_items = 0;
         
-        // Process items with price adjustments
         foreach($_POST["item"] as $id_harga_satuan => $qty) {
             if ($qty > 0) {
                 $total_items += $qty;
                 $q = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
                 $baseHarga = mysqli_fetch_assoc($q)['harga'];
                 
-                // Apply price adjustments
                 $harga = $baseHarga;
                 if($jenis === 'setrika') $harga *= 0.8;
                 if($jenis === 'komplit') $harga *= 1.5;
                 
                 $subtotal = $qty * $harga;
+                
+                error_log("Adding item: Satuan ID $id_harga_satuan, Qty $qty, Price $harga");
                 
                 mysqli_query($connect, "INSERT INTO detail_cucian 
                     (id_cucian, id_harga_satuan, jumlah, subtotal) 
@@ -471,10 +501,12 @@ if (isset($_POST["pesanSatuan"])) {
             }
         }
 
+        error_log("Updating total items to: " . $total_items);
         mysqli_query($connect, "UPDATE cucian SET total_item = $total_items WHERE id_cucian = $cucian_id");
         mysqli_commit($connect);
 
         echo "<script>
+            console.log('Order created successfully, redirecting...');
             Swal.fire({
                 title: 'Pesanan Berhasil!',
                 text: 'Menunggu konfirmasi agen',
@@ -482,6 +514,7 @@ if (isset($_POST["pesanSatuan"])) {
             }).then(() => window.location = 'status.php');
         </script>";
     } catch (Exception $e) {
+        error_log("Error in satuan order: " . $e->getMessage());
         mysqli_rollback($connect);
         echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
