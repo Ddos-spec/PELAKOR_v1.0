@@ -244,25 +244,13 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
             alamatSatuan.value = this.value;
         });
         
-        // Form validation
-        document.getElementById('formSatuan').onsubmit = function(e) {
-            let totalItems = 0;
-            const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
-            inputs.forEach(input => totalItems += parseInt(input.value));
-            
-            if(totalItems === 0) {
-                e.preventDefault();
-                Swal.fire('Error', 'Minimal pesan 1 item', 'error');
-            }
-        };
-
-        // Form submission handlers with validation
+        // Form submission handlers with AJAX
         document.getElementById('formKiloan').onsubmit = function(e) {
             e.preventDefault();
             
             if (!alamatPenerima.value.trim()) {
                 Swal.fire('Error', 'Alamat pengiriman wajib diisi', 'error');
-                return;
+                return false;
             }
             
             Swal.fire({
@@ -283,9 +271,37 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 cancelButtonColor: '#ff5252',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.submit();
+                    const formData = new FormData(this);
+                    formData.append('X-Requested-With', 'XMLHttpRequest');
+                    
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        if(html.includes('Pesanan Berhasil')) {
+                            Swal.fire({
+                                title: 'Pesanan Berhasil!',
+                                text: 'Menunggu konfirmasi agen',
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = 'status.php';
+                            });
+                        } else {
+                            throw new Error('Gagal membuat pesanan');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error!', error.message, 'error');
+                    });
                 }
             });
+            
+            return false;
         };
 
         document.getElementById('formSatuan').onsubmit = function(e) {
@@ -336,7 +352,33 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 cancelButtonColor: '#ff5252',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.submit();
+                    const formData = new FormData(this);
+                    formData.append('X-Requested-With', 'XMLHttpRequest');
+                    
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        if(html.includes('Pesanan Berhasil')) {
+                            Swal.fire({
+                                title: 'Pesanan Berhasil!',
+                                text: 'Menunggu konfirmasi agen',
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = 'status.php';
+                            });
+                        } else {
+                            throw new Error('Gagal membuat pesanan');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error!', error.message, 'error');
+                    });
                 }
             });
         };
@@ -433,7 +475,7 @@ if (isset($_POST["pesanKiloan"])) {
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
-    $tgl = date("Y-m-d"); 
+    $tgl = date("Y-m-d H:i:s"); 
     $tipe_layanan = "kiloan";
 
     mysqli_begin_transaction($connect);
@@ -453,18 +495,32 @@ if (isset($_POST["pesanKiloan"])) {
         error_log("Successfully created kiloan order with ID: " . $newOrderId);
 
         mysqli_commit($connect);
-        echo "<script>
-            console.log('Order created successfully, redirecting...');
-            Swal.fire({
-                title: 'Pesanan Berhasil!',
-                text: 'Menunggu konfirmasi agen',
-                icon: 'success'
-            }).then(() => window.location = 'status.php');
-        </script>";
+        
+        // Check if this is an AJAX request
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo "Pesanan Berhasil";
+            exit;
+        } else {
+            echo "<script>
+                console.log('Order created successfully, redirecting...');
+                Swal.fire({
+                    title: 'Pesanan Berhasil!',
+                    text: 'Menunggu konfirmasi agen',
+                    icon: 'success'
+                }).then(() => window.location = 'status.php');
+            </script>";
+        }
     } catch (Exception $e) {
         mysqli_rollback($connect);
         error_log("Error in kiloan order: " . $e->getMessage());
-        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
+        
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            http_response_code(500);
+            echo $e->getMessage();
+            exit;
+        } else {
+            echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
+        }
     }
 }
 
@@ -474,7 +530,7 @@ if (isset($_POST["pesanSatuan"])) {
     $alamat = htmlspecialchars($_POST["alamat"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
-    $tgl = date("Y-m-d");
+    $tgl = date("Y-m-d H:i:s");
     $tipe_layanan = "satuan";
     
     mysqli_begin_transaction($connect);
@@ -529,18 +585,32 @@ if (isset($_POST["pesanSatuan"])) {
         mysqli_stmt_execute($stmt);
 
         mysqli_commit($connect);
-        echo "<script>
-            console.log('Order created successfully, redirecting...');
-            Swal.fire({
-                title: 'Pesanan Berhasil!',
-                text: 'Menunggu konfirmasi agen',
-                icon: 'success'
-            }).then(() => window.location = 'status.php');
-        </script>";
+        
+        // Check if this is an AJAX request
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo "Pesanan Berhasil";
+            exit;
+        } else {
+            echo "<script>
+                console.log('Order created successfully, redirecting...');
+                Swal.fire({
+                    title: 'Pesanan Berhasil!',
+                    text: 'Menunggu konfirmasi agen',
+                    icon: 'success'
+                }).then(() => window.location = 'status.php');
+            </script>";
+        }
     } catch (Exception $e) {
         mysqli_rollback($connect);
         error_log("Error in satuan order: " . $e->getMessage());
-        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
+        
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            http_response_code(500);
+            echo $e->getMessage();
+            exit;
+        } else {
+            echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
+        }
     }
 }
 ?>
