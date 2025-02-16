@@ -94,13 +94,22 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php 
         elseif ($login == "Agen") : 
+            // Debug logging
+            error_log("ID Agen: " . $idAgen);
+            
             // Query untuk pesanan baru
-            $queryBaru = mysqli_query($connect, "SELECT c.*, p.nama as nama_pelanggan 
+            $queryStr = "SELECT c.*, p.nama as nama_pelanggan 
                       FROM cucian c 
                       JOIN pelanggan p ON c.id_pelanggan = p.id_pelanggan 
                       WHERE c.id_agen = $idAgen 
                       AND c.status_cucian = 'Penjemputan'
-                      ORDER BY c.tgl_mulai DESC");
+                      ORDER BY c.tgl_mulai DESC";
+            error_log("Query Baru: " . $queryStr);
+            
+            $queryBaru = mysqli_query($connect, $queryStr);
+            if (!$queryBaru) {
+                error_log("Error in queryBaru: " . mysqli_error($connect));
+            }
 
             // Query untuk pesanan proses
             $queryProses = mysqli_query($connect, "SELECT c.*, p.nama as nama_pelanggan 
@@ -301,10 +310,16 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 <div class="modal-content">
                     <h4>Detail Pesanan Satuan #<?= $pesanan['id_cucian'] ?></h4>
                     <?php
-                    $queryDetail = mysqli_query($connect, "SELECT d.*, h.nama_item, h.harga 
-                                                         FROM detail_cucian d 
-                                                         JOIN harga_satuan h ON d.id_harga_satuan = h.id_harga_satuan 
-                                                         WHERE d.id_cucian = {$pesanan['id_cucian']}");
+                    $queryDetail = "SELECT d.*, h.nama_item, h.harga 
+                                   FROM detail_cucian d 
+                                   JOIN harga_satuan h ON d.id_harga_satuan = h.id_harga_satuan 
+                                   WHERE d.id_cucian = {$pesanan['id_cucian']}";
+                    error_log("Detail Query: " . $queryDetail);
+                    
+                    $detailResult = mysqli_query($connect, $queryDetail);
+                    if (!$detailResult) {
+                        error_log("Error in detail query: " . mysqli_error($connect));
+                    }
                     ?>
                     <table class="striped">
                         <thead>
@@ -318,7 +333,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <tbody>
                             <?php 
                             $total = 0;
-                            while($detail = mysqli_fetch_assoc($queryDetail)): 
+                            while($detail = mysqli_fetch_assoc($detailResult)): 
                                 $subtotal = $detail['jumlah'] * $detail['harga'];
                                 $total += $subtotal;
                             ?>

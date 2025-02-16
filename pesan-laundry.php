@@ -435,12 +435,17 @@ if (isset($_POST["pesanSatuan"])) {
     
     mysqli_begin_transaction($connect);
     try {
+        error_log("Processing satuan order for agen_id: " . $idAgen);
+        
         // Insert main order
-        $query = mysqli_query($connect, "INSERT INTO cucian 
+        $query = "INSERT INTO cucian 
             (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
-            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')");
-
-        if (!$query) throw new Exception(mysqli_error($connect));
+            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+        
+        error_log("Main order query: " . $query);
+        if (!mysqli_query($connect, $query)) {
+            throw new Exception("Error inserting cucian: " . mysqli_error($connect));
+        }
         
         $cucian_id = mysqli_insert_id($connect);
         $total_items = 0;
@@ -449,12 +454,22 @@ if (isset($_POST["pesanSatuan"])) {
         foreach($_POST["item"] as $id_harga_satuan => $qty) {
             if ($qty > 0) {
                 $total_items += $qty;
-                mysqli_query($connect, "INSERT INTO detail_cucian 
-                    (id_cucian, id_harga_satuan, jumlah) 
-                    VALUES ($cucian_id, $id_harga_satuan, $qty)");
+                // Get item price
+                $q = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
+                $harga = mysqli_fetch_assoc($q)['harga'];
+                $subtotal = $qty * $harga;
+                
+                $detailQuery = "INSERT INTO detail_cucian 
+                    (id_cucian, id_harga_satuan, jumlah, subtotal) 
+                    VALUES ($cucian_id, $id_harga_satuan, $qty, $subtotal)";
+                
+                error_log("Detail insert query: " . $detailQuery);
+                if (!mysqli_query($connect, $detailQuery)) {
+                    throw new Exception("Error inserting detail: " . mysqli_error($connect));
+                }
             }
         }
-        
+
         // Update total items
         mysqli_query($connect, "UPDATE cucian SET total_item = $total_items WHERE id_cucian = $cucian_id");
         mysqli_commit($connect);
