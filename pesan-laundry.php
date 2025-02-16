@@ -3,13 +3,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
-ini_set('error_log', 'laundry_debug.log');
+ini_set('error_log', 'laundry_error.log');
 
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// Start logging
 error_log("Starting pesan-laundry.php execution");
 
 cekPelanggan();
@@ -60,8 +59,9 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
     <?php include 'header.php' ?>
 
     <div class="container">
+        <!-- Profile and Customer Data -->
         <div class="row">
-            <!-- Profil Agen -->
+            <!-- Profile -->
             <div class="col s12 m6">
                 <div class="card">
                     <div class="card-image">
@@ -91,7 +91,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 </div>
             </div>
 
-            <!-- Data Diri -->
+            <!-- Customer Data -->
             <div class="col s12 m6">
                 <div class="card">
                     <div class="card-content">
@@ -105,7 +105,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                             <label for="telp_penerima">No Telp</label>
                         </div>
                         <div class="input-field">
-                            <textarea id="alamat_penerima" class="materialize-textarea" name="alamat_penerima"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
+                            <textarea id="alamat_penerima" class="materialize-textarea" name="alamat"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
                             <label for="alamat_penerima">Alamat</label>
                         </div>
                     </div>
@@ -113,7 +113,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
             </div>
         </div>
 
-        <!-- Form Pemesanan -->
+        <!-- Order Forms -->
         <div class="card">
             <div class="card-content">
                 <span class="card-title center">Pilih Jenis Layanan</span>
@@ -129,7 +129,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                     <div id="kiloan" class="col s12">
                         <form action="" method="post" id="formKiloan">
                             <input type="hidden" name="tipe_layanan" value="kiloan">
-                            <input type="hidden" name="alamat_penerima" id="alamat_kiloan">
+                            <input type="hidden" name="alamat" id="alamat_kiloan">
                             <div class="row">
                                 <div class="col s12">
                                     <p>Jenis Layanan</p>
@@ -172,7 +172,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                     <div id="satuan" class="col s12">
                         <form action="" method="post" id="formSatuan">
                             <input type="hidden" name="tipe_layanan" value="satuan">
-                            <input type="hidden" name="alamat_penerima" id="alamat_satuan">
+                            <input type="hidden" name="alamat" id="alamat_satuan">
                             <div class="row">
                                 <div class="col s12">
                                     <p>Jenis Layanan</p>
@@ -224,21 +224,27 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tabs
         var tabs = document.querySelectorAll('.tabs');
         M.Tabs.init(tabs);
         updateDaftarItem('cuci');
 
         // Sync address across forms
-        document.getElementById('alamat_penerima').addEventListener('change', function() {
-            document.getElementById('alamat_kiloan').value = this.value;
-            document.getElementById('alamat_satuan').value = this.value;
+        var alamatPenerima = document.getElementById('alamat_penerima');
+        var alamatKiloan = document.getElementById('alamat_kiloan');
+        var alamatSatuan = document.getElementById('alamat_satuan');
+
+        // Set initial values
+        alamatKiloan.value = alamatPenerima.value;
+        alamatSatuan.value = alamatPenerima.value;
+
+        // Update when changed
+        alamatPenerima.addEventListener('change', function() {
+            alamatKiloan.value = this.value;
+            alamatSatuan.value = this.value;
         });
         
-        // Set initial address values
-        document.getElementById('alamat_kiloan').value = document.getElementById('alamat_penerima').value;
-        document.getElementById('alamat_satuan').value = document.getElementById('alamat_penerima').value;
-        
-        // Add form validation
+        // Form validation
         document.getElementById('formSatuan').onsubmit = function(e) {
             let totalItems = 0;
             const inputs = document.querySelectorAll('#daftarItem input[type="number"]');
@@ -250,9 +256,14 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
             }
         };
 
-        // Form submission handlers
+        // Form submission handlers with validation
         document.getElementById('formKiloan').onsubmit = function(e) {
             e.preventDefault();
+            
+            if (!alamatPenerima.value.trim()) {
+                Swal.fire('Error', 'Alamat pengiriman wajib diisi', 'error');
+                return;
+            }
             
             Swal.fire({
                 title: 'Konfirmasi Pesanan',
@@ -261,7 +272,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                         <p><b>Jenis Layanan:</b> ${document.querySelector('input[name="jenis"]:checked').value}</p>
                         <p><b>Estimasi Item:</b> ${document.getElementById('estimasi_item').value || '-'}</p>
                         <p><b>Catatan:</b> ${document.getElementById('catatan_kiloan').value || '-'}</p>
-                        <p><b>Alamat:</b> ${document.getElementById('alamat_penerima').value}</p>
+                        <p><b>Alamat:</b> ${alamatPenerima.value}</p>
                     </div>
                 `,
                 icon: 'question',
@@ -279,6 +290,11 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
 
         document.getElementById('formSatuan').onsubmit = function(e) {
             e.preventDefault();
+            
+            if (!alamatPenerima.value.trim()) {
+                Swal.fire('Error', 'Alamat pengiriman wajib diisi', 'error');
+                return;
+            }
             
             let totalItems = 0;
             const items = [];
@@ -309,7 +325,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                         </ul>
                         <p><b>Total:</b> ${document.getElementById('totalHarga').textContent}</p>
                         <p><b>Catatan:</b> ${document.getElementById('catatan_satuan').value || '-'}</p>
-                        <p><b>Alamat:</b> ${document.getElementById('alamat_penerima').value}</p>
+                        <p><b>Alamat:</b> ${alamatPenerima.value}</p>
                     </div>
                 `,
                 icon: 'question',
@@ -411,26 +427,25 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
 
 <?php
 if (isset($_POST["pesanKiloan"])) {
-    error_log("Processing kiloan order. POST data: " . json_encode($_POST));
+    error_log("Processing kiloan order. POST data: " . print_r($_POST, true));
     
-    $alamat = htmlspecialchars($_POST["alamat_penerima"]);
+    $alamat = htmlspecialchars($_POST["alamat"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
     $tgl = date("Y-m-d"); 
     $tipe_layanan = "kiloan";
 
-    error_log("Processed kiloan data - Address: $alamat, Type: $jenis, Date: $tgl");
-
     mysqli_begin_transaction($connect);
     try {
         $query = "INSERT INTO cucian 
                   (id_agen, id_pelanggan, tgl_mulai, jenis, estimasi_item, alamat, catatan, status_cucian, tipe_layanan) 
-                  VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+                  VALUES (?, ?, ?, ?, ?, ?, ?, 'Penjemputan', ?)";
         
-        error_log("Executing query: " . $query);
+        $stmt = mysqli_prepare($connect, $query);
+        mysqli_stmt_bind_param($stmt, "iissssss", $idAgen, $idPelanggan, $tgl, $jenis, $estimasi_item, $alamat, $catatan, $tipe_layanan);
         
-        if (!mysqli_query($connect, $query)) {
+        if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error creating order: " . mysqli_error($connect));
         }
 
@@ -447,32 +462,31 @@ if (isset($_POST["pesanKiloan"])) {
             }).then(() => window.location = 'status.php');
         </script>";
     } catch (Exception $e) {
-        error_log("Error in kiloan order: " . $e->getMessage());
         mysqli_rollback($connect);
+        error_log("Error in kiloan order: " . $e->getMessage());
         echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
 }
 
 if (isset($_POST["pesanSatuan"])) {
-    error_log("Processing satuan order. POST data: " . json_encode($_POST));
+    error_log("Processing satuan order. POST data: " . print_r($_POST, true));
     
-    $alamat = htmlspecialchars($_POST["alamat_penerima"]);
+    $alamat = htmlspecialchars($_POST["alamat"]);
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $tgl = date("Y-m-d");
     $tipe_layanan = "satuan";
     
-    error_log("Processed satuan data - Address: $alamat, Type: $jenis, Date: $tgl");
-
     mysqli_begin_transaction($connect);
     try {
         $query = "INSERT INTO cucian 
                   (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
-                  VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$alamat', '$catatan', 'Penjemputan', '$tipe_layanan')";
+                  VALUES (?, ?, ?, ?, ?, ?, 'Penjemputan', ?)";
         
-        error_log("Executing main query: " . $query);
+        $stmt = mysqli_prepare($connect, $query);
+        mysqli_stmt_bind_param($stmt, "iisssss", $idAgen, $idPelanggan, $tgl, $jenis, $alamat, $catatan, $tipe_layanan);
         
-        if (!mysqli_query($connect, $query)) {
+        if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Error creating order: " . mysqli_error($connect));
         }
         
@@ -484,9 +498,15 @@ if (isset($_POST["pesanSatuan"])) {
         foreach($_POST["item"] as $id_harga_satuan => $qty) {
             if ($qty > 0) {
                 $total_items += $qty;
-                $q = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
-                $baseHarga = mysqli_fetch_assoc($q)['harga'];
                 
+                // Get base price
+                $qHarga = mysqli_prepare($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = ?");
+                mysqli_stmt_bind_param($qHarga, "i", $id_harga_satuan);
+                mysqli_stmt_execute($qHarga);
+                $result = mysqli_stmt_get_result($qHarga);
+                $baseHarga = mysqli_fetch_assoc($result)['harga'];
+                
+                // Calculate adjusted price
                 $harga = $baseHarga;
                 if($jenis === 'setrika') $harga *= 0.8;
                 if($jenis === 'komplit') $harga *= 1.5;
@@ -495,16 +515,20 @@ if (isset($_POST["pesanSatuan"])) {
                 
                 error_log("Adding item: Satuan ID $id_harga_satuan, Qty $qty, Price $harga");
                 
-                mysqli_query($connect, "INSERT INTO detail_cucian 
+                $stmt = mysqli_prepare($connect, "INSERT INTO detail_cucian 
                     (id_cucian, id_harga_satuan, jumlah, subtotal) 
-                    VALUES ($cucian_id, $id_harga_satuan, $qty, $subtotal)");
+                    VALUES (?, ?, ?, ?)");
+                mysqli_stmt_bind_param($stmt, "iiid", $cucian_id, $id_harga_satuan, $qty, $subtotal);
+                mysqli_stmt_execute($stmt);
             }
         }
 
         error_log("Updating total items to: " . $total_items);
-        mysqli_query($connect, "UPDATE cucian SET total_item = $total_items WHERE id_cucian = $cucian_id");
-        mysqli_commit($connect);
+        $stmt = mysqli_prepare($connect, "UPDATE cucian SET total_item = ? WHERE id_cucian = ?");
+        mysqli_stmt_bind_param($stmt, "ii", $total_items, $cucian_id);
+        mysqli_stmt_execute($stmt);
 
+        mysqli_commit($connect);
         echo "<script>
             console.log('Order created successfully, redirecting...');
             Swal.fire({
@@ -514,8 +538,8 @@ if (isset($_POST["pesanSatuan"])) {
             }).then(() => window.location = 'status.php');
         </script>";
     } catch (Exception $e) {
-        error_log("Error in satuan order: " . $e->getMessage());
         mysqli_rollback($connect);
+        error_log("Error in satuan order: " . $e->getMessage());
         echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
     }
 }
