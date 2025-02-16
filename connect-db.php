@@ -1,17 +1,26 @@
 <?php
+// Konfigurasi database
+$config = [
+    'host' => 'localhost',
+    'username' => 'root',
+    'password' => '',
+    'database' => 'laundryku'
+];
 
-$username = "root";
-$passwordDB = "";
-$server = "localhost";
-$db_name = "laundryku";
+// Membuat koneksi
+$connect = mysqli_connect($config['host'], $config['username'], $config['password'], $config['database']);
 
-$connect = mysqli_connect($server, $username, $passwordDB, $db_name);
-
-
-$connect = mysqli_connect("localhost", "root", "", "laundryku");
-
+// Cek koneksi
 if (!$connect) {
-    error_log("Database connection failed: " . mysqli_connect_error());
-    die("Connection failed: " . mysqli_connect_error());
+    $error = mysqli_connect_error();
+    error_log("Database connection failed: " . $error);
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'Database connection failed',
+        'error' => $error
+    ]));
 }
+
+// Set charset
+mysqli_set_charset($connect, 'utf8mb4');
 ?>
