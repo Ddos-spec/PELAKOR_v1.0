@@ -2,6 +2,36 @@
 
 // Existing validation functions...
 
+// Simplified Order Function
+function createLaundryOrder($idAgen, $idPelanggan, $orderData) {
+    global $connect;
+    
+    $tgl = date("Y-m-d H:i:s");
+    $status = "Penjemputan";
+    
+    $query = "INSERT INTO cucian 
+              (id_agen, id_pelanggan, tgl_mulai, jenis, alamat, catatan, status_cucian, tipe_layanan) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $stmt = mysqli_prepare($connect, $query);
+    mysqli_stmt_bind_param($stmt, "iissssss", 
+        $idAgen, 
+        $idPelanggan, 
+        $tgl, 
+        $orderData['jenis'], 
+        $orderData['alamat'], 
+        $orderData['catatan'], 
+        $status, 
+        $orderData['tipe_layanan']
+    );
+    
+    if (!mysqli_stmt_execute($stmt)) {
+        return false;
+    }
+    
+    return mysqli_insert_id($connect);
+}
+
 // Order Processing Functions
 
 function processKiloanOrder($connect, $idPelanggan) {

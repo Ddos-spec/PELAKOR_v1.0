@@ -1,5 +1,19 @@
 <?php
 
+function handleNewOrder($idCucian) {
+    global $connect;
+    
+    $query = "UPDATE cucian SET status_cucian = 'Menunggu Konfirmasi' WHERE id_cucian = ?";
+    $stmt = mysqli_prepare($connect, $query);
+    mysqli_stmt_bind_param($stmt, "i", $idCucian);
+    
+    if (!mysqli_stmt_execute($stmt)) {
+        return false;
+    }
+    
+    return true;
+}
+
 function handleSimpleStatus($connect, $statusCucian, $idCucian, $idAgen) {
     mysqli_query($connect, "UPDATE cucian SET status_cucian = '$statusCucian' WHERE id_cucian = '$idCucian'");
     
