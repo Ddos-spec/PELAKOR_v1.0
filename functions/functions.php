@@ -1,5 +1,15 @@
 <?php
 
+function cekPelanggan() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (!isset($_SESSION["pelanggan"])) {
+        header("Location: login.php");
+        exit();
+    }
+}
+
 // Existing validation functions...
 
 // Simplified Order Function
