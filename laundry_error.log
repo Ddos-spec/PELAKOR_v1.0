@@ -10,3 +10,160 @@
 [16-Feb-2025 09:53:03 Europe/Berlin] Starting pesan-laundry.php execution
 [16-Feb-2025 09:53:03 Europe/Berlin] Retrieved agent data for ID: 13
 [16-Feb-2025 09:53:03 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 09:56:50 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 09:56:50 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 09:56:50 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 09:57:00 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 09:57:00 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 09:57:00 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 09:59:03 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 09:59:03 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 09:59:03 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 09:59:43 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 09:59:43 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 09:59:43 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:01:06 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:01:06 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:01:06 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:01:13 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:01:13 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:01:13 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:30:00 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:30:00 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:30:00 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:30:10 Europe/Berlin] Received POST request at 2025-02-16 10:30:10
+[16-Feb-2025 10:30:10 Europe/Berlin] POST data: Array
+(
+    [tipe_layanan] => kiloan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => setrika
+    [estimasi_item] => 86
+    [catatan] => 
+    [pesanKiloan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:10 Europe/Berlin] Files: Array
+(
+)
+
+[16-Feb-2025 10:30:10 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:30:10 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:30:10 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:30:10 Europe/Berlin] Processing kiloan order. POST data: Array
+(
+    [tipe_layanan] => kiloan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => setrika
+    [estimasi_item] => 86
+    [catatan] => 
+    [pesanKiloan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:10 Europe/Berlin] Successfully created kiloan order with ID: 12
+[16-Feb-2025 10:30:10 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\pelakorku\pesan-laundry.php:107) in C:\xampp\htdocs\pelakorku\pesan-laundry.php on line 514
+[16-Feb-2025 10:30:23 Europe/Berlin] Received POST request at 2025-02-16 10:30:23
+[16-Feb-2025 10:30:23 Europe/Berlin] POST data: Array
+(
+    [tipe_layanan] => satuan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => cuci
+    [item] => Array
+        (
+            [21] => 6
+            [22] => 0
+            [23] => 0
+            [24] => 0
+            [25] => 0
+            [26] => 0
+        )
+
+    [catatan] => 
+    [pesanSatuan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:23 Europe/Berlin] Files: Array
+(
+)
+
+[16-Feb-2025 10:30:23 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:30:23 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:30:23 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:30:23 Europe/Berlin] Processing satuan order. POST data: Array
+(
+    [tipe_layanan] => satuan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => cuci
+    [item] => Array
+        (
+            [21] => 6
+            [22] => 0
+            [23] => 0
+            [24] => 0
+            [25] => 0
+            [26] => 0
+        )
+
+    [catatan] => 
+    [pesanSatuan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:23 Europe/Berlin] Created main order with ID: 13
+[16-Feb-2025 10:30:23 Europe/Berlin] Adding item: Satuan ID 21, Qty 6, Price 5000
+[16-Feb-2025 10:30:23 Europe/Berlin] Updating total items to: 6
+[16-Feb-2025 10:30:23 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\pelakorku\pesan-laundry.php:107) in C:\xampp\htdocs\pelakorku\pesan-laundry.php on line 606
+[16-Feb-2025 10:30:31 Europe/Berlin] Received POST request at 2025-02-16 10:30:31
+[16-Feb-2025 10:30:31 Europe/Berlin] POST data: Array
+(
+    [tipe_layanan] => satuan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => cuci
+    [item] => Array
+        (
+            [21] => 6
+            [22] => 0
+            [23] => 0
+            [24] => 0
+            [25] => 0
+            [26] => 0
+        )
+
+    [catatan] => 
+    [pesanSatuan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:31 Europe/Berlin] Files: Array
+(
+)
+
+[16-Feb-2025 10:30:31 Europe/Berlin] Starting pesan-laundry.php execution
+[16-Feb-2025 10:30:31 Europe/Berlin] Retrieved agent data for ID: 13
+[16-Feb-2025 10:30:31 Europe/Berlin] Retrieved customer data for ID: 15
+[16-Feb-2025 10:30:31 Europe/Berlin] Processing satuan order. POST data: Array
+(
+    [tipe_layanan] => satuan
+    [alamat] => sfsffdwdwa, adfwfawda
+    [jenis] => cuci
+    [item] => Array
+        (
+            [21] => 6
+            [22] => 0
+            [23] => 0
+            [24] => 0
+            [25] => 0
+            [26] => 0
+        )
+
+    [catatan] => 
+    [pesanSatuan] => true
+    [X-Requested-With] => XMLHttpRequest
+)
+
+[16-Feb-2025 10:30:31 Europe/Berlin] Created main order with ID: 14
+[16-Feb-2025 10:30:31 Europe/Berlin] Adding item: Satuan ID 21, Qty 6, Price 5000
+[16-Feb-2025 10:30:31 Europe/Berlin] Updating total items to: 6
+[16-Feb-2025 10:30:31 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\pelakorku\pesan-laundry.php:107) in C:\xampp\htdocs\pelakorku\pesan-laundry.php on line 606

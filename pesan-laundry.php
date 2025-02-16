@@ -5,6 +5,13 @@ ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', 'laundry_error.log');
 
+// Debug POST requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("Received POST request at " . date('Y-m-d H:i:s'));
+    error_log("POST data: " . print_r($_POST, true));
+    error_log("Files: " . print_r($_FILES, true));
+}
+
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
@@ -252,7 +259,10 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 Swal.fire('Error', 'Alamat pengiriman wajib diisi', 'error');
                 return false;
             }
-            
+
+            const formData = new FormData(this);
+            formData.append('pesanKiloan', 'true'); // Add submit button name
+
             Swal.fire({
                 title: 'Konfirmasi Pesanan',
                 html: `
@@ -271,19 +281,19 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 cancelButtonColor: '#ff5252',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const formData = new FormData(this);
                     formData.append('X-Requested-With', 'XMLHttpRequest');
                     
                     fetch(window.location.href, {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
                     })
-                    .then(response => response.text())
-                    .then(html => {
-                        if(html.includes('Pesanan Berhasil')) {
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.status === 'success') {
                             Swal.fire({
                                 title: 'Pesanan Berhasil!',
                                 text: 'Menunggu konfirmasi agen',
@@ -292,7 +302,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                                 window.location.href = 'status.php';
                             });
                         } else {
-                            throw new Error('Gagal membuat pesanan');
+                            throw new Error(data.message || 'Gagal membuat pesanan');
                         }
                     })
                     .catch(error => {
@@ -311,6 +321,9 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 Swal.fire('Error', 'Alamat pengiriman wajib diisi', 'error');
                 return;
             }
+
+            const formData = new FormData(this);
+            formData.append('pesanSatuan', 'true'); // Add submit button name
             
             let totalItems = 0;
             const items = [];
@@ -352,19 +365,19 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                 cancelButtonColor: '#ff5252',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const formData = new FormData(this);
                     formData.append('X-Requested-With', 'XMLHttpRequest');
                     
                     fetch(window.location.href, {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
                     })
-                    .then(response => response.text())
-                    .then(html => {
-                        if(html.includes('Pesanan Berhasil')) {
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.status === 'success') {
                             Swal.fire({
                                 title: 'Pesanan Berhasil!',
                                 text: 'Menunggu konfirmasi agen',
@@ -373,7 +386,7 @@ error_log("Retrieved customer data for ID: " . $idPelanggan);
                                 window.location.href = 'status.php';
                             });
                         } else {
-                            throw new Error('Gagal membuat pesanan');
+                            throw new Error(data.message || 'Gagal membuat pesanan');
                         }
                     })
                     .catch(error => {
@@ -498,7 +511,8 @@ if (isset($_POST["pesanKiloan"])) {
         
         // Check if this is an AJAX request
         if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            echo "Pesanan Berhasil";
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Pesanan Berhasil']);
             exit;
         } else {
             echo "<script>
@@ -515,8 +529,9 @@ if (isset($_POST["pesanKiloan"])) {
         error_log("Error in kiloan order: " . $e->getMessage());
         
         if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
             http_response_code(500);
-            echo $e->getMessage();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
             exit;
         } else {
             echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
@@ -588,7 +603,8 @@ if (isset($_POST["pesanSatuan"])) {
         
         // Check if this is an AJAX request
         if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            echo "Pesanan Berhasil";
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Pesanan Berhasil']);
             exit;
         } else {
             echo "<script>
@@ -605,8 +621,9 @@ if (isset($_POST["pesanSatuan"])) {
         error_log("Error in satuan order: " . $e->getMessage());
         
         if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
             http_response_code(500);
-            echo $e->getMessage();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
             exit;
         } else {
             echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
