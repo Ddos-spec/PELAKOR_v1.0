@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2020 at 05:49 AM
--- Server version: 10.4.11-MariaDB
--- PHP Version: 7.4.5
+-- Waktu pembuatan: 17 Feb 2025 pada 08.01
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,26 +24,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admin`
+-- Struktur dari tabel `admin`
 --
 
 CREATE TABLE `admin` (
   `id_admin` int(11) NOT NULL,
   `username` varchar(30) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `admin`
+-- Dumping data untuk tabel `admin`
 --
 
 INSERT INTO `admin` (`id_admin`, `username`, `password`) VALUES
-(1, 'admin2', 'admin');
+(1, 'admin', 'admin');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `agen`
+-- Struktur dari tabel `agen`
 --
 
 CREATE TABLE `agen` (
@@ -57,24 +57,20 @@ CREATE TABLE `agen` (
   `plat_driver` varchar(12) DEFAULT NULL,
   `foto` text NOT NULL,
   `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `agen`
+-- Dumping data untuk tabel `agen`
 --
 
 INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`) VALUES
-(1, 'Nadya LaundryKu', 'Nadya Eka', '083123456789', 'agen1@gmail.com', 'Denpasar', 'Jl. Diponegoro No 55', 'DK 1234 AA', '5eab524e20d98.jpg', '$2y$10$tQ4th/nx/LLxYB7iHpbg4.FX1wdffLb5yplJIJsTdU6XlUCNPgEC6'),
-(4, 'Laundry 2', 'Firdaus', '3875120', 'agen2@gmail.com', 'Surabaya', 'Jl. Surabaya No 12', 'DK 0000 AA', 'default.png', '$2y$10$mmXlXG97cauDgYemQwPjKuScxSjrnSrTZMH04bb1dosa7luvj1yUW'),
-(5, 'Laundry WINA GANS', 'Wina Arth', '57109', 'agen3@gmail.com', 'Badung', 'Kuta No 22', 'DK 1234 AA', 'default.png', '$2y$10$tKrLGx8FMw8sCwuxIdUWgevKb0ikEozi8xseBV9CvBzUnUhOkHd1S'),
-(7, 'Hairul Laundry', 'Hairul Lana', '08321456378', 'agen5@gmail.com', 'Karangasem', 'Jl. Mawar No 78', 'DK 5432 AB', 'default.png', '$2y$10$ldHD7JtlC26H.EuNf.kMPO9aamXxsO3yRWagW/gKzUrWjcWezq/eO'),
-(9, 'Satan Laundry', 'Satan', '098527815618', 'agen6@gmail.com', 'Denpasar', 'Jl. Hehe No 77', 'DK 6666 DD', 'default.png', '$2y$10$IS1G8nhOpgY2EeVXppcz1u5sX.enw50eNYkRy9lli2wpnhlCu7PZG'),
-(10, 'IBM Laundry', 'IBM Shava', '083123456789', 'agen4@gmail.com', 'Bangli', 'Jl. Sumatra No 33', 'DK 5555 SM', 'default.png', '$2y$10$OB2C9R4kUHrhGaMi3eF6z.DrDnQzapZhPZTucYh4I.ckes73MoFxy');
+(13, 'Pelakor Kilat', 'kilat', '524352342', 'kilat@gmail.com', 'nbasdkbasjkhgdjk', 'jkahbvkdada', '2143131', 'default.png', '$2y$10$K7H3PqwyVNhZUrFuIF3ix.xpa9LeA77mHZ2S7r23v9IXOKhHIOGGC'),
+(14, 'bersinar', 'bersinar', '1412313131', 'bersinar@gmail.com', 'dsvsfvsfefsfe', 'ffggjfdhthjdrhfd', '12313', 'default.png', '$2y$10$.iA6arWAfxPVhq4PeiUv5.T0Rh5GuBnOLiaXSYvlyohqEErzv/oiG');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cucian`
+-- Struktur dari tabel `cucian`
 --
 
 CREATE TABLE `cucian` (
@@ -84,32 +80,74 @@ CREATE TABLE `cucian` (
   `tgl_mulai` date NOT NULL,
   `tgl_selesai` date NOT NULL,
   `jenis` varchar(15) DEFAULT NULL,
+  `estimasi_item` text DEFAULT NULL,
+  `tipe_layanan` enum('kiloan','satuan') NOT NULL DEFAULT 'kiloan',
   `total_item` int(11) DEFAULT NULL,
   `berat` double DEFAULT NULL,
   `alamat` varchar(100) NOT NULL,
   `catatan` text NOT NULL,
+  `catatan_berat` text DEFAULT NULL,
   `status_cucian` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `cucian`
+-- Dumping data untuk tabel `cucian`
 --
 
-INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `total_item`, `berat`, `alamat`, `catatan`, `status_cucian`) VALUES
-(1, 1, 11, '2020-04-25', '0000-00-00', 'setrika', 2, 1, 'Jl. Aceg No 44, Aceh', 'tak ada', 'Selesai'),
-(2, 5, 8, '2020-04-25', '0000-00-00', 'komplit', 6, 4, 'Jl. Melati No 99, Denpasar', 'yang bersih yaaaa', 'Selesai'),
-(3, 1, 11, '2020-04-26', '0000-00-00', 'cuci', 1, 5, 'Jl. Aceg No 44, Aceh', 'cepet ya', 'Selesai'),
-(4, 4, 11, '2020-04-27', '0000-00-00', 'cuci', 1, 5, 'Jl. Aceg No 44, Aceh', 'cepet', 'Selesai'),
-(5, 5, 11, '2020-04-27', '0000-00-00', 'komplit', 5, 6, 'Jl. Aceg No 44, Aceh', 'yg bersih y', 'Selesai'),
-(6, 7, 9, '2020-04-27', '0000-00-00', 'setrika', 1, NULL, 'Jl. Goa Gong, No 99, Kec Kuta Selatan (Rumah warna hitam), Badung', 'ngebut ya\r\n', 'Penjemputan'),
-(7, 5, 12, '2020-04-29', '0000-00-00', 'setrika', 4, 2, 'Jl. Umum No 77, Singaraja', 'yang sabar', 'Sedang Di Jemur'),
-(8, 5, 12, '2020-05-06', '0000-00-00', 'setrika', 5, 3, 'Jl. Umum No 77, Singaraja', 'Yang Harum ya beb', 'Sedang di Cuci'),
-(9, 5, 13, '2020-05-06', '0000-00-00', 'komplit', 1, 1, 'Jl. Semarang No 99, Semarang', 'tes', 'Selesai');
+INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `estimasi_item`, `tipe_layanan`, `total_item`, `berat`, `alamat`, `catatan`, `catatan_berat`, `status_cucian`) VALUES
+(11, 13, 15, '2025-02-15', '0000-00-00', 'komplit', 'baju 1000 ', 'kiloan', NULL, NULL, '', '', NULL, 'Penjemputan'),
+(12, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '86', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(13, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(14, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(15, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(16, 13, 15, '2025-02-16', '0000-00-00', 'setrika', NULL, 'satuan', 10, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(17, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 10, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(18, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 1, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(19, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(20, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(21, 13, 15, '2025-02-16', '0000-00-00', 'komplit', '10050', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(22, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(23, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(24, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(25, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(26, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
+(27, 13, 15, '2025-02-16', '0000-00-00', 'komplit', NULL, 'satuan', NULL, NULL, 'mana aja boleh', '', NULL, 'Penjemputan');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `harga`
+-- Struktur dari tabel `detail_cucian`
+--
+
+CREATE TABLE `detail_cucian` (
+  `id_detail` int(11) NOT NULL,
+  `id_cucian` int(11) NOT NULL,
+  `id_harga_satuan` int(11) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `subtotal` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `detail_cucian`
+--
+
+INSERT INTO `detail_cucian` (`id_detail`, `id_cucian`, `id_harga_satuan`, `jumlah`, `subtotal`) VALUES
+(1, 13, 21, 6, 30000),
+(2, 14, 21, 6, 30000),
+(3, 15, 21, 6, 30000),
+(4, 16, 21, 10, 40000),
+(5, 17, 21, 10, 50000),
+(6, 18, 22, 1, 5000),
+(7, 19, 21, 3, 15000),
+(8, 20, 21, 3, 15000),
+(9, 22, 21, 3, 15000),
+(10, 24, 21, 3, 15000),
+(11, 25, 21, 3, 15000);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `harga`
 --
 
 CREATE TABLE `harga` (
@@ -117,48 +155,55 @@ CREATE TABLE `harga` (
   `jenis` varchar(30) NOT NULL,
   `id_agen` int(11) NOT NULL,
   `harga` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `harga`
+-- Dumping data untuk tabel `harga`
 --
 
 INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`) VALUES
-(1, 'cuci', 3, 2000),
-(2, 'setrika', 3, 1000),
-(3, 'komplit', 3, 2500),
-(4, 'cuci', 1, 5000),
-(5, 'setrika', 1, 3000),
-(6, 'komplit', 1, 7000),
-(7, 'cuci', 4, 300),
-(8, 'setrika', 4, 200),
-(9, 'komplit', 4, 400),
-(10, 'cuci', 5, 4000),
-(11, 'setrika', 5, 3000),
-(12, 'komplit', 5, 5000),
-(13, 'cuci', 6, 7000),
-(14, 'setrika', 6, 3000),
-(15, 'komplit', 6, 8000),
-(16, 'cuci', 7, 3000),
-(17, 'setrika', 7, 2000),
-(18, 'komplit', 7, 4500),
-(19, 'cuci', 8, 6000),
-(20, 'setrika', 8, 3000),
-(21, 'komplit', 8, 7500),
-(22, 'cuci', 9, 4000),
-(23, 'setrika', 9, 2000),
-(24, 'komplit', 9, 5000),
-(25, 'cuci', 10, 5000),
 (26, 'setrika', 10, 3000),
 (27, 'komplit', 10, 6000),
 (28, 'cuci', 10, 5000),
 (29, 'setrika', 10, 3000),
-(30, 'komplit', 10, 6000);
+(30, 'komplit', 10, 6000),
+(31, 'cuci', 13, 3000),
+(32, 'setrika', 13, 5000),
+(33, 'komplit', 13, 6000),
+(34, 'cuci', 14, 5000),
+(35, 'setrika', 14, 10000),
+(36, 'komplit', 14, 7000);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pelanggan`
+-- Struktur dari tabel `harga_satuan`
+--
+
+CREATE TABLE `harga_satuan` (
+  `id_harga_satuan` int(11) NOT NULL,
+  `id_agen` int(11) NOT NULL,
+  `nama_item` varchar(50) NOT NULL,
+  `jenis` varchar(30) NOT NULL,
+  `harga` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `harga_satuan`
+--
+
+INSERT INTO `harga_satuan` (`id_harga_satuan`, `id_agen`, `nama_item`, `jenis`, `harga`) VALUES
+(21, 13, 'Baju', '', 5000),
+(22, 13, 'Celana', '', 5000),
+(23, 13, 'Jaket/Sweater', '', 5000),
+(24, 13, 'Pakaian Khusus', '', 5000),
+(25, 13, 'Selimut', '', 5000),
+(26, 13, 'Karpet', '', 5000);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pelanggan`
 --
 
 CREATE TABLE `pelanggan` (
@@ -170,23 +215,19 @@ CREATE TABLE `pelanggan` (
   `alamat` varchar(100) DEFAULT NULL,
   `foto` text NOT NULL,
   `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `pelanggan`
+-- Dumping data untuk tabel `pelanggan`
 --
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `nama`, `email`, `telp`, `kota`, `alamat`, `foto`, `password`) VALUES
-(8, 'Pelanggan 1', 'pelanggan1@gmail.com', '0897654321', 'Denpasar', 'Jl. Melati No 99', 'default.png', '$2y$10$Q/LTUi2tH9UawYdI5ynTJe5vq.ga.mIKfTmr7ErtprUQgRkK.pmrG'),
-(9, 'Nadya Eka', 'pelanggan2@gmail.com', '08123456789', 'Badung', 'Jl. Goa Gong, No 99, Kec Kuta Selatan (Rumah warna hitam)', 'default.png', '$2y$10$wvrs6fZ4riwS7j/QoQ1ERunXsVS3a4JBzmaGEMkZEE.2xRGjnVB5G'),
-(11, 'Hairul Lana', 'pelanggan4@gmail.com', '082134567', 'Aceh', 'Jl. Aceg No 44', 'default.png', '$2y$10$XmHjcO/uFSqjtYnwdMAtG.wN/hFJaP2RmX4ObfKXHzYtWzrq88ml6'),
-(12, 'Nadya Okta Via', 'pelanggan5@gmail.com', '089764532132', 'Singaraja', 'Jl. Umum No 77', '5eb222e525b06.jpg', '$2y$10$jxuKyuzIQS3wSYXxcOmde.d26tWIBPf1dpP01IVqDCdKSkkOmEGU.'),
-(13, 'Riski Atma', 'pelanggan3@gmail.com', '09864738429', 'Semarang', 'Jl. Semarang No 99', 'default.png', '$2y$10$rv2iH7OayCjL6.84.9uA8.gaC4lTDzcxG.btFrB6JB4H4mNw5Vxpi');
+(15, 'sakamoto', 'sakamoto@gmail.com', '1231231', 'adfwfawda', 'sfsffdwdwa', 'default.png', '$2y$10$ns0WgyETUbOMTKnqsW6fsuxIcA.tbiw6c2NX8ZnuS/EKCO1/bOd6O');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `transaksi`
+-- Struktur dari tabel `transaksi`
 --
 
 CREATE TABLE `transaksi` (
@@ -199,99 +240,131 @@ CREATE TABLE `transaksi` (
   `total_bayar` int(11) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL,
   `komentar` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `transaksi`
---
-
-INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `rating`, `komentar`) VALUES
-(6, 1, 1, 11, '2020-04-25', '2020-04-26', 1000, 6, 'Mantap'),
-(19, 4, 4, 11, '2020-04-27', '2020-04-27', 10000, 10, 'Reccomended'),
-(20, 3, 1, 11, '2020-04-26', '2020-04-29', 10000, 10, 'Sangat cocok, agennya ramah sampe ke ubun ubun'),
-(21, 2, 5, 8, '2020-04-25', '2020-05-06', 10000, 0, ''),
-(22, 5, 5, 11, '2020-04-27', '2020-05-06', 15000, 0, ''),
-(23, 9, 5, 13, '2020-05-06', '2020-05-06', 2500, 10, 'Sangat direkomendasikan');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `admin`
+-- Indeks untuk tabel `admin`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`id_admin`);
 
 --
--- Indexes for table `agen`
+-- Indeks untuk tabel `agen`
 --
 ALTER TABLE `agen`
   ADD PRIMARY KEY (`id_agen`);
 
 --
--- Indexes for table `cucian`
+-- Indeks untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
   ADD PRIMARY KEY (`id_cucian`);
 
 --
--- Indexes for table `harga`
+-- Indeks untuk tabel `detail_cucian`
+--
+ALTER TABLE `detail_cucian`
+  ADD PRIMARY KEY (`id_detail`),
+  ADD KEY `id_cucian` (`id_cucian`),
+  ADD KEY `id_harga_satuan` (`id_harga_satuan`);
+
+--
+-- Indeks untuk tabel `harga`
 --
 ALTER TABLE `harga`
   ADD PRIMARY KEY (`id_harga`);
 
 --
--- Indexes for table `pelanggan`
+-- Indeks untuk tabel `harga_satuan`
+--
+ALTER TABLE `harga_satuan`
+  ADD PRIMARY KEY (`id_harga_satuan`),
+  ADD KEY `id_agen` (`id_agen`);
+
+--
+-- Indeks untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
   ADD PRIMARY KEY (`id_pelanggan`);
 
 --
--- Indexes for table `transaksi`
+-- Indeks untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   ADD PRIMARY KEY (`kode_transaksi`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `admin`
+-- AUTO_INCREMENT untuk tabel `admin`
 --
 ALTER TABLE `admin`
   MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `agen`
+-- AUTO_INCREMENT untuk tabel `agen`
 --
 ALTER TABLE `agen`
-  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT for table `cucian`
+-- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
--- AUTO_INCREMENT for table `harga`
+-- AUTO_INCREMENT untuk tabel `detail_cucian`
+--
+ALTER TABLE `detail_cucian`
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT untuk tabel `harga`
 --
 ALTER TABLE `harga`
-  MODIFY `id_harga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_harga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
--- AUTO_INCREMENT for table `pelanggan`
+-- AUTO_INCREMENT untuk tabel `harga_satuan`
+--
+ALTER TABLE `harga_satuan`
+  MODIFY `id_harga_satuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
-  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT for table `transaksi`
+-- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+--
+
+--
+-- Ketidakleluasaan untuk tabel `detail_cucian`
+--
+ALTER TABLE `detail_cucian`
+  ADD CONSTRAINT `detail_cucian_ibfk_1` FOREIGN KEY (`id_cucian`) REFERENCES `cucian` (`id_cucian`),
+  ADD CONSTRAINT `detail_cucian_ibfk_2` FOREIGN KEY (`id_harga_satuan`) REFERENCES `harga_satuan` (`id_harga_satuan`);
+
+--
+-- Ketidakleluasaan untuk tabel `harga_satuan`
+--
+ALTER TABLE `harga_satuan`
+  ADD CONSTRAINT `harga_satuan_ibfk_1` FOREIGN KEY (`id_agen`) REFERENCES `agen` (`id_agen`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
