@@ -46,7 +46,7 @@ $komplit = mysqli_fetch_assoc($komplit);
             </div>
 
             <div id="harga-kiloan" class="col s12">
-                <form action="" method="post">
+                <form action="" method="post" onsubmit="return validateHargaForm()">
                     <div class="input field">
                         <label for="cuci">Cuci</label>
                         <input type="text" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
@@ -60,6 +60,9 @@ $komplit = mysqli_fetch_assoc($komplit);
                     </div>
                     <div class="input field center">
                         <button class="btn-large blue darken-2" type="submit" name="simpan">Simpan Data</button>
+                    </div>
+                    <div class="preview-section">
+                        <?php include 'components/harga-preview.php'; ?>
                     </div>
                 </form>
             </div>
@@ -116,6 +119,18 @@ $komplit = mysqli_fetch_assoc($komplit);
                 window.location.href = `hapus-harga-satuan.php?id=${id}`;
             }
         });
+    }
+
+    function validateHargaForm() {
+        const hargaCuci = parseInt($('#cuci').val());
+        const hargaSetrika = parseInt($('#setrika').val());
+        const hargaKomplit = parseInt($('#komplit').val());
+        
+        if(isNaN(hargaCuci) || isNaN(hargaSetrika) || isNaN(hargaKomplit)) {
+            Swal.fire('Error', 'Harga harus berupa angka', 'error');
+            return false;
+        }
+        return true;
     }
     </script>
 

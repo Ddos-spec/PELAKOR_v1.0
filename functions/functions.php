@@ -197,13 +197,15 @@ function hitungTotalBayar($idCucian) {
     $cucian = mysqli_fetch_assoc($query);
     
     if($cucian['tipe_layanan'] == 'kiloan') {
-        $harga = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = {$cucian['id_agen']} AND jenis = '{$cucian['jenis']}'");
+        $harga = mysqli_query($connect, "SELECT harga FROM harga 
+            WHERE id_agen = {$cucian['id_agen']} AND jenis = '{$cucian['jenis']}'");
         $harga = mysqli_fetch_assoc($harga);
         return $cucian['berat'] * $harga['harga'];
     } else {
-        $detail = mysqli_query($connect, "SELECT SUM(subtotal) as total FROM detail_cucian WHERE id_cucian = $idCucian");
+        $detail = mysqli_query($connect, "SELECT SUM(subtotal) as total 
+            FROM detail_cucian WHERE id_cucian = $idCucian");
         $detail = mysqli_fetch_assoc($detail);
-        return $detail['total'];
+        return $detail['total'] ?? 0;
     }
 }
 

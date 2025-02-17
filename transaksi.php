@@ -41,9 +41,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
     <title>Transasksi - <?= $login ?></title>
+    <script src="js/transaksi-handler.js"></script>
 </head>
 <body>
 <?php include 'header.php'; ?>
+<?php include 'components/modal-detail.php'; ?>
     <div class="row">
         <h3 class="header col s12 light center">Riwayat Transaksi Cucian</h3>
         <br>
@@ -151,6 +153,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
+                    <td>
+                        <button class="btn blue" onclick="showDetailTransaksi(<?= $idCucian ?>)">
+                            <i class="material-icons">visibility</i>
+                        </button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -230,6 +237,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
+                    <td>
+                        <button class="btn blue" onclick="showDetailTransaksi(<?= $idCucian ?>)">
+                            <i class="material-icons">visibility</i>
+                        </button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -319,6 +331,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <?php else : ?>
                         <?= $transaksi["komentar"] ?>
                         <?php endif; ?>
+                    </td>
+                    <td>
+                        <button class="btn blue" onclick="showDetailTransaksi(<?= $idCucian ?>)">
+                            <i class="material-icons">visibility</i>
+                        </button>
                     </td>
                 </tr>
                 <?php endwhile; ?>

@@ -51,6 +51,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <br>
         <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
+            <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold;">ID Cucian</td>
@@ -112,6 +113,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
+            <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold;">ID Cucian</td>
@@ -197,6 +199,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php elseif ($login == "Pelanggan") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
+            <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold">ID Cucian</td>
@@ -251,6 +254,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <?php endif; ?>
     </div>
     <?php include "footer.php"; ?>
+    <script src="js/harga-calculator.js"></script>
 </body>
 </html>
 
