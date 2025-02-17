@@ -101,41 +101,49 @@ $pelanggan = mysqli_fetch_assoc($query);
                 <div class="col s5 offset-s1">
                     <h3 class="header light center">Info Paket Laundry</h3>
                     <br>
+                    <!-- Tab untuk pilih tipe layanan -->
                     <div class="input-field">
-                        <label for="total">Total Pakaian</label>
-                        <input type="text" name="total" value="1">
+                        <select class="browser-default" name="tipe_layanan" id="tipe_layanan" onchange="showForm()">
+                            <option value="" disabled selected>Pilih Tipe Layanan</option>
+                            <option value="kiloan">Kiloan</option>
+                            <option value="satuan">Satuan</option>
+                        </select>
                     </div>
-                    <div class="input-field">
-                        <ul>
-                            <li><label for="jenis">Jenis Paket</label></li>
-                            <li>
-                            <?php if ($jenis == NULL) : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "cuci") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" checked/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "setrika") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" checked/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "komplit") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" checked/><span>Komplit</span></label><li>
-                            <?php else : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
-                            <?php endif; ?>
 
-                        </ul>
+                    <!-- Form Kiloan -->
+                    <div id="form-kiloan" style="display:none;">
+                        <div class="input-field">
+                            <label for="total">Estimasi Jumlah Item</label>
+                            <input type="text" name="estimasi_item">
+                        </div>
+                        <div class="input-field">
+                            <ul>
+                                <li><label>Jenis Paket</label></li>
+                                <li>
+                                    <label><input name="jenis" value="cuci" type="radio"/><span>Cuci</span></label>
+                                    <label><input name="jenis" value="setrika" type="radio"/><span>Setrika</span></label>
+                                    <label><input name="jenis" value="komplit" type="radio"/><span>Komplit</span></label>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+
+                    <!-- Form Satuan -->
+                    <div id="form-satuan" style="display:none;">
+                        <?php
+                        $items = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = $idAgen");
+                        while($item = mysqli_fetch_assoc($items)):
+                        ?>
+                        <div class="input-field">
+                            <label for="item_<?= $item['id_harga_satuan'] ?>"><?= $item['nama_item'] ?> (Rp <?= number_format($item['harga']) ?>)</label>
+                            <input type="number" min="0" name="items[<?= $item['id_harga_satuan'] ?>]" id="item_<?= $item['id_harga_satuan'] ?>" value="0">
+                        </div>
+                        <?php endwhile; ?>
+                    </div>
+
                     <div class="input-field">
                         <label for="catatan">Catatan</label>
-                        <textarea class="materialize-textarea" name="catatan" id="catatan" cols="30" rows="10" placeholder="Tulis catatan untuk agen"></textarea>
+                        <textarea class="materialize-textarea" name="catatan" id="catatan"></textarea>
                     </div>
                     <div class="input-field center">
                         <button class="btn-large blue darken-2" type="submit" name="pesan">Buat Pesanan</button>
@@ -144,6 +152,19 @@ $pelanggan = mysqli_fetch_assoc($query);
             </form>
         </div>
     </div>
+
+    <script>
+    function showForm() {
+        var tipe = document.getElementById('tipe_layanan').value;
+        if(tipe == 'kiloan') {
+            document.getElementById('form-kiloan').style.display = 'block';
+            document.getElementById('form-satuan').style.display = 'none';
+        } else {
+            document.getElementById('form-kiloan').style.display = 'none';
+            document.getElementById('form-satuan').style.display = 'block';
+        }
+    }
+    </script>
     <!-- end info pemesanan -->
 
     <!-- end body -->
@@ -157,17 +178,40 @@ $pelanggan = mysqli_fetch_assoc($query);
 
 <?php
 
-if (isset($_POST["pesan"])){
+if (isset($_POST["pesan"])) {
     $alamat = htmlspecialchars($_POST["alamat"]);
-    $jenis = htmlspecialchars($_POST["jenis"]);
+    $tipe_layanan = $_POST["tipe_layanan"];
     $catatan = htmlspecialchars($_POST["catatan"]);
-    $tgl = htmlspecialchars(date("Y-m-d H:i:s"));
-    $total = htmlspecialchars($_POST["total"]);
+    $tgl = date("Y-m-d H:i:s");
+    
+    if($tipe_layanan == 'kiloan') {
+        $jenis = htmlspecialchars($_POST["jenis"]);
+        $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
+        
+        mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, tipe_layanan, estimasi_item, alamat, catatan, status_cucian) 
+            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', 'kiloan', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan')");
+            
+    } else {
+        // Insert cucian satuan
+        mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, tipe_layanan, alamat, catatan, status_cucian) 
+            VALUES ($idAgen, $idPelanggan, '$tgl', 'satuan', '$alamat', '$catatan', 'Penjemputan')");
+        
+        $id_cucian = mysqli_insert_id($connect);
+        
+        // Insert detail items
+        foreach($_POST['items'] as $id_harga_satuan => $jumlah) {
+            if($jumlah > 0) {
+                $harga = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
+                $harga = mysqli_fetch_assoc($harga)['harga'];
+                $subtotal = $jumlah * $harga;
+                
+                mysqli_query($connect, "INSERT INTO detail_cucian (id_cucian, id_harga_satuan, jumlah, subtotal)
+                    VALUES ($id_cucian, $id_harga_satuan, $jumlah, $subtotal)");
+            }
+        }
+    }
 
-
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, total_item, alamat, catatan, status_cucian) VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', $total, '$alamat', '$catatan', 'Penjemputan')");
-
-    if (mysqli_affected_rows($connect) > 0){
+    if (mysqli_affected_rows($connect) > 0) {
         echo "
             <script>
                 Swal.fire('Pesanan Berhasil Dibuat','Silahkan Pergi Ke Halaman Status Cucian','success').then(function(){
@@ -175,11 +219,9 @@ if (isset($_POST["pesan"])){
                 });
             </script>
         ";
-    }else {
+    } else {
         echo mysqli_error($connect);
     }
 }
-
-
 
 ?>

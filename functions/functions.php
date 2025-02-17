@@ -1,5 +1,3 @@
-
-
 <?php
 
 
@@ -117,11 +115,6 @@ function validasiNama($objek){
     }
 }
 
-
-
-
-
-
 // SESSION
 
 // admin
@@ -197,5 +190,32 @@ function cekBelumLogin(){
     }
 }
 
+function hitungTotalBayar($idCucian) {
+    global $connect;
+    
+    $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
+    $cucian = mysqli_fetch_assoc($query);
+    
+    if($cucian['tipe_layanan'] == 'kiloan') {
+        $harga = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = {$cucian['id_agen']} AND jenis = '{$cucian['jenis']}'");
+        $harga = mysqli_fetch_assoc($harga);
+        return $cucian['berat'] * $harga['harga'];
+    } else {
+        $detail = mysqli_query($connect, "SELECT SUM(subtotal) as total FROM detail_cucian WHERE id_cucian = $idCucian");
+        $detail = mysqli_fetch_assoc($detail);
+        return $detail['total'];
+    }
+}
+
+function validasiHargaSatuan($harga) {
+    if(!is_numeric($harga) || $harga < 0) {
+        echo "
+            <script>
+                Swal.fire('Harga Tidak Valid','Masukkan harga yang valid','error');
+            </script>
+        ";
+        exit;
+    }
+}
 
 ?>

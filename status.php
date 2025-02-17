@@ -83,7 +83,21 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             echo $data["nama"];
                         ?>
                     </td>
-                    <td><?= $cucian["total_item"] ?></td>
+                    <td>
+                        <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
+                            <?= $cucian["estimasi_item"] ?> item
+                        <?php else: ?>
+                            <?php
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            ?>
+                        <?php endif; ?>
+                    </td>
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
@@ -119,7 +133,21 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             echo $data["nama"];
                         ?>
                     </td>
-                    <td><?= $cucian["total_item"] ?></td>
+                    <td>
+                        <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
+                            <?= $cucian["estimasi_item"] ?> item
+                        <?php else: ?>
+                            <?php
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            ?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if ($cucian["berat"] == NULL) : ?>
                             <form action="" method="post">
@@ -139,11 +167,14 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             <input type="hidden" name="id_cucian" value="<?= $idCucian ?>">
                             <select class="browser-default" name="status_cucian" id="status_cucian">
                                 <option disabled selected>Status :</option>
+                                <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
                                 <option value="Penjemputan">Penjemputan</option>
+                                <option value="Diterima">Diterima</option>
                                 <option value="Sedang di Cuci">Sedang di Cuci</option>
                                 <option value="Sedang Di Jemur">Sedang Di Jemur</option>
                                 <option value="Sedang di Setrika">Sedang di Setrika</option>
-                                <option value="Pengantaran">Pengantaran</option>
+                                <option value="Quality Control">Quality Control</option>
+                                <option value="Siap Diantar">Siap Diantar</option>
                                 <option value="Selesai">Selesai</option>
                             </select>
                                 
@@ -182,7 +213,21 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             echo $data["nama_laundry"];
                         ?>
                     </td>
-                    <td><?= $cucian["total_item"] ?></td>
+                    <td>
+                        <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
+                            <?= $cucian["estimasi_item"] ?> item
+                        <?php else: ?>
+                            <?php
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            ?>
+                        <?php endif; ?>
+                    </td>
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>

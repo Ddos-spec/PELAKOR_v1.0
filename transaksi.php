@@ -52,6 +52,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold;">Kode Transaksi</td>
+                    <td style="font-weight:bold;">Tipe Layanan</td>
+                    <td style="font-weight:bold;">Detail Item/Kategori</td>
+                    <td style="font-weight:bold;">Total Harga</td>
                     <td style="font-weight:bold;">Agen</td>
                     <td style="font-weight:bold;">Pelanggan</td>
                     <td style="font-weight:bold;">Total Item</td>
@@ -87,7 +90,17 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if($cucian["tipe_layanan"] == "kiloan") {
+                                echo $cucian["estimasi_item"] . " item";
+                            } else {
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            }
                         ?>
                     </td>
                     <td><?= $cucian["berat"] ?></td>
@@ -113,6 +126,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold">Kode Transaksi</td>
+                    <td style="font-weight:bold">Tipe Layanan</td>
+                    <td style="font-weight:bold">Detail Item/Kategori</td>
+                    <td style="font-weight:bold">Total Harga</td>
                     <td style="font-weight:bold">Pelanggan</td>
                     <td style="font-weight:bold">Total Item</td>
                     <td style="font-weight:bold">Berat</td>
@@ -139,7 +155,17 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if($cucian["tipe_layanan"] == "kiloan") {
+                                echo $cucian["estimasi_item"] . " item";
+                            } else {
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            }
                         ?>
                     </td>
                     <td><?= $cucian["berat"] ?></td>
@@ -165,6 +191,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold">Kode Transaksi</td>
+                    <td style="font-weight:bold">Tipe Layanan</td>
+                    <td style="font-weight:bold">Detail Item/Kategori</td>
+                    <td style="font-weight:bold">Total Harga</td>
                     <td style="font-weight:bold">Agen</td>
                     <td style="font-weight:bold">Total Item</td>
                     <td style="font-weight:bold">Berat</td>
@@ -191,7 +220,17 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             $idCucian = $transaksi["id_cucian"];
                             $cucian = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $idCucian");
                             $cucian = mysqli_fetch_assoc($cucian);
-                            echo $cucian["total_item"];
+                            if($cucian["tipe_layanan"] == "kiloan") {
+                                echo $cucian["estimasi_item"] . " item";
+                            } else {
+                                $detail = mysqli_query($connect, "SELECT hs.nama_item, dc.jumlah 
+                                    FROM detail_cucian dc 
+                                    JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan 
+                                    WHERE dc.id_cucian = $idCucian");
+                                while($item = mysqli_fetch_assoc($detail)) {
+                                    echo $item["nama_item"] . " (" . $item["jumlah"] . ")<br>";
+                                }
+                            }
                         ?>
                     </td>
                     <td><?= $cucian["berat"] ?></td>

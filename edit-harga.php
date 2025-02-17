@@ -37,22 +37,65 @@ $komplit = mysqli_fetch_assoc($komplit);
     <!-- body -->
     <div class="container">
         <h3 class="header light center">Data Harga</h3>
-        <form action="" method="post">
-            <div class="input field">
-                <label for="cuci">Cuci</label>
-                <input type="text" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
+        <div class="row">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s6"><a href="#harga-kiloan" class="active">Harga Kiloan</a></li>
+                    <li class="tab col s6"><a href="#harga-satuan">Harga Satuan</a></li>
+                </ul>
             </div>
-            <div class="input field">
-                <label for="setrika">Setrika</label>
-                <input type="text" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
+
+            <div id="harga-kiloan" class="col s12">
+                <form action="" method="post">
+                    <div class="input field">
+                        <label for="cuci">Cuci</label>
+                        <input type="text" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
+                    </div>
+                    <div class="input field">
+                        <label for="setrika">Setrika</label>
+                        <input type="text" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
+                    </div>
+                    <div class="input field">
+                        <label for="komplit">Cuci + Setrika</label><input type="text" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
+                    </div>
+                    <div class="input field center">
+                        <button class="btn-large blue darken-2" type="submit" name="simpan">Simpan Data</button>
+                    </div>
+                </form>
             </div>
-            <div class="input field">
-                <label for="komplit">Cuci + Setrika</label><input type="text" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
+
+            <div id="harga-satuan" class="col s12">
+                <form action="" method="post" id="form-satuan">
+                    <div class="input-field">
+                        <input type="text" name="nama_item" placeholder="Nama Item">
+                        <input type="number" name="harga_satuan" placeholder="Harga">
+                        <button class="btn blue darken-2" type="submit" name="tambah_harga_satuan">Tambah</button>
+                    </div>
+                </form>
+                <table class="responsive-table centered">
+                    <tr>
+                        <th>Nama Item</th>
+                        <th>Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                    <!-- PHP untuk menampilkan daftar harga satuan -->
+                    <?php
+                    $harga_satuan = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = $idAgen");
+                    while($item = mysqli_fetch_assoc($harga_satuan)):
+                    ?>
+                    <tr>
+                        <td><?= $item["nama_item"] ?></td>
+                        <td>Rp <?= number_format($item["harga"]) ?></td>
+                        <td>
+                            <button class="btn red" onclick="hapusHargaSatuan(<?= $item['id_harga_satuan'] ?>)">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </table>
             </div>
-            <div class="input field center">
-                <button class="btn-large blue darken-2" type="submit" name="simpan">Simpan Data</button>
-            </div>
-        </form>
+        </div>
     </div>
     <!-- end body -->
 
@@ -60,11 +103,26 @@ $komplit = mysqli_fetch_assoc($komplit);
     <?php include "footer.php" ?>
     <!-- end footer -->
 
+    <script>
+    function hapusHargaSatuan(id) {
+        Swal.fire({
+            title: 'Hapus harga satuan?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                window.location.href = `hapus-harga-satuan.php?id=${id}`;
+            }
+        });
+    }
+    </script>
+
 </body>
 </html>
 
 <?php
-
 
 // fungsi mengubah harga
 function ubahHarga($data){
@@ -101,7 +159,6 @@ function ubahHarga($data){
     return $hasil1+$hasil2+$hasil3;
 }
 
-
 // jika user menekan tombol simpan harga
 if (isset($_POST["simpan"])) {
 
@@ -122,6 +179,24 @@ if (isset($_POST["simpan"])) {
         mysqli_error($connect);
     }
 
+}
+
+// jika user menekan tombol tambah harga satuan
+if(isset($_POST["tambah_harga_satuan"])) { 
+    $nama_item = htmlspecialchars($_POST["nama_item"]);
+    $harga = htmlspecialchars($_POST["harga_satuan"]);
+    
+    validasiHargaSatuan($harga);
+    
+    mysqli_query($connect, "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
+        VALUES ($idAgen, '$nama_item', $harga)");
+        
+    if(mysqli_affected_rows($connect) > 0) {
+        echo "<script>
+            Swal.fire('Berhasil','Harga satuan berhasil ditambahkan','success')
+            .then(() => location.reload());
+        </script>";
+    }
 }
 
 ?>
