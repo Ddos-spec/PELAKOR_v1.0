@@ -225,19 +225,9 @@ if (isset($_POST["submitSorting"])){
                                         
                                     if ( $totalStar == 0 ) {
                                 ?>
-                                    <div class="rating-display">
-                                        <fieldset class="bintang">
-                                            <span class="starImg star-0"></span>
-                                        </fieldset>
-                                        <small class="grey-text">(Belum ada rating)</small>
-                                    </div>
+                                    <center><fieldset class="bintang"><span class="starImg star-0"></span></fieldset></center>
                                 <?php }else { ?>
-                                    <div class="rating-display">
-                                        <fieldset class="bintang">
-                                            <span class="starImg star-<?= $fixStar ?>"></span>
-                                        </fieldset>
-                                        <small class="grey-text">(<?= $i ?> ulasan)</small>
-                                    </div>
+                                    <center><fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset></center>
                                 <?php } ?>
 
                                 <p class="light">
@@ -256,7 +246,9 @@ if (isset($_POST["submitSorting"])){
 
     <!-- footer -->
     <?php include "footer.php" ?>
+    <!-- end footer -->
+
 </body>
-    <script src="materialize/js/script.js"></script>
-    <script src="materialize/js/scriptAjax.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/scriptAjax.js"></script>
 </html>

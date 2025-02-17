@@ -24,9 +24,13 @@ $agen = mysqli_fetch_assoc($result);
     <title>Registrasi Agen Lanjutan</title>
 </head>
 <body>
+
+    <!-- header -->
     <?php include 'header.php' ?>
+    <!-- end header -->
 
     <div class="row">
+
         <!-- term -->
         <div class="col s4 offset-s1">
             <div class="card">
@@ -54,102 +58,41 @@ $agen = mysqli_fetch_assoc($result);
         </div>
         <!-- end term -->
 
-        <!-- Updated price setup section -->
-        <div class="col s6 offset-s1">
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title center">Pengaturan Harga Awal</span>
-                    
-                    <ul class="tabs">
-                        <li class="tab col s6"><a class="active" href="#setupKiloan">Harga Kiloan</a></li>
-                        <li class="tab col s6"><a href="#setupSatuan">Harga Satuan</a></li>
+    
+        <!-- harga -->
+        <div class="col s4 offset-s1">
+            <h3 class="header light center">Data Harga</h3>
+            <form action="" method="post">
+                <div class="input-field inline">
+                    <ul>
+                        <li>
+                            <label for="cuci">Cuci (Rp.)</label>
+                            <input type="text" size=50 name="cuci" value="0">
+                        </li>
+                        <li>
+                            <label for="setrika">Setrika (Rp.)</label>
+                            <input type="text" size=50 name="setrika" value="0">
+                        </li>
+                        <li>
+                            <label for="komplit">Cuci + Setrika (Rp.)</label>
+                            <input type="text" size=50 name="komplit" value="0">
+                        </li>
+                        <li>
+                            <div class="center">
+                                <button class="btn-large blue darken-2" type="submit" name="submit">Simpan Harga</button>
+                            </div>
+                        </li>
                     </ul>
-
-                    <!-- Existing kiloan form -->
-                    <div id="setupKiloan">
-                        <form action="" method="post">
-                            <div class="input-field">
-                                <input type="number" name="cuci" required>
-                                <label>Cuci (Rp/Kg)</label>
-                            </div>
-                            <div class="input-field">
-                                <input type="number" name="setrika" required>
-                                <label>Setrika (Rp/Kg)</label>
-                            </div>
-                            <div class="input-field">
-                                <input type="number" name="komplit" required>
-                                <label>Cuci + Setrika (Rp/Kg)</label>
-                            </div>
-                            <div class="center">
-                                <button class="btn-large blue darken-2" type="submit" name="setupKiloan">
-                                    Simpan & Lanjutkan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Updated satuan form -->
-                    <div id="setupSatuan">
-                        <form action="" method="post" id="formSetupSatuan">
-                            <?php
-                            $default_items = [
-                                'Baju' => 'Pakaian Atas',
-                                'Celana' => 'Pakaian Bawah',
-                                'Jaket/Sweater' => 'Outerwear',
-                                'Pakaian Khusus' => 'Special Care',
-                                'Selimut' => 'Home Items',
-                                'Karpet' => 'Home Items'
-                            ];
-                            
-                            foreach($default_items as $item => $kategori): ?>
-                                <div class="row">
-                                    <div class="col s12">
-                                        <div class="input-field">
-                                            <input type="number" name="harga[<?= $item ?>]" required>
-                                            <label><?= $item ?> (<?= $kategori ?>)</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                            
-                            <div class="center">
-                                <button class="btn-large blue darken-2" type="submit" name="setupSatuan">
-                                    Simpan & Lanjutkan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
-            </div>
+            </form>
         </div>
+        <!-- end harga -->
     </div>
 
+    <!-- footer -->
     <?php include 'footer.php'; ?>
+    <!-- end footer -->
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var tabs = document.querySelectorAll('.tabs');
-        M.Tabs.init(tabs);
-    });
-
-    function tambahItemSatuan() {
-        var template = document.querySelector('.item-satuan').cloneNode(true);
-        template.querySelectorAll('input').forEach(input => {
-            input.value = '';
-        });
-        document.getElementById('listItemSatuan').appendChild(template);
-        M.updateTextFields();
-    }
-
-    function hapusItem(btn) {
-        var items = document.querySelectorAll('.item-satuan');
-        if(items.length > 1) {
-            btn.closest('.item-satuan').remove();
-        } else {
-            M.toast({html: 'Minimal harus ada 1 item!'});
-        }
-    }
-    </script>
 </body>
 </html>
 
@@ -213,43 +156,4 @@ if ( isset($_POST["submit"]) ){
     }
 }
 
-if(isset($_POST["setupKiloan"])) {
-    if(dataHarga($_POST) > 0) {
-        echo "<script>Swal.fire('Berhasil','Data harga kiloan berhasil disimpan','success')
-            .then(() => window.location='index.php');</script>";
-    }
-}
-
-if(isset($_POST["setupSatuan"])) {
-    $harga_items = $_POST["harga"];
-    
-    mysqli_begin_transaction($connect);
-    try {
-        mysqli_query($connect, "DELETE FROM harga_satuan WHERE id_agen = '$idAgen'");
-        
-        foreach($harga_items as $nama => $harga) {
-            $nama = mysqli_real_escape_string($connect, $nama);
-            $harga = (int)$harga;
-            
-            $query = "INSERT INTO harga_satuan (id_agen, nama_item, harga) 
-                     VALUES ('$idAgen', '$nama', '$harga')";
-                     
-            if(!mysqli_query($connect, $query)) {
-                throw new Exception(mysqli_error($connect));
-            }
-        }
-        
-        mysqli_commit($connect);
-        echo "<script>
-            Swal.fire('Berhasil!', 'Data harga berhasil disimpan', 'success')
-            .then(() => window.location = 'index.php');
-        </script>";
-        
-    } catch(Exception $e) {
-        mysqli_rollback($connect);
-        echo "<script>
-            Swal.fire('Error!', '".$e->getMessage()."', 'error');
-        </script>";
-    }
-}
 ?>

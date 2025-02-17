@@ -4,7 +4,6 @@
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
-include 'functions/status-handler.php';
 
 cekBelumLogin();
 
@@ -123,7 +122,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Tanggal Selesai</td>
                     <td style="font-weight:bold">Rating</td>
                     <td style="font-weight:bold">Komentar</td>
-                    <td style="font-weight:bold">Invoice</td>
                 </tr>
                 <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -158,12 +156,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <fieldset class="bintang"><span class="starImg star-<?= $star ?>"></span></fieldset>
                     </td>
                     <td><?= $transaksi["komentar"] ?></td>
-                    <td>
-                        <button class="btn blue waves-effect waves-light btn-small" 
-                                onclick="cetakInvoice(<?= $transaksi['kode_transaksi'] ?>)">
-                            <i class="material-icons">receipt</i>
-                        </button>
-                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -248,16 +240,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <?php endif; ?>
     </div>
     <?php include "footer.php"; ?>
-    <script>
-    function cetakInvoice(kodeTransaksi) {
-        // Placeholder untuk fungsi cetak invoice
-        Swal.fire({
-            title: 'Cetak Invoice',
-            text: 'Fungsi cetak invoice akan diimplementasikan',
-            icon: 'info'
-        });
-    }
-    </script>
 </body>
 </html>
 
@@ -265,50 +247,34 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 
 
 // jika pelanggan rating
-if (isset($_POST["simpanRating"])) {
+if ( isset($_POST["simpanRating"]) ){
+
     $rating = $_POST["rating"];
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_begin_transaction($connect);
-    try {
-        mysqli_query($connect, "UPDATE transaksi SET rating = $rating WHERE kode_transaksi = $kodeTransaksiRating");
-        
-        if (mysqli_affected_rows($connect) == 0) {
-            throw new Exception("Rating gagal disimpan");
-        }
-
-        mysqli_commit($connect);
-        echo "<script>
-            Swal.fire('Penilaian Berhasil','Rating Berhasil Di Tambahkan','success')
-            .then(() => window.location = 'transaksi.php');
-        </script>";
-    } catch (Exception $e) {
-        mysqli_rollback($connect);
-        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>";
-    }
+    mysqli_query($connect, "UPDATE transaksi SET rating = $rating WHERE kode_transaksi = $kodeTransaksiRating");
+    echo "
+        <script>
+            Swal.fire('Penilaian Berhasil','Rating Berhasil Di Tambahkan','success').then(function() {
+                window.location = 'transaksi.php';
+            });
+        </script>
+    ";
 }
 
-if (isset($_POST["kirimKomentar"])) {
+if ( isset($_POST["kirimKomentar"])){
+
     $komentar = htmlspecialchars($_POST["komentar"]);
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    mysqli_begin_transaction($connect);
-    try {
-        mysqli_query($connect, "UPDATE transaksi SET komentar = '$komentar' WHERE kode_transaksi = $kodeTransaksiRating");
-        
-        if (mysqli_affected_rows($connect) == 0) {
-            throw new Exception("Komentar gagal disimpan");
-        }
-
-        mysqli_commit($connect);
-        echo "<script>
-            Swal.fire('Penilaian Berhasil','Feedback Berhasil Di Tambahkan','success')
-            .then(() => window.location = 'transaksi.php');
-        </script>";
-    } catch (Exception $e) {
-        mysqli_rollback($connect);
-        echo "<script>Swal.fire('Error!','".$e->getMessage()."','error');</script>"; 
-    }
+    mysqli_query($connect, "UPDATE transaksi SET komentar = '$komentar' WHERE kode_transaksi = $kodeTransaksiRating");
+    echo "
+        <script>
+            Swal.fire('Penilaian Berhasil','Feedback Berhasil Di Tambahkan','success').then(function() {
+                window.location = 'transaksi.php';
+            });
+        </script>
+    ";
 }
 
 ?>

@@ -5,8 +5,8 @@
             <div class="col l6 s12">
             <h5 class="white-text">Company Bio</h5>
             <p class="grey-text text-lighten-4">
-                pelakorKu adalah sebuah projek yang ditujukan sebagai tugas akhir untuk UKOM.<br/>
-                Terima Kasih buat diri sendiri udah mau bantuin bikin web ini sama kepada adam yang telah membantu membuatkan desainnya.
+                LaundryKu adalah sebuah projek yang ditujukan sebagai tugas akhir untuk mata kuliah "Basis Data Lanjut" pada Program Studi Informatika, Fakultas MIPA, Universitas Udayana.<br/>
+                Segala bentuk dukungan akan sangat membantu kami dalam menyelesaikan projek ini. Terima Kasih.
             </p>
 
 
@@ -23,9 +23,10 @@
             <div class="col l3 s12">
             <h5 class="white-text">Developer</h5>
             <ul>
-                <li><a class="white-text" href="team.php">Fadjar Aryo Seto</a></li>
-                <li><a class="white-text" href="team.php">Adam</a></li>
-                
+                <li><a class="white-text" href="team.php">Nadya Okatviana</a></li>
+                <li><a class="white-text" href="team.php">Eka Nadya</a></li>
+                <li><a class="white-text" href="team.php">Hairul Lana</a></li>
+                <li><a class="white-text" href="team.php">Wina Artha Setiawan</a></li>
             </ul>
             </div>
         </div>
