@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 17 Feb 2025 pada 08.01
+-- Waktu pembuatan: 17 Feb 2025 pada 13.54
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -95,23 +95,26 @@ CREATE TABLE `cucian` (
 --
 
 INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `estimasi_item`, `tipe_layanan`, `total_item`, `berat`, `alamat`, `catatan`, `catatan_berat`, `status_cucian`) VALUES
-(11, 13, 15, '2025-02-15', '0000-00-00', 'komplit', 'baju 1000 ', 'kiloan', NULL, NULL, '', '', NULL, 'Penjemputan'),
-(12, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '86', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(13, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(14, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(15, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(16, 13, 15, '2025-02-16', '0000-00-00', 'setrika', NULL, 'satuan', 10, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(17, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 10, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(18, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 1, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(19, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(20, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(21, 13, 15, '2025-02-16', '0000-00-00', 'komplit', '10050', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(22, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(23, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(24, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(25, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(26, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan'),
-(27, 13, 15, '2025-02-16', '0000-00-00', 'komplit', NULL, 'satuan', NULL, NULL, 'mana aja boleh', '', NULL, 'Penjemputan');
+(11, 13, 15, '2025-02-15', '0000-00-00', 'komplit', 'baju 1000 ', 'kiloan', NULL, 100, '', '', NULL, 'Selesai'),
+(12, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '86', 'kiloan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(13, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(14, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, NULL, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(15, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 6, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(16, 13, 15, '2025-02-16', '0000-00-00', 'setrika', NULL, 'satuan', 10, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(17, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 10, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(18, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 1, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(19, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(20, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(21, 13, 15, '2025-02-16', '0000-00-00', 'komplit', '10050', 'kiloan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(22, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(23, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(24, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(25, 13, 15, '2025-02-16', '0000-00-00', 'cuci', NULL, 'satuan', 3, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(26, 13, 15, '2025-02-16', '0000-00-00', 'setrika', '123', 'kiloan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(27, 13, 15, '2025-02-16', '0000-00-00', 'komplit', NULL, 'satuan', NULL, 100, 'mana aja boleh', '', NULL, 'Selesai'),
+(28, 13, 15, '2025-02-17', '0000-00-00', 'komplit', '1000', 'kiloan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Selesai'),
+(29, 13, 15, '2025-02-17', '0000-00-00', NULL, NULL, 'satuan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, ''),
+(30, 13, 15, '2025-02-17', '0000-00-00', NULL, NULL, 'satuan', NULL, 100, 'sfsffdwdwa, adfwfawda', '', NULL, 'Penjemputan');
 
 -- --------------------------------------------------------
 
@@ -142,7 +145,8 @@ INSERT INTO `detail_cucian` (`id_detail`, `id_cucian`, `id_harga_satuan`, `jumla
 (8, 20, 21, 3, 15000),
 (9, 22, 21, 3, 15000),
 (10, 24, 21, 3, 15000),
-(11, 25, 21, 3, 15000);
+(11, 25, 21, 3, 15000),
+(12, 30, 21, 5, 25000);
 
 -- --------------------------------------------------------
 
@@ -243,6 +247,65 @@ CREATE TABLE `transaksi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data untuk tabel `transaksi`
+--
+
+INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `rating`, `komentar`) VALUES
+(24, 11, 13, 15, '2025-02-15', '2025-02-17', 600000, 0, ''),
+(25, 12, 13, 15, '2025-02-16', '2025-02-17', 300000, 0, ''),
+(26, 13, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(27, 14, 13, 15, '2025-02-16', '2025-02-17', 0, 0, ''),
+(28, 15, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(29, 16, 13, 15, '2025-02-16', '2025-02-17', 300000, 0, ''),
+(30, 17, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(31, 18, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(32, 19, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(33, 20, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(34, 21, 13, 15, '2025-02-16', '2025-02-17', 600000, 0, ''),
+(35, 22, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(36, 23, 13, 15, '2025-02-16', '2025-02-17', 300000, 0, ''),
+(37, 24, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(38, 25, 13, 15, '2025-02-16', '2025-02-17', 500000, 0, ''),
+(39, 26, 13, 15, '2025-02-16', '2025-02-17', 300000, 0, ''),
+(40, 27, 13, 15, '2025-02-16', '2025-02-17', 600000, 0, ''),
+(41, 28, 13, 15, '2025-02-17', '2025-02-17', 600000, 0, '');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in struktur untuk tampilan `v_status_cucian`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `v_status_cucian` (
+`id_cucian` int(11)
+,`id_agen` int(11)
+,`id_pelanggan` int(11)
+,`tgl_mulai` date
+,`tgl_selesai` date
+,`jenis` varchar(15)
+,`estimasi_item` text
+,`tipe_layanan` enum('kiloan','satuan')
+,`total_item` int(11)
+,`berat` double
+,`alamat` varchar(100)
+,`catatan` text
+,`catatan_berat` text
+,`status_cucian` varchar(20)
+,`nama_laundry` varchar(30)
+,`nama_pelanggan` varchar(30)
+,`total_harga` double
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `v_status_cucian`
+--
+DROP TABLE IF EXISTS `v_status_cucian`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_status_cucian`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`tgl_selesai` AS `tgl_selesai`, `c`.`jenis` AS `jenis`, `c`.`estimasi_item` AS `estimasi_item`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`total_item` AS `total_item`, `c`.`berat` AS `berat`, `c`.`alamat` AS `alamat`, `c`.`catatan` AS `catatan`, `c`.`catatan_berat` AS `catatan_berat`, `c`.`status_cucian` AS `status_cucian`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan`, coalesce((select sum(`detail_cucian`.`subtotal`) from `detail_cucian` where `detail_cucian`.`id_cucian` = `c`.`id_cucian`),`c`.`berat` * `h`.`harga`) AS `total_harga` FROM (((`cucian` `c` left join `agen` `a` on(`a`.`id_agen` = `c`.`id_agen`)) left join `pelanggan` `p` on(`p`.`id_pelanggan` = `c`.`id_pelanggan`)) left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) WHERE `c`.`status_cucian` <> 'Selesai' ;
+
+--
 -- Indexes for dumped tables
 --
 
@@ -262,28 +325,30 @@ ALTER TABLE `agen`
 -- Indeks untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  ADD PRIMARY KEY (`id_cucian`);
+  ADD PRIMARY KEY (`id_cucian`),
+  ADD KEY `idx_status` (`status_cucian`);
 
 --
 -- Indeks untuk tabel `detail_cucian`
 --
 ALTER TABLE `detail_cucian`
   ADD PRIMARY KEY (`id_detail`),
-  ADD KEY `id_cucian` (`id_cucian`),
-  ADD KEY `id_harga_satuan` (`id_harga_satuan`);
+  ADD KEY `id_harga_satuan` (`id_harga_satuan`),
+  ADD KEY `idx_cucian` (`id_cucian`);
 
 --
 -- Indeks untuk tabel `harga`
 --
 ALTER TABLE `harga`
-  ADD PRIMARY KEY (`id_harga`);
+  ADD PRIMARY KEY (`id_harga`),
+  ADD KEY `idx_agen_jenis` (`id_agen`,`jenis`);
 
 --
 -- Indeks untuk tabel `harga_satuan`
 --
 ALTER TABLE `harga_satuan`
   ADD PRIMARY KEY (`id_harga_satuan`),
-  ADD KEY `id_agen` (`id_agen`);
+  ADD KEY `idx_agen` (`id_agen`);
 
 --
 -- Indeks untuk tabel `pelanggan`
@@ -295,7 +360,8 @@ ALTER TABLE `pelanggan`
 -- Indeks untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  ADD PRIMARY KEY (`kode_transaksi`);
+  ADD PRIMARY KEY (`kode_transaksi`),
+  ADD KEY `idx_pelanggan_agen` (`id_pelanggan`,`id_agen`);
 
 --
 -- AUTO_INCREMENT untuk tabel yang dibuang
@@ -317,13 +383,13 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT untuk tabel `detail_cucian`
 --
 ALTER TABLE `detail_cucian`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -347,7 +413,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
