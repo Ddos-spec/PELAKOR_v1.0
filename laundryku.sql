@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 17 Feb 2025 pada 13.54
+-- Waktu pembuatan: 17 Feb 2025 pada 16.16
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -207,6 +207,17 @@ INSERT INTO `harga_satuan` (`id_harga_satuan`, `id_agen`, `nama_item`, `jenis`, 
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `kategori_item`
+--
+
+CREATE TABLE `kategori_item` (
+  `id_kategori` int(11) NOT NULL,
+  `nama_kategori` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `pelanggan`
 --
 
@@ -227,6 +238,20 @@ CREATE TABLE `pelanggan` (
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `nama`, `email`, `telp`, `kota`, `alamat`, `foto`, `password`) VALUES
 (15, 'sakamoto', 'sakamoto@gmail.com', '1231231', 'adfwfawda', 'sfsffdwdwa', 'default.png', '$2y$10$ns0WgyETUbOMTKnqsW6fsuxIcA.tbiw6c2NX8ZnuS/EKCO1/bOd6O');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `status_history`
+--
+
+CREATE TABLE `status_history` (
+  `id` int(11) NOT NULL,
+  `id_cucian` int(11) NOT NULL,
+  `status_lama` varchar(50) DEFAULT NULL,
+  `status_baru` varchar(50) DEFAULT NULL,
+  `waktu_ubah` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -273,6 +298,33 @@ INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan
 -- --------------------------------------------------------
 
 --
+-- Stand-in struktur untuk tampilan `v_cucian_total`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `v_cucian_total` (
+`id_cucian` int(11)
+,`id_agen` int(11)
+,`id_pelanggan` int(11)
+,`tgl_mulai` date
+,`tgl_selesai` date
+,`jenis` varchar(15)
+,`estimasi_item` text
+,`tipe_layanan` enum('kiloan','satuan')
+,`total_item` int(11)
+,`berat` double
+,`alamat` varchar(100)
+,`catatan` text
+,`catatan_berat` text
+,`status_cucian` varchar(20)
+,`nama_laundry` varchar(30)
+,`nama_pelanggan` varchar(30)
+,`total_harga` double
+,`detail_item` mediumtext
+);
+
+-- --------------------------------------------------------
+
+--
 -- Stand-in struktur untuk tampilan `v_status_cucian`
 -- (Lihat di bawah untuk tampilan aktual)
 --
@@ -299,11 +351,115 @@ CREATE TABLE `v_status_cucian` (
 -- --------------------------------------------------------
 
 --
+-- Stand-in struktur untuk tampilan `v_status_monitoring`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `v_status_monitoring` (
+`id_cucian` int(11)
+,`id_agen` int(11)
+,`id_pelanggan` int(11)
+,`tipe_layanan` enum('kiloan','satuan')
+,`berat` double
+,`jenis` varchar(15)
+,`status_cucian` varchar(20)
+,`tgl_mulai` date
+,`estimasi_item` text
+,`nama_laundry` varchar(30)
+,`nama_pelanggan` varchar(30)
+,`total_harga` double
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in struktur untuk tampilan `v_total_cucian`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `v_total_cucian` (
+`id_cucian` int(11)
+,`id_agen` int(11)
+,`id_pelanggan` int(11)
+,`tgl_mulai` date
+,`tgl_selesai` date
+,`jenis` varchar(15)
+,`estimasi_item` text
+,`tipe_layanan` enum('kiloan','satuan')
+,`total_item` int(11)
+,`berat` double
+,`alamat` varchar(100)
+,`catatan` text
+,`catatan_berat` text
+,`status_cucian` varchar(20)
+,`total_harga` double
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in struktur untuk tampilan `v_transaksi`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `v_transaksi` (
+`kode_transaksi` int(11)
+,`id_cucian` int(11)
+,`id_agen` int(11)
+,`id_pelanggan` int(11)
+,`tgl_mulai` date
+,`tgl_selesai` date
+,`total_bayar` int(11)
+,`rating` int(11)
+,`komentar` text
+,`tipe_layanan` enum('kiloan','satuan')
+,`berat` double
+,`jenis` varchar(15)
+,`nama_laundry` varchar(30)
+,`nama_pelanggan` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `v_cucian_total`
+--
+DROP TABLE IF EXISTS `v_cucian_total`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_cucian_total`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`tgl_selesai` AS `tgl_selesai`, `c`.`jenis` AS `jenis`, `c`.`estimasi_item` AS `estimasi_item`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`total_item` AS `total_item`, `c`.`berat` AS `berat`, `c`.`alamat` AS `alamat`, `c`.`catatan` AS `catatan`, `c`.`catatan_berat` AS `catatan_berat`, `c`.`status_cucian` AS `status_cucian`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan`, CASE WHEN `c`.`tipe_layanan` = 'kiloan' THEN `c`.`berat`* `h`.`harga` ELSE coalesce((select sum(`dc`.`jumlah` * `hs`.`harga`) from (`detail_cucian` `dc` join `harga_satuan` `hs` on(`dc`.`id_harga_satuan` = `hs`.`id_harga_satuan`)) where `dc`.`id_cucian` = `c`.`id_cucian`),0) END AS `total_harga`, coalesce((select group_concat(concat(`hs`.`nama_item`,' (',`dc`.`jumlah`,')') separator ',') from (`detail_cucian` `dc` join `harga_satuan` `hs` on(`dc`.`id_harga_satuan` = `hs`.`id_harga_satuan`)) where `dc`.`id_cucian` = `c`.`id_cucian`),`c`.`estimasi_item`) AS `detail_item` FROM (((`cucian` `c` left join `agen` `a` on(`c`.`id_agen` = `a`.`id_agen`)) left join `pelanggan` `p` on(`c`.`id_pelanggan` = `p`.`id_pelanggan`)) left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) ;
+
+-- --------------------------------------------------------
+
+--
 -- Struktur untuk view `v_status_cucian`
 --
 DROP TABLE IF EXISTS `v_status_cucian`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_status_cucian`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`tgl_selesai` AS `tgl_selesai`, `c`.`jenis` AS `jenis`, `c`.`estimasi_item` AS `estimasi_item`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`total_item` AS `total_item`, `c`.`berat` AS `berat`, `c`.`alamat` AS `alamat`, `c`.`catatan` AS `catatan`, `c`.`catatan_berat` AS `catatan_berat`, `c`.`status_cucian` AS `status_cucian`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan`, coalesce((select sum(`detail_cucian`.`subtotal`) from `detail_cucian` where `detail_cucian`.`id_cucian` = `c`.`id_cucian`),`c`.`berat` * `h`.`harga`) AS `total_harga` FROM (((`cucian` `c` left join `agen` `a` on(`a`.`id_agen` = `c`.`id_agen`)) left join `pelanggan` `p` on(`p`.`id_pelanggan` = `c`.`id_pelanggan`)) left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) WHERE `c`.`status_cucian` <> 'Selesai' ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_status_cucian`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`tgl_selesai` AS `tgl_selesai`, `c`.`jenis` AS `jenis`, `c`.`estimasi_item` AS `estimasi_item`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`total_item` AS `total_item`, `c`.`berat` AS `berat`, `c`.`alamat` AS `alamat`, `c`.`catatan` AS `catatan`, `c`.`catatan_berat` AS `catatan_berat`, `c`.`status_cucian` AS `status_cucian`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan`, CASE WHEN `c`.`tipe_layanan` = 'kiloan' THEN `c`.`berat`* `h`.`harga` ELSE (select sum(`dc`.`subtotal`) from `detail_cucian` `dc` where `dc`.`id_cucian` = `c`.`id_cucian`) END AS `total_harga` FROM (((`cucian` `c` left join `agen` `a` on(`a`.`id_agen` = `c`.`id_agen`)) left join `pelanggan` `p` on(`p`.`id_pelanggan` = `c`.`id_pelanggan`)) left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `v_status_monitoring`
+--
+DROP TABLE IF EXISTS `v_status_monitoring`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_status_monitoring`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`berat` AS `berat`, `c`.`jenis` AS `jenis`, `c`.`status_cucian` AS `status_cucian`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`estimasi_item` AS `estimasi_item`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan`, CASE WHEN `c`.`tipe_layanan` = 'kiloan' THEN `c`.`berat`* `h`.`harga` ELSE (select sum(`dc`.`subtotal`) from `detail_cucian` `dc` where `dc`.`id_cucian` = `c`.`id_cucian`) END AS `total_harga` FROM (((`cucian` `c` join `agen` `a` on(`c`.`id_agen` = `a`.`id_agen`)) join `pelanggan` `p` on(`c`.`id_pelanggan` = `p`.`id_pelanggan`)) left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) WHERE `c`.`status_cucian` <> 'Selesai' ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `v_total_cucian`
+--
+DROP TABLE IF EXISTS `v_total_cucian`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_total_cucian`  AS SELECT `c`.`id_cucian` AS `id_cucian`, `c`.`id_agen` AS `id_agen`, `c`.`id_pelanggan` AS `id_pelanggan`, `c`.`tgl_mulai` AS `tgl_mulai`, `c`.`tgl_selesai` AS `tgl_selesai`, `c`.`jenis` AS `jenis`, `c`.`estimasi_item` AS `estimasi_item`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`total_item` AS `total_item`, `c`.`berat` AS `berat`, `c`.`alamat` AS `alamat`, `c`.`catatan` AS `catatan`, `c`.`catatan_berat` AS `catatan_berat`, `c`.`status_cucian` AS `status_cucian`, CASE WHEN `c`.`tipe_layanan` = 'kiloan' THEN `c`.`berat`* `h`.`harga` ELSE coalesce((select sum(`dc`.`jumlah` * `hs`.`harga`) from (`detail_cucian` `dc` join `harga_satuan` `hs` on(`dc`.`id_harga_satuan` = `hs`.`id_harga_satuan`)) where `dc`.`id_cucian` = `c`.`id_cucian`),0) END AS `total_harga` FROM (`cucian` `c` left join `harga` `h` on(`h`.`id_agen` = `c`.`id_agen` and `h`.`jenis` = `c`.`jenis`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `v_transaksi`
+--
+DROP TABLE IF EXISTS `v_transaksi`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_transaksi`  AS SELECT `t`.`kode_transaksi` AS `kode_transaksi`, `t`.`id_cucian` AS `id_cucian`, `t`.`id_agen` AS `id_agen`, `t`.`id_pelanggan` AS `id_pelanggan`, `t`.`tgl_mulai` AS `tgl_mulai`, `t`.`tgl_selesai` AS `tgl_selesai`, `t`.`total_bayar` AS `total_bayar`, `t`.`rating` AS `rating`, `t`.`komentar` AS `komentar`, `c`.`tipe_layanan` AS `tipe_layanan`, `c`.`berat` AS `berat`, `c`.`jenis` AS `jenis`, `a`.`nama_laundry` AS `nama_laundry`, `p`.`nama` AS `nama_pelanggan` FROM (((`transaksi` `t` join `cucian` `c` on(`t`.`id_cucian` = `c`.`id_cucian`)) join `agen` `a` on(`t`.`id_agen` = `a`.`id_agen`)) join `pelanggan` `p` on(`t`.`id_pelanggan` = `p`.`id_pelanggan`)) ;
 
 --
 -- Indexes for dumped tables
@@ -326,7 +482,10 @@ ALTER TABLE `agen`
 --
 ALTER TABLE `cucian`
   ADD PRIMARY KEY (`id_cucian`),
-  ADD KEY `idx_status` (`status_cucian`);
+  ADD KEY `idx_status` (`status_cucian`),
+  ADD KEY `idx_cucian_status` (`status_cucian`),
+  ADD KEY `idx_cucian_dates` (`tgl_mulai`),
+  ADD KEY `idx_tipe_status` (`tipe_layanan`,`status_cucian`);
 
 --
 -- Indeks untuk tabel `detail_cucian`
@@ -334,7 +493,8 @@ ALTER TABLE `cucian`
 ALTER TABLE `detail_cucian`
   ADD PRIMARY KEY (`id_detail`),
   ADD KEY `id_harga_satuan` (`id_harga_satuan`),
-  ADD KEY `idx_cucian` (`id_cucian`);
+  ADD KEY `idx_cucian` (`id_cucian`),
+  ADD KEY `idx_cucian_harga` (`id_cucian`,`id_harga_satuan`);
 
 --
 -- Indeks untuk tabel `harga`
@@ -351,17 +511,31 @@ ALTER TABLE `harga_satuan`
   ADD KEY `idx_agen` (`id_agen`);
 
 --
+-- Indeks untuk tabel `kategori_item`
+--
+ALTER TABLE `kategori_item`
+  ADD PRIMARY KEY (`id_kategori`);
+
+--
 -- Indeks untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
   ADD PRIMARY KEY (`id_pelanggan`);
 
 --
+-- Indeks untuk tabel `status_history`
+--
+ALTER TABLE `status_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_cucian` (`id_cucian`);
+
+--
 -- Indeks untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
   ADD PRIMARY KEY (`kode_transaksi`),
-  ADD KEY `idx_pelanggan_agen` (`id_pelanggan`,`id_agen`);
+  ADD KEY `idx_pelanggan_agen` (`id_pelanggan`,`id_agen`),
+  ADD KEY `idx_transaksi_customer` (`id_pelanggan`,`id_agen`);
 
 --
 -- AUTO_INCREMENT untuk tabel yang dibuang
@@ -404,10 +578,22 @@ ALTER TABLE `harga_satuan`
   MODIFY `id_harga_satuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
+-- AUTO_INCREMENT untuk tabel `kategori_item`
+--
+ALTER TABLE `kategori_item`
+  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT untuk tabel `pelanggan`
 --
 ALTER TABLE `pelanggan`
   MODIFY `id_pelanggan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT untuk tabel `status_history`
+--
+ALTER TABLE `status_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `transaksi`
@@ -431,6 +617,12 @@ ALTER TABLE `detail_cucian`
 --
 ALTER TABLE `harga_satuan`
   ADD CONSTRAINT `harga_satuan_ibfk_1` FOREIGN KEY (`id_agen`) REFERENCES `agen` (`id_agen`);
+
+--
+-- Ketidakleluasaan untuk tabel `status_history`
+--
+ALTER TABLE `status_history`
+  ADD CONSTRAINT `status_history_ibfk_1` FOREIGN KEY (`id_cucian`) REFERENCES `cucian` (`id_cucian`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
