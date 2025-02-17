@@ -47,7 +47,41 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <div class="row">
         <h3 class="header col s12 light center">Riwayat Transaksi Cucian</h3>
         <br>
-        <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM transaksi"); ?>
+        <!-- Tambah filter di bagian atas tabel -->
+        <div class="row">
+            <div class="col s12">
+                <div class="input-field inline">
+                    <select id="filter_tipe" onchange="filterTipe(this.value)">
+                        <option value="all">Semua Tipe</option>
+                        <option value="kiloan">Kiloan</option>
+                        <option value="satuan">Satuan</option>
+                    </select>
+                    <label>Filter Tipe Layanan</label>
+                </div>
+                <div class="right-align">
+                    <a class="btn blue" onclick="exportData('pdf')">
+                        <i class="material-icons left">picture_as_pdf</i>Export PDF
+                    </a>
+                    <a class="btn green" onclick="exportData('excel')">
+                        <i class="material-icons left">grid_on</i>Export Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php if ($login == "Admin") : ?>
+        <!-- Modifikasi query untuk paginasi -->
+        <?php 
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+
+        $query = mysqli_query($connect, "SELECT c.*, dc.*, hs.*, h.harga as harga_kiloan 
+            FROM cucian c 
+            LEFT JOIN detail_cucian dc ON c.id_cucian = dc.id_cucian
+            LEFT JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan
+            LEFT JOIN harga h ON h.id_agen = c.id_agen AND h.jenis = c.jenis
+            LIMIT $limit OFFSET $offset");
+        ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
@@ -120,6 +154,20 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php endwhile; ?>
             </table>
+        </div>
+        <!-- Tambah pagination -->
+        <div class="center">
+            <ul class="pagination">
+                <?php
+                $total = mysqli_num_rows(mysqli_query($connect, "SELECT * FROM cucian"));
+                $pages = ceil($total / $limit);
+                for($i = 1; $i <= $pages; $i++):
+                ?>
+                <li class="<?= $i==$page?'active':'' ?>">
+                    <a href="?page=<?= $i ?>"><?= $i ?></a>
+                </li>
+                <?php endfor; ?>
+            </ul>
         </div>
         <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = '$idAgen'"); ?>
         <div class="col s10 offset-s1">

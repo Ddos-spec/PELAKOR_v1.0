@@ -67,53 +67,70 @@ $agen = mysqli_fetch_assoc($query);
         </div>
     </div>
 
-        <!-- data harga -->
+    <!-- data harga -->
     <div class="row">
-        <div class="col s3 offset-s2">
-            <div class="card-panel grey lighten-5 z-depth-1">
-                <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=cuci" style="margin:0% 15%"><button class="btn blue darken-3">CUCI</button></a>
-                    <div>
-                        <?php
-                            $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'cuci'");
-                            $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
-                        ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col s3">
-            <div class="card-panel grey lighten-5 z-depth-1">
-                <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=setrika" style="margin:0% 15%"><button class="btn blue darken-3">SETRIKA</button></a>
-                    <div>
-                        <?php
-                            $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'setrika'");
-                            $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
-                        ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col s3">
-            <div class="card-panel grey lighten-5 z-depth-1">
-                <div class="row valign-wrapper">
-                    <a href="pesan-laundry.php?id=<?= $idAgen ?>&jenis=komplit" style="margin:0% 15%"><button class="btn blue darken-3">KOMPLIT</button></a>
-                    <div>
-                        <?php
-                            $harga = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen' AND jenis = 'komplit'");
-                            $harga = mysqli_fetch_assoc($harga);
-                            echo "Rp. " . $harga['harga'] . " /Kg";
-                        ?>
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title center">Pilih Jenis Layanan</span>
+                    
+                    <div class="row">
+                        <!-- Layanan Kiloan -->
+                        <div class="col s6">
+                            <div class="card blue-grey darken-1">
+                                <div class="card-content white-text">
+                                    <span class="card-title">Layanan Kiloan</span>
+                                    <ul class="collection">
+                                        <li class="collection-item">
+                                            <div>Cuci <span class="secondary-content">Rp <?= number_format($cuci['harga']) ?>/kg</span></div>
+                                            <a href="pesan-laundry.php?id=<?= $idAgen ?>&tipe=kiloan&jenis=cuci" class="btn-small blue">Pilih</a>
+                                        </li>
+                                        <li class="collection-item">
+                                            <div>Setrika <span class="secondary-content">Rp <?= number_format($setrika['harga']) ?>/kg</span></div>
+                                            <a href="pesan-laundry.php?id=<?= $idAgen ?>&tipe=kiloan&jenis=setrika" class="btn-small blue">Pilih</a>
+                                        </li>
+                                        <li class="collection-item">
+                                            <div>Komplit <span class="secondary-content">Rp <?= number_format($komplit['harga']) ?>/kg</span></div>
+                                            <a href="pesan-laundry.php?id=<?= $idAgen ?>&tipe=kiloan&jenis=komplit" class="btn-small blue">Pilih</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Layanan Satuan -->
+                        <div class="col s6">
+                            <div class="card blue-grey darken-1">
+                                <div class="card-content white-text">
+                                    <span class="card-title">Layanan Satuan</span>
+                                    <ul class="collection">
+                                        <?php
+                                        $items = mysqli_query($connect, "SELECT * FROM harga_satuan WHERE id_agen = '$idAgen'");
+                                        while($item = mysqli_fetch_assoc($items)):
+                                        ?>
+                                        <li class="collection-item">
+                                            <div><?= $item['nama_item'] ?> <span class="secondary-content">Rp <?= number_format($item['harga']) ?>/pc</span></div>
+                                        </li>
+                                        <?php endwhile; ?>
+                                    </ul>
+                                    <div class="center-align" style="margin-top:10px">
+                                        <a href="pesan-laundry.php?id=<?= $idAgen ?>&tipe=satuan" class="btn-large blue">Pesan Layanan Satuan</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- end agen -->
 
+    <!-- Tombol Pesan -->
+    <div class="center">
+        <a class="btn-large red darken-3" href="pesan-laundry.php?id=<?= $idAgen ?>">
+            PESAN LAUNDRY
+        </a>
+    </div>
 
     <hr><br>
 

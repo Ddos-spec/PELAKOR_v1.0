@@ -61,6 +61,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Jenis</td>
                     <td style="font-weight:bold;">Tanggal Dibuat</td>
                     <td style="font-weight:bold;">Status</td>
+                    <td style="font-weight:bold">Tipe Layanan</td>
+                    <td style="font-weight:bold">Total Harga</td>
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -102,6 +104,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
+                    <td><?= $cucian["tipe_layanan"] ?></td>
+                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -118,6 +122,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Tanggal Dibuat</td>
                     <td style="font-weight:bold;">Status</td>
                     <td style="font-weight:bold;">Aksi</td>
+                    <td style="font-weight:bold">Tipe Layanan</td>
+                    <td style="font-weight:bold">Total Harga</td>
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -183,6 +189,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                             </div>
                         </form>
                     </td>
+                    <td><?= $cucian["tipe_layanan"] ?></td>
+                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -198,6 +206,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Jenis</td>
                     <td style="font-weight:bold">Tanggal Dibuat</td>
                     <td style="font-weight:bold">Status</td>
+                    <td style="font-weight:bold">Tipe Layanan</td>
+                    <td style="font-weight:bold">Total Harga</td>
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
@@ -232,7 +242,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
-                    
+                    <td><?= $cucian["tipe_layanan"] ?></td>
+                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
                 </tr>
                 <?php endwhile; ?>
             </table>

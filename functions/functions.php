@@ -218,4 +218,12 @@ function validasiHargaSatuan($harga) {
     }
 }
 
+function exportData($type, $data) {
+    if($type == 'pdf') {
+        // Logic untuk export PDF
+    } else {
+        // Logic untuk export Excel
+    }
+}
+
 ?>
