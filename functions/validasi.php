@@ -1,3 +1,4 @@
+<?php
 function validasiPesanan($data) {
     if(empty($data['alamat'])) {
         throw new Exception('Alamat pengambilan harus diisi');
@@ -16,3 +17,4 @@ function validasiPesanan($data) {
         }
     }
 }
+?>
