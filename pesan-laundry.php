@@ -81,7 +81,7 @@ $pelanggan = mysqli_fetch_assoc($query);
     <!-- info pemesanan -->
     <div class="row">
         <div class="col s10 offset-s1">
-            <form action="" method="post">
+            <form action="" method="post" id="formPesanan" onsubmit="return validateForm()">
                 <div class="col s5">
                     <h3 class="header light center">Data Diri</h3>
                     <br>

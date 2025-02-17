@@ -28,26 +28,6 @@ CREATE TABLE history_harga_satuan (
     tanggal_ubah TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_harga_satuan) REFERENCES harga_satuan(id_harga_satuan)    a.nama_laundry,
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 WHERE c.status_cucian != 'Selesai';LEFT JOIN harga h ON h.id_agen = c.id_agen AND h.jenis = c.jenisJOIN pelanggan p ON c.id_pelanggan = p.id_pelangganJOIN agen a ON c.id_agen = a.id_agenFROM cucian c    (SELECT COUNT(*) FROM detail_cucian WHERE id_cucian = c.id_cucian) as jumlah_item    h.harga as harga_kiloan,    p.nama as nama_pelanggan,    a.nama_laundry,    c.*,SELECT CREATE VIEW v_status_monitoring AS-- View untuk Status MonitoringCREATE INDEX idx_transaksi_date ON transaksi(tgl_mulai, tgl_selesai);CREATE INDEX idx_cucian_tipe ON cucian(tipe_layanan);CREATE INDEX idx_cucian_status ON cucian(status_cucian);-- Optimasi Index);    p.nama as nama_pelanggan,
     h.harga as harga_kiloan,
     (SELECT COUNT(*) FROM detail_cucian WHERE id_cucian = c.id_cucian) as jumlah_item

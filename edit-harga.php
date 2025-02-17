@@ -46,24 +46,58 @@ $komplit = mysqli_fetch_assoc($komplit);
             </div>
 
             <div id="harga-kiloan" class="col s12">
-                <form action="" method="post" onsubmit="return validateHargaForm()">
-                    <div class="input field">
-                        <label for="cuci">Cuci</label>
-                        <input type="text" id="cuci" name="cuci" value="<?= $cuci['harga'] ?>">
+                <form action="" method="post" id="formHarga" onsubmit="return validateHarga()">
+                    <div class="input-field">
+                        <label for="cuci">Cuci (per kg)</label>
+                        <input type="number" 
+                               id="cuci" 
+                               name="cuci" 
+                               value="<?= $cuci['harga'] ?>" 
+                               min="0"
+                               class="validate"
+                               onchange="updatePreview()">
+                        <span class="helper-text" data-error="Harga harus valid"></span>
                     </div>
-                    <div class="input field">
-                        <label for="setrika">Setrika</label>
-                        <input type="text" id="setrika" name="setrika" value="<?= $setrika['harga'] ?>">
+                    
+                    <div class="input-field">
+                        <label for="setrika">Setrika (per kg)</label>
+                        <input type="number" 
+                               id="setrika" 
+                               name="setrika" 
+                               value="<?= $setrika['harga'] ?>" 
+                               min="0"
+                               class="validate"
+                               onchange="updatePreview()">
                     </div>
-                    <div class="input field">
-                        <label for="komplit">Cuci + Setrika</label><input type="text" id="komplit" name="komplit" value="<?= $komplit['harga'] ?>">
+                    
+                    <div class="input-field">
+                        <label for="komplit">Cuci + Setrika (per kg)</label>
+                        <input type="number" 
+                               id="komplit" 
+                               name="komplit" 
+                               value="<?= $komplit['harga'] ?>" 
+                               min="0"
+                               class="validate"
+                               onchange="updatePreview()">
                     </div>
-                    <div class="input field center">
-                        <button class="btn-large blue darken-2" type="submit" name="simpan">Simpan Data</button>
+
+                    <!-- Preview perubahan harga -->
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Preview Perubahan</span>
+                            <table class="striped">
+                                <tr>
+                                    <th>Layanan</th>
+                                    <th>Harga Lama</th>
+                                    <th>Harga Baru</th>
+                                    <th>Selisih</th>
+                                </tr>
+                                <tbody id="previewPerubahan"></tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="preview-section">
-                        <?php include 'components/harga-preview.php'; ?>
-                    </div>
+
+                    <button type="submit" name="simpan" class="btn blue">Simpan</button>
                 </form>
             </div>
 
@@ -121,17 +155,61 @@ $komplit = mysqli_fetch_assoc($komplit);
         });
     }
 
-    function validateHargaForm() {
-        const hargaCuci = parseInt($('#cuci').val());
-        const hargaSetrika = parseInt($('#setrika').val());
-        const hargaKomplit = parseInt($('#komplit').val());
-        
-        if(isNaN(hargaCuci) || isNaN(hargaSetrika) || isNaN(hargaKomplit)) {
-            Swal.fire('Error', 'Harga harus berupa angka', 'error');
-            return false;
+    function validateHarga() {
+        const fields = ['cuci', 'setrika', 'komplit'];
+        let isValid = true;
+        let message = '';
+
+        fields.forEach(field => {
+            const value = $(`#${field}`).val();
+            if(!value || value < 0) {
+                message = `Harga ${field} harus valid`;
+                isValid = false;
+            }
+        });
+
+        if(!isValid) {
+            Swal.fire('Validasi Gagal', message, 'error');
         }
-        return true;
+        return isValid;
     }
+
+    function updatePreview() {
+        const oldPrices = {
+            cuci: <?= $cuci['harga'] ?>,
+            setrika: <?= $setrika['harga'] ?>,
+            komplit: <?= $komplit['harga'] ?>
+        };
+
+        let html = '';
+        ['cuci', 'setrika', 'komplit'].forEach(service => {
+            const oldPrice = oldPrices[service];
+            const newPrice = parseInt($(`#${service}`).val()) || 0;
+            const diff = newPrice - oldPrice;
+
+            html += `
+                <tr>
+                    <td>${service.charAt(0).toUpperCase() + service.slice(1)}</td>
+                    <td>Rp ${formatNumber(oldPrice)}</td>
+                    <td>Rp ${formatNumber(newPrice)}</td>
+                    <td class="${diff > 0 ? 'green-text' : diff < 0 ? 'red-text' : ''}">
+                        ${diff > 0 ? '+' : ''}${formatNumber(diff)}
+                    </td>
+                </tr>
+            `;
+        });
+
+        $('#previewPerubahan').html(html);
+    }
+
+    function formatNumber(num) {
+        return new Intl.NumberFormat('id-ID').format(num);
+    }
+
+    // Initialize preview
+    $(document).ready(function() {
+        updatePreview();
+    });
     </script>
 
 </body>
