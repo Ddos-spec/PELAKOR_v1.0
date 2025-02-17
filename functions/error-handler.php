@@ -1,0 +1,27 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>}    exit;    ]);        'message' => $error        'success' => false,    echo json_encode([    header('Content-Type: application/json');function handleAjaxError($error) {}    </script>";        });            icon: '$type'            html: '$message',            title: '" . ucfirst($type) . "',        Swal.fire({    echo "<script>        }        $message = $error;    } else {        $message = implode('<br>', $error);    if(is_array($error)) {function handleError($error, $type = 'error') {<?php

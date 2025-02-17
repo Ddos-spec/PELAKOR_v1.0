@@ -89,6 +89,38 @@ if ( isset($_POST["cari"])) {
     </form>
     <!-- end searching -->
 
+    <!-- Filter Section -->
+    <div class="row">
+        <div class="col s12">
+            <div class="input-field col s3">
+                <input type="text" id="searchInput" onkeyup="filterAgen()">
+                <label for="searchInput">Cari Agen</label>
+            </div>
+            <div class="input-field col s3">
+                <select id="filterKota" onchange="filterAgen()">
+                    <option value="">Semua Kota</option>
+                    <?php
+                    $kotas = mysqli_query($connect, "SELECT DISTINCT kota FROM agen ORDER BY kota");
+                    while($kota = mysqli_fetch_assoc($kotas)) {
+                        echo "<option value='{$kota['kota']}'>{$kota['kota']}</option>";
+                    }
+                    ?>
+                </select>
+                <label>Filter Kota</label>
+            </div>
+            <div class="input-field col s3">
+                <select id="filterRating" onchange="filterAgen()">
+                    <option value="">Semua Rating</option>
+                    <option value="4">4+ ⭐</option>
+                    <option value="3">3+ ⭐</option>
+                    <option value="2">2+ ⭐</option>
+                    <option value="1">1+ ⭐</option>
+                </select>
+                <label>Filter Rating</label>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col s10 offset-s1">
             
@@ -134,9 +166,9 @@ if ( isset($_POST["cari"])) {
 
                 <?php foreach ($agen as $dataAgen) : ?>
                 
-                <tr>
+                <tr class="agen-item" data-kota="<?= $dataAgen['kota'] ?>" data-rating="<?= $rating ?>">
                     <td><?= $dataAgen["id_agen"] ?></td>
-                    <td><?= $dataAgen["nama_laundry"] ?></td>
+                    <td class="nama-laundry"><?= $dataAgen["nama_laundry"] ?></td>
                     <td><?= $dataAgen["nama_pemilik"] ?></td>
                     <td><?= $dataAgen["telp"] ?></td>
                     <td><?= $dataAgen["email"] ?></td>
@@ -160,6 +192,33 @@ if ( isset($_POST["cari"])) {
     <!-- footer -->
     <?php include "footer.php"; ?>
     <!-- end footer -->
+
+    <script>
+    function filterAgen() {
+        let search = $('#searchInput').val().toLowerCase();
+        let kota = $('#filterKota').val();
+        let rating = $('#filterRating').val();
+
+        $('.agen-item').each(function() {
+            let item = $(this);
+            let namaAgen = item.find('.nama-laundry').text().toLowerCase();
+            let kotaAgen = item.data('kota');
+            let ratingAgen = parseFloat(item.data('rating'));
+            
+            let showItem = true;
+
+            if(search && !namaAgen.includes(search)) showItem = false;
+            if(kota && kotaAgen !== kota) showItem = false;
+            if(rating && ratingAgen < rating) showItem = false;
+
+            item.toggle(showItem);
+        });
+    }
+
+    $(document).ready(function() {
+        $('select').formSelect();
+    });
+    </script>
 </body>
 </html>
 <?php

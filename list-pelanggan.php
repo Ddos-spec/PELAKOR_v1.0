@@ -86,6 +86,27 @@ if ( isset($_POST["cari"])) {
     <!-- end searching -->
 
     <div class="row">
+        <div class="col s12">
+            <div class="input-field col s4">
+                <input type="text" id="searchInput" onkeyup="filterPelanggan()">
+                <label for="searchInput">Cari Pelanggan</label>
+            </div>
+            <div class="input-field col s4">
+                <select id="filterKota" onchange="filterPelanggan()">
+                    <option value="">Semua Kota</option>
+                    <?php
+                    $kotas = mysqli_query($connect, "SELECT DISTINCT kota FROM pelanggan ORDER BY kota");
+                    while($kota = mysqli_fetch_assoc($kotas)) {
+                        echo "<option value='{$kota['kota']}'>{$kota['kota']}</option>";
+                    }
+                    ?>
+                </select>
+                <label>Filter Kota</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col s10 offset-s1">
 
             <!-- pagination -->
@@ -124,9 +145,9 @@ if ( isset($_POST["cari"])) {
 
                 <?php foreach ($pelanggan as $dataPelanggan) : ?>
                 
-                <tr>
+                <tr class="pelanggan-item" data-kota="<?= $dataPelanggan['kota'] ?>">
                     <td><?= $dataPelanggan["id_pelanggan"] ?></td>
-                    <td><?= $dataPelanggan["nama"] ?></td>
+                    <td class="nama-pelanggan"><?= $dataPelanggan["nama"] ?></td>
                     <td><?= $dataPelanggan["telp"] ?></td>
                     <td><?= $dataPelanggan["email"] ?></td>
                     <td><?= $dataPelanggan["kota"] ?></td>
@@ -143,6 +164,30 @@ if ( isset($_POST["cari"])) {
     <?php include "footer.php"; ?>
 </body>
 </html>
+
+<script>
+function filterPelanggan() {
+    let search = $('#searchInput').val().toLowerCase();
+    let kota = $('#filterKota').val();
+
+    $('.pelanggan-item').each(function() {
+        let item = $(this);
+        let namaPelanggan = item.find('.nama-pelanggan').text().toLowerCase();
+        let kotaPelanggan = item.data('kota');
+        
+        let showItem = true;
+
+        if(search && !namaPelanggan.includes(search)) showItem = false;
+        if(kota && kotaPelanggan !== kota) showItem = false;
+
+        item.toggle(showItem);
+    });
+}
+
+$(document).ready(function() {
+    $('select').formSelect();
+});
+</script>
 
 <?php
 

@@ -42,6 +42,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html" ?>
+    <link rel="stylesheet" href="css/status-tracker.css">
     <title>Status Cucian - <?= $login ?></title>
 </head>
 <body>
@@ -49,7 +50,24 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <div id="body">
         <h3 class="header col s10 light center">Status Cucian</h3>
         <br>
-        <?php if ($login == "Admin") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE status_cucian != 'Selesai'"); ?>
+        <?php if ($login == "Admin") : 
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $limit = 10;
+            $offset = ($page - 1) * $limit;
+
+            // Use optimized view with pagination
+            $query = "SELECT * FROM v_status_monitoring LIMIT ? OFFSET ?";
+            $stmt = mysqli_prepare($connect, $query);
+            mysqli_stmt_bind_param($stmt, "ii", $limit, $offset);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+
+            // Get total pages
+            $total_query = "SELECT COUNT(*) as total FROM v_status_monitoring";
+            $total_result = mysqli_query($connect, $total_query);
+            $total_data = mysqli_fetch_assoc($total_result)['total'];
+            $total_pages = ceil($total_data / $limit);
+        ?>
         <div class="col s10 offset-s1">
             <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
@@ -65,27 +83,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Tipe Layanan</td>
                     <td style="font-weight:bold">Total Harga</td>
                 </tr>
-                <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
+                <?php while ($cucian = mysqli_fetch_assoc($result)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                            $data = mysqli_query($connect, "SELECT agen.nama_laundry FROM cucian INNER JOIN agen ON agen.id_agen = cucian.id_agen WHERE id_cucian = $idCucian");
-                            $data = mysqli_fetch_assoc($data);
-                            echo $data["nama_laundry"];
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                            $data = mysqli_query($connect, "SELECT pelanggan.nama FROM cucian INNER JOIN pelanggan ON pelanggan.id_pelanggan = cucian.id_pelanggan WHERE id_cucian = $idCucian");
-                            $data = mysqli_fetch_assoc($data);
-                            echo $data["nama"];
-                        ?>
-                    </td>
+                    <td><?= $idCucian = $cucian['id_cucian'] ?></td>
+                    <td><?= $cucian["nama_laundry"] ?></td>
+                    <td><?= $cucian["nama_pelanggan"] ?></td>
                     <td>
                         <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
                             <?= $cucian["estimasi_item"] ?> item
@@ -106,12 +108,34 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
                     <td><?= $cucian["tipe_layanan"] ?></td>
-                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
+                    <td>Rp <?= number_format($cucian["total_harga"]) ?></td>
+                    <td>
+                        <!-- Tambahkan status tracker -->
+                        <?php include 'components/status-tracker.php'; ?>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
+            <!-- Add pagination controls -->
+            <div class="center">
+                <ul class="pagination">
+                    <?php if($page > 1): ?>
+                        <li><a href="?page=<?= $page-1 ?>"><i class="material-icons">chevron_left</i></a></li>
+                    <?php endif; ?>
+                    
+                    <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="<?= $i==$page ? 'active' : 'waves-effect' ?>">
+                            <a href="?page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <?php if($page < $total_pages): ?>
+                        <li><a href="?page=<?= $page+1 ?>"><i class="material-icons">chevron_right</i></a></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
         </div>
-        <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'"); ?>
+        <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM v_status_cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
             <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
@@ -129,18 +153,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                            $data = mysqli_query($connect, "SELECT pelanggan.nama FROM cucian INNER JOIN pelanggan ON pelanggan.id_pelanggan = cucian.id_pelanggan WHERE id_cucian = $idCucian");
-                            $data = mysqli_fetch_assoc($data);
-                            echo $data["nama"];
-                        ?>
-                    </td>
+                    <td><?= $idCucian = $cucian['id_cucian'] ?></td>
+                    <td><?= $cucian["nama_pelanggan"] ?></td>
                     <td>
                         <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
                             <?= $cucian["estimasi_item"] ?> item
@@ -192,12 +206,12 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         </form>
                     </td>
                     <td><?= $cucian["tipe_layanan"] ?></td>
-                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
+                    <td>Rp <?= number_format($cucian["total_harga"]) ?></td>
                 </tr>
                 <?php endwhile; ?>
             </table>
         </div>
-        <?php elseif ($login == "Pelanggan") : $query = mysqli_query($connect, "SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'"); ?>
+        <?php elseif ($login == "Pelanggan") : $query = mysqli_query($connect, "SELECT * FROM v_status_cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'"); ?>
         <div class="col s10 offset-s1">
             <?php include 'components/harga-preview.php'; ?>
             <table border=1 cellpadding=10 class="responsive-table centered">
@@ -214,18 +228,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </tr>
                 <?php while ($cucian = mysqli_fetch_assoc($query)) : ?>
                 <tr>
-                    <td>
-                        <?php
-                            echo $idCucian = $cucian['id_cucian'];
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                            $data = mysqli_query($connect, "SELECT agen.nama_laundry FROM cucian INNER JOIN agen ON agen.id_agen = cucian.id_agen WHERE id_cucian = $idCucian");
-                            $data = mysqli_fetch_assoc($data);
-                            echo $data["nama_laundry"];
-                        ?>
-                    </td>
+                    <td><?= $idCucian = $cucian['id_cucian'] ?></td>
+                    <td><?= $cucian["nama_laundry"] ?></td>
                     <td>
                         <?php if($cucian["tipe_layanan"] == "kiloan"): ?>
                             <?= $cucian["estimasi_item"] ?> item
@@ -246,13 +250,18 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
                     <td><?= $cucian["tipe_layanan"] ?></td>
-                    <td>Rp <?= number_format(hitungTotalBayar($idCucian)) ?></td>
+                    <td>Rp <?= number_format($cucian["total_harga"]) ?></td>
+                    <td>
+                        <!-- Tambahkan status tracker -->
+                        <?php include 'components/status-tracker.php'; ?>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
         </div>
         <?php endif; ?>
     </div>
+    <script src="js/status-handler.js"></script>
     <?php include "footer.php"; ?>
     <script src="js/harga-calculator.js"></script>
 </body>
@@ -278,7 +287,7 @@ if ( isset($_POST["simpanStatus"]) ){
         // isi data di tabel transaksi
         $tglMulai = $cucian["tgl_mulai"];
         $tglSelesai = date("Y-m-d H:i:s");
-        $totalBayar = $cucian["berat"] * $cucian["harga"];
+        $totalBayar = hitungTotal($idCucian);
         $idCucian = $cucian["id_cucian"];
         $idPelanggan = $cucian["id_pelanggan"];
         // masukkan ke tabel transaksi

@@ -42,6 +42,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     <?php include "headtags.html"; ?>
     <title>Transasksi - <?= $login ?></title>
     <script src="js/transaksi-handler.js"></script>
+    <script src="js/price-utils.js"></script>
 </head>
 <body>
 <?php include 'header.php'; ?>
@@ -70,19 +71,57 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                 </div>
             </div>
         </div>
-        <?php if ($login == "Admin") : ?>
-        <!-- Modifikasi query untuk paginasi -->
-        <?php 
-        $page = isset($_GET['page']) ? $_GET['page'] : 1;
-        $limit = 10;
-        $offset = ($page - 1) * $limit;
+        <div class="row">
+            <div class="input-field col s4">
+                <select id="filter_tipe" onchange="filterTransaksi(this.value)">
+                    <option value="all">Semua Tipe</option>
+                    <option value="kiloan">Kiloan</option>
+                    <option value="satuan">Satuan</option>
+                </select>
+                <label>Filter Tipe</label>
+            </div>
+            
+            <?php if($login == "Admin" || $login == "Agen"): ?>
+            <div class="col s8 right-align">
+                <button class="btn blue" onclick="exportData('pdf')">
+                    <i class="material-icons left">picture_as_pdf</i> PDF
+                </button>
+                <button class="btn green" onclick="exportData('excel')">
+                    <i class="material-icons left">grid_on</i> Excel
+                </button>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php if ($login == "Admin") : 
+            // Optimasi query dengan JOIN dan VIEW
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $limit = 10;
+            $offset = ($page - 1) * $limit;
 
-        $query = mysqli_query($connect, "SELECT c.*, dc.*, hs.*, h.harga as harga_kiloan 
-            FROM cucian c 
-            LEFT JOIN detail_cucian dc ON c.id_cucian = dc.id_cucian
-            LEFT JOIN harga_satuan hs ON dc.id_harga_satuan = hs.id_harga_satuan
-            LEFT JOIN harga h ON h.id_agen = c.id_agen AND h.jenis = c.jenis
-            LIMIT $limit OFFSET $offset");
+            $query = "SELECT t.*, c.tipe_layanan, c.berat, c.jenis, c.estimasi_item,
+                        a.nama_laundry, p.nama as nama_pelanggan,
+                        CASE 
+                            WHEN c.tipe_layanan = 'kiloan' THEN c.berat * h.harga
+                            ELSE (SELECT SUM(subtotal) FROM detail_cucian WHERE id_cucian = c.id_cucian)
+                        END as total_harga
+                      FROM transaksi t
+                      JOIN cucian c ON t.id_cucian = c.id_cucian
+                      JOIN agen a ON t.id_agen = a.id_agen 
+                      JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
+                      LEFT JOIN harga h ON h.id_agen = c.id_agen AND h.jenis = c.jenis
+                      ORDER BY t.tgl_mulai DESC
+                      LIMIT ? OFFSET ?";
+
+            $stmt = mysqli_prepare($connect, $query);
+            mysqli_stmt_bind_param($stmt, "ii", $limit, $offset);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            // Get total for pagination
+            $total_query = "SELECT COUNT(*) as total FROM transaksi";
+            $total_result = mysqli_query($connect, $total_query);
+            $total_data = mysqli_fetch_assoc($total_result)['total'];
+            $total_pages = ceil($total_data / $limit);
         ?>
         <div class="col s10 offset-s1">
             <table border=1 cellpadding=10 class="responsive-table centered">
@@ -102,8 +141,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Rating</td>
                     <td style="font-weight:bold;">Komentar</td>
                 </tr>
-                <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
-                <tr>
+                <?php while ($transaksi = mysqli_fetch_assoc($result)) : ?>
+                <tr class="data-row" data-tipe="<?= $cucian['tipe_layanan'] ?>">
                     <td><?php echo $kodeTransaksi = $transaksi["kode_transaksi"] ?></td>
                     <td>
                         <?php
@@ -166,9 +205,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <div class="center">
             <ul class="pagination">
                 <?php
-                $total = mysqli_num_rows(mysqli_query($connect, "SELECT * FROM cucian"));
-                $pages = ceil($total / $limit);
-                for($i = 1; $i <= $pages; $i++):
+                for($i = 1; $i <= $total_pages; $i++):
                 ?>
                 <li class="<?= $i==$page?'active':'' ?>">
                     <a href="?page=<?= $i ?>"><?= $i ?></a>
@@ -195,7 +232,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Komentar</td>
                 </tr>
                 <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
-                <tr>
+                <tr class="data-row" data-tipe="<?= $cucian['tipe_layanan'] ?>">
                     <td><?php echo $kodeTransaksi = $transaksi["kode_transaksi"] ?></td>
                     <td>
                         <?php
@@ -265,7 +302,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Feedback</td>
                 </tr>
                 <?php while ($transaksi = mysqli_fetch_assoc($query)) : ?>
-                <tr>
+                <tr class="data-row" data-tipe="<?= $cucian['tipe_layanan'] ?>">
                     <td><?php echo $kodeTransaksi = $transaksi["kode_transaksi"] ?></td>
                     <td>
                         <?php

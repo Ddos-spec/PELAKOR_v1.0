@@ -179,48 +179,74 @@ $pelanggan = mysqli_fetch_assoc($query);
 <?php
 
 if (isset($_POST["pesan"])) {
-    $alamat = htmlspecialchars($_POST["alamat"]);
-    $tipe_layanan = $_POST["tipe_layanan"];
-    $catatan = htmlspecialchars($_POST["catatan"]);
-    $tgl = date("Y-m-d H:i:s");
+    include 'functions/validasi-pesanan.php';
     
-    if($tipe_layanan == 'kiloan') {
-        $jenis = htmlspecialchars($_POST["jenis"]);
-        $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
+    $errors = validasiPesananBaru($_POST);
+    
+    if(empty($errors)) {
+        $alamat = htmlspecialchars($_POST["alamat"]);
+        $tipe_layanan = $_POST["tipe_layanan"];
+        $catatan = htmlspecialchars($_POST["catatan"]);
+        $tgl = date("Y-m-d H:i:s");
         
-        mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, tipe_layanan, estimasi_item, alamat, catatan, status_cucian) 
-            VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', 'kiloan', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan')");
-            
-    } else {
-        // Insert cucian satuan
-        mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, tipe_layanan, alamat, catatan, status_cucian) 
-            VALUES ($idAgen, $idPelanggan, '$tgl', 'satuan', '$alamat', '$catatan', 'Penjemputan')");
-        
-        $id_cucian = mysqli_insert_id($connect);
-        
-        // Insert detail items
-        foreach($_POST['items'] as $id_harga_satuan => $jumlah) {
-            if($jumlah > 0) {
-                $harga = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
-                $harga = mysqli_fetch_assoc($harga)['harga'];
-                $subtotal = $jumlah * $harga;
+        mysqli_begin_transaction($connect);
+        try {
+            if($tipe_layanan == 'kiloan') {
+                $jenis = htmlspecialchars($_POST["jenis"]);
+                $estimasi_item = htmlspecialchars($_POST["estimasi_item"]);
                 
-                mysqli_query($connect, "INSERT INTO detail_cucian (id_cucian, id_harga_satuan, jumlah, subtotal)
-                    VALUES ($id_cucian, $id_harga_satuan, $jumlah, $subtotal)");
+                mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, tipe_layanan, estimasi_item, alamat, catatan, status_cucian) 
+                    VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', 'kiloan', '$estimasi_item', '$alamat', '$catatan', 'Penjemputan')");
+                    
+            } else {
+                // Insert cucian satuan
+                mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, tipe_layanan, alamat, catatan, status_cucian) 
+                    VALUES ($idAgen, $idPelanggan, '$tgl', 'satuan', '$alamat', '$catatan', 'Penjemputan')");
+                
+                $id_cucian = mysqli_insert_id($connect);
+                
+                // Insert detail items
+                foreach($_POST['items'] as $id_harga_satuan => $jumlah) {
+                    if($jumlah > 0) {
+                        $harga = mysqli_query($connect, "SELECT harga FROM harga_satuan WHERE id_harga_satuan = $id_harga_satuan");
+                        $harga = mysqli_fetch_assoc($harga)['harga'];
+                        $subtotal = $jumlah * $harga;
+                        
+                        mysqli_query($connect, "INSERT INTO detail_cucian (id_cucian, id_harga_satuan, jumlah, subtotal)
+                            VALUES ($id_cucian, $id_harga_satuan, $jumlah, $subtotal)");
+                    }
+                }
             }
-        }
-    }
-
-    if (mysqli_affected_rows($connect) > 0) {
-        echo "
-            <script>
-                Swal.fire('Pesanan Berhasil Dibuat','Silahkan Pergi Ke Halaman Status Cucian','success').then(function(){
+            
+            mysqli_commit($connect);
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pesanan Berhasil Dibuat',
+                    text: 'Silahkan cek status cucian Anda',
+                    showConfirmButton: true
+                }).then(() => {
                     window.location = 'status.php';
                 });
-            </script>
-        ";
+            </script>";
+        } catch(Exception $e) {
+            mysqli_rollback($connect);
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan saat memproses pesanan'
+                });
+            </script>";
+        }
     } else {
-        echo mysqli_error($connect);
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Validasi Gagal',
+                html: '" . implode('<br>', $errors) . "'
+            });
+        </script>";
     }
 }
 

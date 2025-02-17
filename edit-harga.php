@@ -176,24 +176,30 @@ function ubahHarga($data){
 
 // jika user menekan tombol simpan harga
 if (isset($_POST["simpan"])) {
+    include 'functions/harga-handler.php';
+    
+    try {
+        $hargaCuci = htmlspecialchars($_POST["cuci"]);
+        $hargaSetrika = htmlspecialchars($_POST["setrika"]); 
+        $hargaKomplit = htmlspecialchars($_POST["komplit"]);
 
-    if ( ubahHarga($_POST) > 0)   {
-        echo "
-            <script>
-                Swal.fire('Data Berhasil Di Update','','success').then(function() {
-                    window.location = 'edit-harga.php';
-                });
-            </script>
-        ";
-    }else {
-        echo "
-            <script>
-                Swal.fire('Data Gagal Di Update','','error');
-            </script>
-        ";
-        mysqli_error($connect);
+        validasiHarga($hargaCuci);
+        validasiHarga($hargaSetrika);
+        validasiHarga($hargaKomplit);
+
+        updateHargaKiloan($idAgen, 'cuci', $hargaCuci);
+        updateHargaKiloan($idAgen, 'setrika', $hargaSetrika);
+        updateHargaKiloan($idAgen, 'komplit', $hargaKomplit);
+
+        echo "<script>
+            Swal.fire('Berhasil','Harga berhasil diupdate','success')
+            .then(() => location.reload());
+        </script>";
+    } catch(Exception $e) {
+        echo "<script>
+            Swal.fire('Gagal','Gagal mengupdate harga','error');
+        </script>";
     }
-
 }
 
 // jika user menekan tombol tambah harga satuan
