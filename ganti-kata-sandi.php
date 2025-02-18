@@ -45,7 +45,9 @@ if((isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]))){
     <h3 class="header col s24 light center">Ganti Kata Sandi</h3>
     <form action="" method="POST" class="col s18 center"> 
         <div class="input-field inline">
-            <input type="password" name="passwordLama" placeholder="Password Lama">
+            <?php if (!isset($_GET['id'])): ?>
+                <input type="password" name="passwordLama" placeholder="Password Lama">
+            <?php endif; ?>
             <input type="password" name="password" placeholder="Password Baru">
             <input type="password" name="repassword" placeholder="Konfirmasi Password Baru">
             <button class="waves-effect blue darken-2 btn" type="submit" name="gantiPassword">Ganti Password</button>
@@ -66,32 +68,59 @@ if (isset($_POST["gantiPassword"])){
 
     if ($login == 'Admin'){
         $idAdmin = $_SESSION["admin"];
-        $data = mysqli_query($connect, "SELECT * FROM admin WHERE id_admin = $idAdmin");
-        $data = mysqli_fetch_assoc($data);
+        
+        if (isset($_GET['id'])) {
+            // Admin resetting another user's password
+            $targetId = $_GET['id'];
+            $type = $_GET['type'];
+            
+            if ($password != $repassword) {
+                echo "
+                    <script>   
+                        Swal.fire('Password Baru Tidak Sama','','error').then(function() {
+                            window.location = 'ganti-kata-sandi.php';
+                        });
+                    </script>
+                ";
+                exit;
+            }
 
-        if ($passwordLama != $data["password"]) {
-            echo "
-                <script>   
-                    Swal.fire('Password Lama Salah','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-            exit;
+            if ($type == 'agen') {
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $query = mysqli_query($connect, "UPDATE agen SET password = '$password' WHERE id_agen = $targetId");
+            } else if ($type == 'pelanggan') {
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $query = mysqli_query($connect, "UPDATE pelanggan SET password = '$password' WHERE id_pelanggan = $targetId");
+            }
+        } else {
+            // Admin changing their own password
+            $data = mysqli_query($connect, "SELECT * FROM admin WHERE id_admin = $idAdmin");
+            $data = mysqli_fetch_assoc($data);
+
+            if ($passwordLama != $data["password"]) {
+                echo "
+                    <script>   
+                        Swal.fire('Password Lama Salah','','error').then(function() {
+                            window.location = 'ganti-kata-sandi.php';
+                        });
+                    </script>
+                ";
+                exit;
+            }
+
+            if ($password != $repassword) {
+                echo "
+                    <script>   
+                        Swal.fire('Password Baru Tidak Sama','','error').then(function() {
+                            window.location = 'ganti-kata-sandi.php';
+                        });
+                    </script>
+                ";
+                exit;
+            }
+
+            $query = mysqli_query($connect, "UPDATE admin SET password = '$password' WHERE id_admin = $idAdmin");
         }
-
-        if ($password != $repassword) {
-            echo "
-                <script>   
-                    Swal.fire('Password Baru Tidak Sama','','error').then(function() {
-                        window.location = 'ganti-kata-sandi.php';
-                    });
-                </script>
-            ";
-            exit;
-        }
-
-        $query = mysqli_query($connect, "UPDATE admin SET password = '$password' WHERE id_admin = $idAdmin");
         
         if (mysqli_affected_rows($connect) > 0) {
             echo "
