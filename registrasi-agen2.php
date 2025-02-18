@@ -98,61 +98,105 @@ $agen = mysqli_fetch_assoc($result);
 
 <?php
 
-function dataHarga($data){
+function dataHarga($data) {
     global $connect, $idAgen;
 
-    $cuci = htmlspecialchars($data["cuci"]);
-    $setrika = htmlspecialchars($data["setrika"]);
-    $komplit = htmlspecialchars($data["komplit"]);
+    // Validate and sanitize input
+    $cuci = filter_var($data["cuci"], FILTER_SANITIZE_NUMBER_INT);
+    $setrika = filter_var($data["setrika"], FILTER_SANITIZE_NUMBER_INT);
+    $komplit = filter_var($data["komplit"], FILTER_SANITIZE_NUMBER_INT);
 
-    validasiHarga($cuci);
-    validasiHarga($setrika);
-    validasiHarga($komplit);
+    // Set default minimum prices if values are 0 or invalid
+    $minPrice = 1000; // Minimum price in IDR
+    $cuci = ($cuci < $minPrice) ? $minPrice : $cuci;
+    $setrika = ($setrika < $minPrice) ? $minPrice : $setrika;
+    $komplit = ($komplit < $minPrice) ? $minPrice : $komplit;
 
-    $query2 = "INSERT INTO harga VALUES(
-        '',
-        'cuci',
-        '$idAgen',
-        '$cuci'
-    )";
-    $query3 = "INSERT INTO harga VALUES(
-        '',
-        'setrika',
-        '$idAgen',
-        '$setrika'
-    )";
-    $query4 = "INSERT INTO harga VALUES(
-        '',
-        'komplit',
-        '$idAgen',
-        '$komplit'
-    )";
+    // Validate prices
+    if (!validasiHarga($cuci) || !validasiHarga($setrika) || !validasiHarga($komplit)) {
+        return -1;
+    }
 
-    $result2 = mysqli_query($connect, $query2);
-    $result3 = mysqli_query($connect, $query3);
-    $result4 = mysqli_query($connect, $query4);
+    // Start transaction
+    mysqli_begin_transaction($connect);
 
-    return mysqli_affected_rows($connect);
+    try {
+        // Prepare insert queries with prepared statements
+        $queries = [
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('cuci', ?, ?)",
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('setrika', ?, ?)",
+            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('komplit', ?, ?)"
+        ];
+
+        $successCount = 0;
+        foreach ($queries as $query) {
+            $stmt = mysqli_prepare($connect, $query);
+            if ($stmt) {
+                // Bind the appropriate price based on query type
+                $price = match($query) {
+                    str_contains($query, 'cuci') => $cuci,
+                    str_contains($query, 'setrika') => $setrika,
+                    str_contains($query, 'komplit') => $komplit,
+                    default => 0
+                };
+                
+                mysqli_stmt_bind_param($stmt, "ii", $idAgen, $price);
+                if (mysqli_stmt_execute($stmt)) {
+                    $successCount++;
+                } else {
+                    throw new Exception(mysqli_stmt_error($stmt));
+                }
+                mysqli_stmt_close($stmt);
+            } else {
+                throw new Exception(mysqli_error($connect));
+            }
+        }
+
+        // Commit transaction
+        mysqli_commit($connect);
+        return $successCount;
+
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        mysqli_rollback($connect);
+        error_log("Error in dataHarga: " . $e->getMessage());
+        return -1;
+    }
 }
 
-if ( isset($_POST["submit"]) ){
+if (isset($_POST["submit"])) {
+    $result = dataHarga($_POST);
     
-
-    if ( dataHarga($_POST) > 0 ){
+    if ($result > 0) {
         echo "
             <script>
-                Swal.fire('Pendaftaran Berhasil','Data Harga Berhasil Ditambahkan','success').then(function(){
+                Swal.fire({
+                    title: 'Pendaftaran Berhasil',
+                    text: 'Data harga berhasil disimpan',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
                     window.location = 'index.php';
                 });
             </script>
         ";
-    }else {
+    } else {
+        $errorMsg = ($result == -1) ? "Terjadi kesalahan saat menyimpan data harga" : "Data harga tidak valid";
+        
         echo "
             <script>
-                alert('Data Gagal Ditambahkan !');
+                Swal.fire({
+                    title: 'Gagal',
+                    text: '$errorMsg',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             </script>
         ";
-        echo mysqli_error($connect);
+        
+        if($result == -1) {
+            error_log("Database error: " . mysqli_error($connect));
+        }
     }
 }
 

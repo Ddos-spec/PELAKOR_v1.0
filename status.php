@@ -315,16 +315,28 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 <?php
 
 function getItemPrice($item, $serviceType) {
-    $prices = [
-        'baju' => ['cuci' => 5000, 'setrika' => 3000, 'komplit' => 7000],
-        'celana' => ['cuci' => 4000, 'setrika' => 2500, 'komplit' => 6000],
-        'jaket' => ['cuci' => 6000, 'setrika' => 4000, 'komplit' => 9000],
-        'karpet' => ['cuci' => 8000, 'setrika' => 5000, 'komplit' => 10000],
-        'pakaian_khusus' => ['cuci' => 10000, 'setrika' => 6000, 'komplit' => 12000]
-    ];
+    global $connect;
     
-    $item = strtolower($item);
-    return $prices[$item][$serviceType] ?? 0;
+    // Get the agen ID from the cucian
+    $cucianId = $_GET['id'] ?? 0;
+    $query = mysqli_query($connect, "SELECT id_agen FROM cucian WHERE id_cucian = $cucianId");
+    $cucian = mysqli_fetch_assoc($query);
+    $idAgen = $cucian['id_agen'] ?? 0;
+    
+    // Get the price from database
+    $query = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$serviceType'");
+    if (!$query) {
+        error_log("Database error: " . mysqli_error($connect));
+        return 0;
+    }
+    
+    $price = mysqli_fetch_assoc($query);
+    if (!$price) {
+        error_log("No price found for service type: $serviceType");
+        return 0;
+    }
+    
+    return $price['harga'];
 }
 
 // STATUS CUCIAN

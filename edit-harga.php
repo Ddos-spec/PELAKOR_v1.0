@@ -67,61 +67,87 @@ $komplit = mysqli_fetch_assoc($komplit);
 
 
 // fungsi mengubah harga
-function ubahHarga($data){
+function ubahHarga($data) {
     global $connect, $idAgen;
 
-    $hargaCuci = htmlspecialchars($data["cuci"]);
-    $hargaSetrika = htmlspecialchars($data["setrika"]);
-    $hargaKomplit = htmlspecialchars($data["komplit"]);
+    // Validate and sanitize input
+    $hargaCuci = filter_var($data["cuci"], FILTER_SANITIZE_NUMBER_INT);
+    $hargaSetrika = filter_var($data["setrika"], FILTER_SANITIZE_NUMBER_INT);
+    $hargaKomplit = filter_var($data["komplit"], FILTER_SANITIZE_NUMBER_INT);
 
-    validasiHarga($hargaCuci);
-    validasiHarga($hargaSetrika);
-    validasiHarga($hargaKomplit);
+    // Validate prices
+    if (!validasiHarga($hargaCuci) || !validasiHarga($hargaSetrika) || !validasiHarga($hargaKomplit)) {
+        return -1;
+    }
 
-    $query1 = "UPDATE harga SET
-        harga = $hargaCuci
-        WHERE jenis = 'cuci' AND id_agen = $idAgen
-    ";
-    $query2 = "UPDATE harga SET
-        harga = $hargaSetrika
-        WHERE jenis = 'setrika' AND id_agen = $idAgen
-    ";
-    $query3 = "UPDATE harga SET
-        harga = $hargaKomplit
-        WHERE jenis = 'komplit' AND id_agen = $idAgen
-    ";
+    // Start transaction
+    mysqli_begin_transaction($connect);
 
-    mysqli_query($connect,$query1);
-    $hasil1 = mysqli_affected_rows($connect);
-    mysqli_query($connect,$query2);
-    $hasil2 = mysqli_affected_rows($connect);
-    mysqli_query($connect,$query3);
-    $hasil3 = mysqli_affected_rows($connect);
+    try {
+        // Prepare update queries
+        $queries = [
+            "UPDATE harga SET harga = $hargaCuci WHERE jenis = 'cuci' AND id_agen = $idAgen",
+            "UPDATE harga SET harga = $hargaSetrika WHERE jenis = 'setrika' AND id_agen = $idAgen",
+            "UPDATE harga SET harga = $hargaKomplit WHERE jenis = 'komplit' AND id_agen = $idAgen"
+        ];
 
-    return $hasil1+$hasil2+$hasil3;
+        $successCount = 0;
+        foreach ($queries as $query) {
+            if (mysqli_query($connect, $query)) {
+                $successCount++;
+            } else {
+                throw new Exception(mysqli_error($connect));
+            }
+        }
+
+        // Commit transaction
+        mysqli_commit($connect);
+        return $successCount;
+
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        mysqli_rollback($connect);
+        error_log("Error in ubahHarga: " . $e->getMessage());
+        return -1;
+    }
 }
 
 
 // jika user menekan tombol simpan harga
 if (isset($_POST["simpan"])) {
-
-    if ( ubahHarga($_POST) > 0)   {
+    $result = ubahHarga($_POST);
+    
+    if ($result > 0) {
         echo "
             <script>
-                Swal.fire('Data Berhasil Di Update','','success').then(function() {
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Prices updated successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
                     window.location = 'edit-harga.php';
                 });
             </script>
         ";
-    }else {
+    } else {
+        $errorMsg = ($result == -1) ? "Invalid price values entered" : "Failed to update prices. Please try again.";
+        
         echo "
             <script>
-                Swal.fire('Data Gagal Di Update','','error');
+                Swal.fire({
+                    title: 'Error',
+                    text: '$errorMsg',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             </script>
         ";
-        mysqli_error($connect);
+        
+        if ($result == -1) {
+            error_log("Database error: " . mysqli_error($connect));
+        }
     }
-
 }
 
 ?>

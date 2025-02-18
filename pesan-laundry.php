@@ -170,13 +170,38 @@ $pelanggan = mysqli_fetch_assoc($query);
                         <button class="btn-large blue darken-2" type="submit" name="pesan">Buat Pesanan</button>
                     </div>
                     <script>
-                        const itemPrices = {
-                            baju: { cuci: 5000, setrika: 3000, komplit: 7000 },
-                            celana: { cuci: 4000, setrika: 2500, komplit: 6000 },
-                            jaket: { cuci: 6000, setrika: 4000, komplit: 9000 },
-                            karpet: { cuci: 8000, setrika: 5000, komplit: 10000 },
-                            pakaian_khusus: { cuci: 10000, setrika: 6000, komplit: 12000 }
-                        };
+                        let itemPrices = {};
+
+                        // Fetch prices from database
+                        function fetchPrices() {
+                            const idAgen = <?= $idAgen ?>;
+                            fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (Object.keys(data).length === 0) {
+                                        throw new Error('No price data available');
+                                    }
+                                    itemPrices = data;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching prices:', error);
+                                    // Show error message to user
+                                    M.toast({html: 'Gagal memuat harga. Silakan coba lagi atau hubungi admin.', classes: 'red'});
+                                    // Disable order button
+                                    document.querySelector('button[name="pesan"]').disabled = true;
+                                });
+                        }
+
+                        // Initialize price calculation
+                        document.addEventListener('DOMContentLoaded', function() {
+                            fetchPrices();
+                            calculatePrice();
+                        });
 
                         function toggleQuantity(itemType) {
                             const checkbox = document.querySelector(`input[name="items[${itemType}]"]`);
