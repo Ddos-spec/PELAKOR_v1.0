@@ -1,10 +1,10 @@
 <?php
-session_start();
-
-// Session security settings
+// Session security settings must be set before session starts
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_samesite', 'Strict');
+
+session_start();
 
 // Session timeout (30 minutes)
 $inactive = 1800;
@@ -39,4 +39,5 @@ if (isset($_SESSION['user_agent']) && $_SESSION['user_agent'] !== $_SERVER['HTTP
     header('Location: login.php?security=1');
     exit();
 }
+?>
 ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 18 Feb 2025 pada 05.41
+-- Waktu pembuatan: 18 Feb 2025 pada 09.17
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -91,6 +91,10 @@ CREATE TABLE `job_tracking` (
   `id` int(11) NOT NULL,
   `id_transaksi` int(11) NOT NULL,
   `status` enum('received','washed','processed','finished') DEFAULT 'received',
+  `weight` decimal(10,2) NOT NULL,
+  `estimated_pickup_date` date DEFAULT NULL,
+  `actual_pickup_date` date DEFAULT NULL,
+  `notification_sent` tinyint(1) DEFAULT 0,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -120,6 +124,14 @@ CREATE TABLE `tb_akun` (
   `level` varchar(20) NOT NULL,
   `id_petugas` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tb_akun`
+--
+
+INSERT INTO `tb_akun` (`id_akun`, `username`, `password`, `level`, `id_petugas`) VALUES
+(3, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL),
+(4, 'petugas', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'petugas', NULL);
 
 -- --------------------------------------------------------
 
@@ -169,8 +181,11 @@ CREATE TABLE `tb_transaksi` (
   `tgl_transaksi` date NOT NULL,
   `waktu_transaksi` time NOT NULL,
   `status` int(11) NOT NULL,
+  `payment_status` enum('paid','unpaid') DEFAULT 'unpaid',
+  `invoice_number` varchar(20) DEFAULT NULL,
   `id_petugas` int(11) DEFAULT NULL,
-  `id_customer` int(11) DEFAULT NULL
+  `id_customer` int(11) DEFAULT NULL,
+  UNIQUE KEY `invoice_number` (`invoice_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -296,7 +311,7 @@ ALTER TABLE `laundry_types`
 -- AUTO_INCREMENT untuk tabel `tb_akun`
 --
 ALTER TABLE `tb_akun`
-  MODIFY `id_akun` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_akun` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_customer`

@@ -43,7 +43,7 @@ if (!isset($_SESSION['user_id'])) {
                 $query = "SELECT * FROM inventory";
                 $result = $conn->query($query);
                 
-                while ($row = $result->fetch_assoc()):
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)):
                 ?>
                 <tr>
                     <td><?= htmlspecialchars($row['id']) ?></td>

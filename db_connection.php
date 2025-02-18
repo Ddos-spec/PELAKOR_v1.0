@@ -6,7 +6,7 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 
 // Error handling configuration
-define('DB_SHOW_ERRORS', false); // Set to true in development, false in production
+define('DB_SHOW_ERRORS', true); // Set to true in development, false in production
 
 try {
     // Create PDO instance with additional options

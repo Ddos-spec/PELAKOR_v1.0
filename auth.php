@@ -45,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
             $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 
-            // Redirect based on user level
             $redirect = ($user['level'] === 'admin') ? 
                 'admin_dashboard.php' : 'officer_dashboard.php';
-            header("Location: $redirect");
+            header("Location: $redirect?login=success");
             exit();
         }
     } catch (PDOException $e) {

@@ -1,5 +1,8 @@
-<?php include 'auth_check.php'; ?>
-<?php include 'header.php'; ?>
+<?php 
+require_once 'db_connection.php';
+include 'auth_check.php'; 
+include 'header.php'; 
+?>
 
 <div class="container mt-4">
     <h1>Transaction Management</h1>
@@ -13,27 +16,35 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Invoice #</th>
                 <th>Customer</th>
                 <th>Date</th>
+                <th>Weight (kg)</th>
                 <th>Status</th>
+                <th>Payment</th>
+                <th>Est. Pickup</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $query = "SELECT t.id_transaksi, c.nama_customer, t.tgl_transaksi, t.status 
+            $query = "SELECT t.id_transaksi, c.nama_customer, t.tgl_transaksi, t.status,
+                             t.payment_status, t.invoice_number, jt.weight, jt.estimated_pickup_date
                       FROM tb_transaksi t
-                      JOIN tb_customer c ON t.id_customer = c.id_customer";
+                      JOIN tb_customer c ON t.id_customer = c.id_customer
+                      LEFT JOIN job_tracking jt ON t.id_transaksi = jt.id_transaksi";
             $result = $conn->query($query);
             
-            while ($row = $result->fetch_assoc()):
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)):
             ?>
             <tr>
-                <td><?= htmlspecialchars($row['id_transaksi']) ?></td>
+                <td><?= htmlspecialchars($row['invoice_number']) ?></td>
                 <td><?= htmlspecialchars($row['nama_customer']) ?></td>
                 <td><?= htmlspecialchars($row['tgl_transaksi']) ?></td>
+                <td><?= htmlspecialchars($row['weight']) ?></td>
                 <td><?= getStatusText($row['status']) ?></td>
+                <td><?= htmlspecialchars(ucfirst($row['payment_status'])) ?></td>
+                <td><?= htmlspecialchars($row['estimated_pickup_date']) ?></td>
                 <td>
                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editTransactionModal"
                         data-id="<?= $row['id_transaksi'] ?>">
@@ -64,7 +75,7 @@
                         <select class="form-select" id="customerSelect" required>
                             <?php
                             $customers = $conn->query("SELECT id_customer, nama_customer FROM tb_customer");
-                            while ($customer = $customers->fetch_assoc()):
+                            while ($customer = $customers->fetch(PDO::FETCH_ASSOC)):
                             ?>
                             <option value="<?= $customer['id_customer'] ?>">
                                 <?= htmlspecialchars($customer['nama_customer']) ?>
@@ -75,6 +86,14 @@
                     <div class="mb-3">
                         <label for="transactionDate" class="form-label">Date</label>
                         <input type="date" class="form-control" id="transactionDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transactionWeight" class="form-label">Weight (kg)</label>
+                        <input type="number" step="0.1" class="form-control" id="transactionWeight" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="estimatedPickup" class="form-label">Estimated Pickup Date</label>
+                        <input type="date" class="form-control" id="estimatedPickup" required>
                     </div>
                     <div class="mb-3">
                         <label for="transactionStatus" class="form-label">Status</label>
