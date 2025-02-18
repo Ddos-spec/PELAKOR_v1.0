@@ -30,11 +30,10 @@ include 'connect-db.php';
             <div class="card">
                 <div class="card-image center">
                     <img src="img/logo.png">
-                    <h5 class="header light">Nadya Oktaviana</h5>
+                    <h5 class="header light">Fadjar Aryo Seto</h5>
                 </div>
                 <div class="card-content">
-                <p>I am a very simple card. I am good at containing small bits of information.
-                I am convenient because I require little markup to use effectively.</p>
+                <p>YAUDAH INTINYA ALHAMDULILLAH.</p>
                 </div>
                 <div class="card-action">
                 <a href="#">This is a link</a>
@@ -45,47 +44,17 @@ include 'connect-db.php';
             <div class="card">
                 <div class="card-image center">
                     <img src="img/logo.png">
-                    <h5 class="header light">Eka Nadya</h5>
+                    <h5 class="header light">Adam GPT</h5>
                 </div>
                 <div class="card-content">
-                <p>I am a very simple card. I am good at containing small bits of information.
-                I am convenient because I require little markup to use effectively.</p>
+                <p>THE BEST SUPPORT SYSTEM AING.</p>
                 </div>
                 <div class="card-action">
                 <a href="#">This is a link</a>
                 </div>
             </div>
         </div>
-        <div class="col s2">
-            <div class="card">
-                <div class="card-image center">
-                    <img src="img/logo.png">
-                    <h5 class="header light">Hairul Lana</h5>
-                </div>
-                <div class="card-content">
-                <p>I am a very simple card. I am good at containing small bits of information.
-                I am convenient because I require little markup to use effectively.</p>
-                </div>
-                <div class="card-action">
-                <a href="#">This is a link</a>
-                </div>
-            </div>
-        </div>
-        <div class="col s2">
-            <div class="card">
-                <div class="card-image center">
-                    <img src="img/logo.png">
-                    <h5 class="header light">Wina Artha</h5>
-                </div>
-                <div class="card-content">
-                <p>I am a very simple card. I am good at containing small bits of information.
-                I am convenient because I require little markup to use effectively.</p>
-                </div>
-                <div class="card-action">
-                <a href="#">This is a link</a>
-                </div>
-            </div>
-        </div>
+        
     </div>
     <!-- end body -->
 

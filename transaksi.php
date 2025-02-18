@@ -31,7 +31,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
     ";
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -58,6 +57,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Berat</td>
                     <td style="font-weight:bold;">Jenis</td>
                     <td style="font-weight:bold;">Total Bayar</td>
+                    <td style="font-weight:bold;">Status Pembayaran</td>
                     <td style="font-weight:bold;">Tanggal Pesan</td>
                     <td style="font-weight:bold;">Tanggal Selesai</td>
                     <td style="font-weight:bold;">Rating</td>
@@ -93,6 +93,20 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
+                    <td>
+                        <span class="payment-status <?= strtolower($transaksi['status_pembayaran']) ?>">
+                            <i class="material-icons">
+                                <?php 
+                                    switch($transaksi['status_pembayaran']) {
+                                        case 'Pending': echo 'access_time'; break;
+                                        case 'Paid': echo 'check_circle'; break;
+                                        case 'Failed': echo 'error'; break;
+                                    }
+                                ?>
+                            </i>
+                            <?= $transaksi["status_pembayaran"] ?>
+                        </span>
+                    </td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
                     <td>
@@ -110,7 +124,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         </div>
         <?php elseif ($login == "Agen") : $query = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = '$idAgen'"); ?>
         <div class="col s10 offset-s1">
-        <table border=1 cellpadding=10 class="responsive-table centered">
+            <table border=1 cellpadding=10 class="responsive-table centered">
                 <tr>
                     <td style="font-weight:bold">Kode Transaksi</td>
                     <td style="font-weight:bold">Pelanggan</td>
@@ -118,6 +132,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Berat</td>
                     <td style="font-weight:bold">Jenis</td>
                     <td style="font-weight:bold">Total Bayar</td>
+                    <td style="font-weight:bold">Status Pembayaran</td>
                     <td style="font-weight:bold">Tanggal Pesan</td>
                     <td style="font-weight:bold">Tanggal Selesai</td>
                     <td style="font-weight:bold">Rating</td>
@@ -145,6 +160,20 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
+                    <td>
+                        <span class="payment-status <?= strtolower($transaksi['status_pembayaran']) ?>">
+                            <i class="material-icons">
+                                <?php 
+                                    switch($transaksi['status_pembayaran']) {
+                                        case 'Pending': echo 'access_time'; break;
+                                        case 'Paid': echo 'check_circle'; break;
+                                        case 'Failed': echo 'error'; break;
+                                    }
+                                ?>
+                            </i>
+                            <?= $transaksi["status_pembayaran"] ?>
+                        </span>
+                    </td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
                     <td>
@@ -170,6 +199,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold">Berat</td>
                     <td style="font-weight:bold">Jenis</td>
                     <td style="font-weight:bold">Total Bayar</td>
+                    <td style="font-weight:bold">Status Pembayaran</td>
                     <td style="font-weight:bold">Tanggal Pesan</td>
                     <td style="font-weight:bold">Tanggal Selesai</td>
                     <td style="font-weight:bold">Rating</td>
@@ -197,6 +227,20 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $transaksi["total_bayar"] ?></td>
+                    <td>
+                        <span class="payment-status <?= strtolower($transaksi['status_pembayaran']) ?>">
+                            <i class="material-icons">
+                                <?php 
+                                    switch($transaksi['status_pembayaran']) {
+                                        case 'Pending': echo 'access_time'; break;
+                                        case 'Paid': echo 'check_circle'; break;
+                                        case 'Failed': echo 'error'; break;
+                                    }
+                                ?>
+                            </i>
+                            <?= $transaksi["status_pembayaran"] ?>
+                        </span>
+                    </td>
                     <td><?= $transaksi["tgl_mulai"] ?></td>
                     <td><?= $transaksi["tgl_selesai"] ?></td>
                     <td>
@@ -226,7 +270,7 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <?php if ( $transaksi["komentar"] == "" ) : ?>
                             <form action="" method="post">
                                 <input type="hidden" value="<?= $kodeTransaksi ?>" name="kodeTransaksi">
-                                <textarea name="komentar" class="materialize-textarea" id="" cols="30" rows="10" placeholder="Masukkan Komentar"></textarea>
+                                <textarea name="komentar", class="materialize-textarea" id="" cols="30" rows="10" placeholder="Masukkan Komentar"></textarea>
                                 <div class="center"><button class="btn blue darken-2" type="submit" name="kirimKomentar"><i class="material-icons">send</i></button></div>
                             </form>
                         <?php else : ?>
@@ -244,7 +288,6 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 </html>
 
 <?php
-
 
 // jika pelanggan rating
 if ( isset($_POST["simpanRating"]) ){

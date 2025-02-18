@@ -88,6 +88,11 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
+                    <td>
+                        <button class="btn modal-trigger" data-target="modal-<?= $cucian['id_cucian'] ?>">
+                            View Details
+                        </button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -186,8 +191,24 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
-                    <td><?= $cucian["status_cucian"] ?></td>
-                    
+                    <td>
+                        <span class="status-badge <?= str_replace(' ', '-', strtolower($cucian['status_cucian'])) ?>">
+                            <i class="material-icons">
+                                <?php 
+                                    switch($cucian['status_cucian']) {
+                                        case 'Penjemputan': echo 'directions_car'; break;
+                                        case 'Sedang di Cuci': echo 'local_laundry_service'; break;
+                                        case 'Sedang Di Jemur': echo 'wb_sunny'; break;
+                                        case 'Sedang di Setrika': echo 'iron'; break;
+                                        case 'Pengantaran': echo 'local_shipping'; break;
+                                        case 'Selesai': echo 'check_circle'; break;
+                                        default: echo 'info'; break;
+                                    }
+                                ?>
+                            </i>
+                            <?= $cucian["status_cucian"] ?>
+                        </span>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -195,11 +216,116 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
         <?php endif; ?>
     </div>
     <?php include "footer.php"; ?>
+    
+    <style>
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .penjemputan { 
+            background-color: #2196F3;
+            background: linear-gradient(45deg, #2196F3, #64B5F6);
+        }
+        .sedang-di-cuci { 
+            background-color: #FFC107;
+            background: linear-gradient(45deg, #FFC107, #FFD54F);
+        }
+        .sedang-di-jemur { 
+            background-color: #4CAF50;
+            background: linear-gradient(45deg, #4CAF50, #81C784);
+        }
+        .sedang-di-setrika { 
+            background-color: #9C27B0;
+            background: linear-gradient(45deg, #9C27B0, #BA68C8);
+        }
+        .pengantaran { 
+            background-color: #FF5722;
+            background: linear-gradient(45deg, #FF5722, #FF8A65);
+        }
+        .selesai { 
+            background-color: #607D8B;
+            background: linear-gradient(45deg, #607D8B, #90A4AE);
+        }
+        
+        .status-badge i {
+            font-size: 1.2em;
+        }
+    </style>
+    
+    <!-- Modals -->
+    <?php while($cucian = mysqli_fetch_assoc($query)): ?>
+    <div id="modal-<?= $cucian['id_cucian'] ?>" class="modal">
+        <div class="modal-content">
+            <h4>Order Details #<?= $cucian['id_cucian'] ?></h4>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Item Type</th>
+                        <th>Quantity</th>
+                        <th>Price per Item</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $items = explode(', ', $cucian['item_type']);
+                    foreach($items as $item):
+                        list($itemName, $quantity) = explode(' (', $item);
+                        $quantity = str_replace(')', '', $quantity);
+                        $price = getItemPrice($itemName, $cucian['jenis']);
+                    ?>
+                    <tr>
+                        <td><?= $itemName ?></td>
+                        <td><?= $quantity ?></td>
+                        <td>Rp <?= number_format($price, 0, ',', '.') ?></td>
+                        <td>Rp <?= number_format($price * $quantity, 0, ',', '.') ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close btn">Close</a>
+        </div>
+    </div>
+    <?php endwhile; ?>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems);
+        });
+    </script>
 </body>
 </html>
 
 <?php
 
+function getItemPrice($item, $serviceType) {
+    $prices = [
+        'baju' => ['cuci' => 5000, 'setrika' => 3000, 'komplit' => 7000],
+        'celana' => ['cuci' => 4000, 'setrika' => 2500, 'komplit' => 6000],
+        'jaket' => ['cuci' => 6000, 'setrika' => 4000, 'komplit' => 9000],
+        'karpet' => ['cuci' => 8000, 'setrika' => 5000, 'komplit' => 10000],
+        'pakaian_khusus' => ['cuci' => 10000, 'setrika' => 6000, 'komplit' => 12000]
+    ];
+    
+    $item = strtolower($item);
+    return $prices[$item][$serviceType] ?? 0;
+}
 
 // STATUS CUCIAN
 if ( isset($_POST["simpanStatus"]) ){

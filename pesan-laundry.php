@@ -102,29 +102,55 @@ $pelanggan = mysqli_fetch_assoc($query);
                     <h3 class="header light center">Info Paket Laundry</h3>
                     <br>
                     <div class="input-field">
-                        <label for="total">Total Pakaian</label>
-                        <input type="text" name="total" value="1">
+                        <h5>Pilih Jenis Pakaian:</h5>
+                        <div class="item-selection">
+                            <label>
+                                <input type="checkbox" class="item-checkbox" name="items[baju]" value="baju" onchange="toggleQuantity('baju')">
+                                <span>Baju</span>
+                                <input type="number" name="quantities[baju]" id="quantity-baju" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
+                            </label>
+                            <label>
+                                <input type="checkbox" class="item-checkbox" name="items[celana]" value="celana" onchange="toggleQuantity('celana')">
+                                <span>Celana</span>
+                                <input type="number" name="quantities[celana]" id="quantity-celana" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
+                            </label>
+                            <label>
+                                <input type="checkbox" class="item-checkbox" name="items[jaket]" value="jaket" onchange="toggleQuantity('jaket')">
+                                <span>Jaket</span>
+                                <input type="number" name="quantities[jaket]" id="quantity-jaket" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
+                            </label>
+                            <label>
+                                <input type="checkbox" class="item-checkbox" name="items[karpet]" value="karpet" onchange="toggleQuantity('karpet')">
+                                <span>Karpet</span>
+                                <input type="number" name="quantities[karpet]" id="quantity-karpet" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
+                            </label>
+                            <label>
+                                <input type="checkbox" class="item-checkbox" name="items[pakaian_khusus]" value="pakaian_khusus" onchange="toggleQuantity('pakaian_khusus')">
+                                <span>Pakaian Khusus</span>
+                                <input type="number" name="quantities[pakaian_khusus]" id="quantity-pakaian_khusus" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
+                            </label>
+                        </div>
                     </div>
                     <div class="input-field">
                         <ul>
                             <li><label for="jenis">Jenis Paket</label></li>
                             <li>
                             <?php if ($jenis == NULL) : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
+                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
+                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
+                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
                             <?php elseif ($jenis == "cuci") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" checked/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
+                                <label><input id="jenis" name="jenis" value="cuci" type="radio" checked onchange="calculatePrice()"/><span>Cuci</span> </label>
+                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
+                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
                             <?php elseif ($jenis == "setrika") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" checked/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
+                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
+                                <label><input id="jenis" name="jenis" value="setrika" type="radio" checked onchange="calculatePrice()"/><span>Setrika</span> </label>
+                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
                             <?php elseif ($jenis == "komplit") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" checked/><span>Komplit</span></label><li>
+                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
+                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
+                                <label><input id="jenis" name="jenis" value="komplit" type="radio" checked onchange="calculatePrice()"/><span>Komplit</span></label><li>
                             <?php else : ?>
                                 <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
                                 <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
@@ -137,9 +163,50 @@ $pelanggan = mysqli_fetch_assoc($query);
                         <label for="catatan">Catatan</label>
                         <textarea class="materialize-textarea" name="catatan" id="catatan" cols="30" rows="10" placeholder="Tulis catatan untuk agen"></textarea>
                     </div>
+                    <div class="input-field">
+                        <h4>Perkiraan Harga: <span id="pricePreview">Rp 0</span></h4>
+                    </div>
                     <div class="input-field center">
                         <button class="btn-large blue darken-2" type="submit" name="pesan">Buat Pesanan</button>
                     </div>
+                    <script>
+                        const itemPrices = {
+                            baju: { cuci: 5000, setrika: 3000, komplit: 7000 },
+                            celana: { cuci: 4000, setrika: 2500, komplit: 6000 },
+                            jaket: { cuci: 6000, setrika: 4000, komplit: 9000 },
+                            karpet: { cuci: 8000, setrika: 5000, komplit: 10000 },
+                            pakaian_khusus: { cuci: 10000, setrika: 6000, komplit: 12000 }
+                        };
+
+                        function toggleQuantity(itemType) {
+                            const checkbox = document.querySelector(`input[name="items[${itemType}]"]`);
+                            const quantityInput = document.getElementById(`quantity-${itemType}`);
+                            quantityInput.disabled = !checkbox.checked;
+                            if (!checkbox.checked) {
+                                quantityInput.value = 0;
+                            }
+                            calculatePrice();
+                        }
+
+                        function calculatePrice() {
+                            const serviceType = document.querySelector('input[name="jenis"]:checked').value;
+                            let totalPrice = 0;
+                            
+                            ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
+                                const quantity = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
+                                if (quantity > 0) {
+                                    totalPrice += quantity * itemPrices[item][serviceType];
+                                }
+                            });
+
+                            document.getElementById('pricePreview').innerText = `Rp ${totalPrice.toLocaleString()}`;
+                        }
+
+                        // Initialize price calculation on page load
+                        document.addEventListener('DOMContentLoaded', function() {
+                            calculatePrice();
+                        });
+                    </script>
                 </div>
             </form>
         </div>
@@ -162,10 +229,24 @@ if (isset($_POST["pesan"])){
     $jenis = htmlspecialchars($_POST["jenis"]);
     $catatan = htmlspecialchars($_POST["catatan"]);
     $tgl = htmlspecialchars(date("Y-m-d H:i:s"));
-    $total = htmlspecialchars($_POST["total"]);
+    
+    // Process items and quantities
+    $items = $_POST['items'] ?? [];
+    $quantities = $_POST['quantities'] ?? [];
+    $totalItems = 0;
+    $itemDetails = [];
+    
+    foreach ($items as $item => $value) {
+        $quantity = (int)($quantities[$item] ?? 0);
+        if ($quantity > 0) {
+            $totalItems += $quantity;
+            $itemDetails[] = ucfirst($item) . ' (' . $quantity . ')';
+        }
+    }
+    
+    $itemType = implode(', ', $itemDetails);
 
-
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, total_item, alamat, catatan, status_cucian) VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', $total, '$alamat', '$catatan', 'Penjemputan')");
+    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, item_type, total_item, alamat, catatan, status_cucian) VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$itemType', $totalItems, '$alamat', '$catatan', 'Penjemputan')");
 
     if (mysqli_affected_rows($connect) > 0){
         echo "
