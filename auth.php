@@ -2,11 +2,25 @@
 session_start();
 require_once 'db_connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+// Session security settings
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 
-    // Validate input
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limiting (basic implementation)
+    if (isset($_SESSION['last_login_attempt']) && 
+        time() - $_SESSION['last_login_attempt'] < 5) {
+        $_SESSION['error'] = 'Too many attempts. Please wait.';
+        header('Location: login.php');
+        exit();
+    }
+    $_SESSION['last_login_attempt'] = time();
+
+    // Validate and sanitize input
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+
     if (empty($username) || empty($password)) {
         $_SESSION['error'] = 'Please fill in all fields';
         header('Location: login.php');
@@ -14,31 +28,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Check user credentials
-    $query = "SELECT * FROM tb_akun WHERE username = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    try {
+        $query = "SELECT * FROM tb_akun WHERE username = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            // Set session variables
+        if ($user && password_verify($password, $user['password'])) {
+            // Regenerate session ID to prevent session fixation
+            session_regenerate_id(true);
+
+            // Set secure session variables
             $_SESSION['user_id'] = $user['id_akun'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['level'] = $user['level'];
+            $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+            $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 
             // Redirect based on user level
-            if ($user['level'] === 'admin') {
-                header('Location: admin_dashboard.php');
-            } else {
-                header('Location: officer_dashboard.php');
-            }
+            $redirect = ($user['level'] === 'admin') ? 
+                'admin_dashboard.php' : 'officer_dashboard.php';
+            header("Location: $redirect");
             exit();
         }
+    } catch (PDOException $e) {
+        error_log('Login error: ' . $e->getMessage());
     }
 
-    // If authentication fails
+    // Generic error message to prevent user enumeration
     $_SESSION['error'] = 'Invalid username or password';
     header('Location: login.php');
     exit();
