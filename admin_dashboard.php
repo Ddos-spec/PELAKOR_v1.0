@@ -1,5 +1,8 @@
-<?php include 'auth_check.php'; ?>
-<?php include 'header.php'; ?>
+<!DOCTYPE html>
+<?php 
+include 'auth_check.php';
+include 'header.php';
+?>
 
 <div class="container mt-4">
     <h1>Admin Dashboard</h1>
