@@ -47,6 +47,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['level'] !== 'officer') {
                     </div>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Inventory Management</h5>
+                        <a href="inventory.php" class="btn btn-primary">Manage Inventory</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 17 Feb 2025 pada 18.32
+-- Waktu pembuatan: 18 Feb 2025 pada 05.41
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -24,6 +24,21 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `coupons`
+--
+
+CREATE TABLE `coupons` (
+  `id` int(11) NOT NULL,
+  `code` varchar(20) NOT NULL,
+  `id_customer` int(11) NOT NULL,
+  `weight_limit` decimal(10,2) DEFAULT 5.00,
+  `used` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `detail_transaksi`
 --
 
@@ -34,6 +49,62 @@ CREATE TABLE `detail_transaksi` (
   `total_harga` int(11) NOT NULL,
   `id_transaksi` int(11) DEFAULT NULL,
   `id_jenis_cucian` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `financial_reports`
+--
+
+CREATE TABLE `financial_reports` (
+  `id` int(11) NOT NULL,
+  `report_type` enum('income','expense') NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `description` text DEFAULT NULL,
+  `report_date` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `inventory`
+--
+
+CREATE TABLE `inventory` (
+  `id` int(11) NOT NULL,
+  `item_name` varchar(100) NOT NULL,
+  `item_type` enum('detergent','equipment') NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `last_restock` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `job_tracking`
+--
+
+CREATE TABLE `job_tracking` (
+  `id` int(11) NOT NULL,
+  `id_transaksi` int(11) NOT NULL,
+  `status` enum('received','washed','processed','finished') DEFAULT 'received',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `laundry_types`
+--
+
+CREATE TABLE `laundry_types` (
+  `id` int(11) NOT NULL,
+  `type_name` varchar(100) NOT NULL,
+  `price_per_kg` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -107,12 +178,45 @@ CREATE TABLE `tb_transaksi` (
 --
 
 --
+-- Indeks untuk tabel `coupons`
+--
+ALTER TABLE `coupons`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `id_customer` (`id_customer`);
+
+--
 -- Indeks untuk tabel `detail_transaksi`
 --
 ALTER TABLE `detail_transaksi`
   ADD PRIMARY KEY (`id_detail_transaksi`),
   ADD KEY `id_transaksi` (`id_transaksi`),
   ADD KEY `id_jenis_cucian` (`id_jenis_cucian`);
+
+--
+-- Indeks untuk tabel `financial_reports`
+--
+ALTER TABLE `financial_reports`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `inventory`
+--
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `job_tracking`
+--
+ALTER TABLE `job_tracking`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_transaksi` (`id_transaksi`);
+
+--
+-- Indeks untuk tabel `laundry_types`
+--
+ALTER TABLE `laundry_types`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indeks untuk tabel `tb_akun`
@@ -153,10 +257,40 @@ ALTER TABLE `tb_transaksi`
 --
 
 --
+-- AUTO_INCREMENT untuk tabel `coupons`
+--
+ALTER TABLE `coupons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT untuk tabel `detail_transaksi`
 --
 ALTER TABLE `detail_transaksi`
   MODIFY `id_detail_transaksi` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `financial_reports`
+--
+ALTER TABLE `financial_reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `inventory`
+--
+ALTER TABLE `inventory`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `job_tracking`
+--
+ALTER TABLE `job_tracking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `laundry_types`
+--
+ALTER TABLE `laundry_types`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_akun`
@@ -193,11 +327,23 @@ ALTER TABLE `tb_transaksi`
 --
 
 --
+-- Ketidakleluasaan untuk tabel `coupons`
+--
+ALTER TABLE `coupons`
+  ADD CONSTRAINT `coupons_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `tb_customer` (`id_customer`) ON DELETE CASCADE;
+
+--
 -- Ketidakleluasaan untuk tabel `detail_transaksi`
 --
 ALTER TABLE `detail_transaksi`
   ADD CONSTRAINT `detail_transaksi_ibfk_1` FOREIGN KEY (`id_transaksi`) REFERENCES `tb_transaksi` (`id_transaksi`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `detail_transaksi_ibfk_2` FOREIGN KEY (`id_jenis_cucian`) REFERENCES `tb_jenis_cucian` (`id_jenis_cucian`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `job_tracking`
+--
+ALTER TABLE `job_tracking`
+  ADD CONSTRAINT `job_tracking_ibfk_1` FOREIGN KEY (`id_transaksi`) REFERENCES `tb_transaksi` (`id_transaksi`) ON DELETE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `tb_akun`

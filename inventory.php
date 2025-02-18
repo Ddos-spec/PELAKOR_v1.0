@@ -40,23 +40,23 @@ if (!isset($_SESSION['user_id'])) {
             </thead>
             <tbody>
                 <?php
-                $query = "SELECT * FROM tb_inventory";
+                $query = "SELECT * FROM inventory";
                 $result = $conn->query($query);
                 
                 while ($row = $result->fetch_assoc()):
                 ?>
                 <tr>
-                    <td><?= htmlspecialchars($row['id_inventory']) ?></td>
-                    <td><?= htmlspecialchars($row['nama_inventory']) ?></td>
-                    <td><?= htmlspecialchars($row['stok']) ?></td>
+                    <td><?= htmlspecialchars($row['id']) ?></td>
+                    <td><?= htmlspecialchars($row['item_name']) ?></td>
+                    <td><?= htmlspecialchars($row['quantity']) ?></td>
                     <td>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editInventoryModal"
-                            data-id="<?= $row['id_inventory'] ?>"
-                            data-name="<?= htmlspecialchars($row['nama_inventory']) ?>"
-                            data-stock="<?= htmlspecialchars($row['stok']) ?>">
+                            data-id="<?= $row['id'] ?>"
+                            data-name="<?= htmlspecialchars($row['item_name']) ?>"
+                            data-stock="<?= htmlspecialchars($row['quantity']) ?>">
                             Edit
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteInventory(<?= $row['id_inventory'] ?>)">
+                        <button class="btn btn-sm btn-danger" onclick="deleteInventory(<?= $row['id'] ?>)">
                             Delete
                         </button>
                     </td>
