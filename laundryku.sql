@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 18 Feb 2025 pada 15.15
+-- Waktu pembuatan: 19 Feb 2025 pada 07.35
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -69,7 +69,9 @@ INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, 
 (5, 'Laundry WINA GANS', 'Wina Arth', '57109', 'agen3@gmail.com', 'Badung', 'Kuta No 22', 'DK 1234 AA', 'default.png', '$2y$10$tKrLGx8FMw8sCwuxIdUWgevKb0ikEozi8xseBV9CvBzUnUhOkHd1S'),
 (7, 'Hairul Laundry', 'Hairul Lana', '08321456378', 'agen5@gmail.com', 'Karangasem', 'Jl. Mawar No 78', 'DK 5432 AB', 'default.png', '$2y$10$ldHD7JtlC26H.EuNf.kMPO9aamXxsO3yRWagW/gKzUrWjcWezq/eO'),
 (9, 'Satan Laundry', 'Satan', '098527815618', 'agen6@gmail.com', 'Denpasar', 'Jl. Hehe No 77', 'DK 6666 DD', 'default.png', '$2y$10$IS1G8nhOpgY2EeVXppcz1u5sX.enw50eNYkRy9lli2wpnhlCu7PZG'),
-(10, 'IBM Laundry', 'IBM Shava', '083123456789', 'agen4@gmail.com', 'Bangli', 'Jl. Sumatra No 33', 'DK 5555 SM', 'default.png', '$2y$10$OB2C9R4kUHrhGaMi3eF6z.DrDnQzapZhPZTucYh4I.ckes73MoFxy');
+(10, 'IBM Laundry', 'IBM Shava', '083123456789', 'agen4@gmail.com', 'Bangli', 'Jl. Sumatra No 33', 'DK 5555 SM', 'default.png', '$2y$10$OB2C9R4kUHrhGaMi3eF6z.DrDnQzapZhPZTucYh4I.ckes73MoFxy'),
+(11, 'Pelakor Kilat', 'Kilat', '141414', 'kilat@gmail.com', 'dgvsgdhbf', 'rhrgzfgfrag', '4123412', 'default.png', '$2y$10$VbRLp28HuiJHq/ZRPscD8O.YTaeCQ/FK9/8WpvW3R1O2CJJUAjDC6'),
+(12, 'awdad', 'ajnawhdd', '684853634', 'test@gmail.com', 'dwawda', 'afawfa', '1231', 'default.png', '$2y$10$wi8BzRod80HRSVXE0e84gOCPNIdKljSbF7VLQ9mdmCPjKoYFAdNFC');
 
 -- --------------------------------------------------------
 
@@ -106,7 +108,8 @@ INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_
 (6, 7, 9, '2020-04-27', '0000-00-00', 'setrika', NULL, 1, NULL, NULL, 'Jl. Goa Gong, No 99, Kec Kuta Selatan (Rumah warna hitam), Badung', 'ngebut ya\r\n', 'Penjemputan'),
 (7, 5, 12, '2020-04-29', '0000-00-00', 'setrika', NULL, 4, NULL, 2, 'Jl. Umum No 77, Singaraja', 'yang sabar', 'Sedang Di Jemur'),
 (8, 5, 12, '2020-05-06', '0000-00-00', 'setrika', NULL, 5, NULL, 3, 'Jl. Umum No 77, Singaraja', 'Yang Harum ya beb', 'Sedang di Cuci'),
-(9, 5, 13, '2020-05-06', '0000-00-00', 'komplit', NULL, 1, NULL, 1, 'Jl. Semarang No 99, Semarang', 'tes', 'Selesai');
+(9, 5, 13, '2020-05-06', '0000-00-00', 'komplit', NULL, 1, NULL, 1, 'Jl. Semarang No 99, Semarang', 'tes', 'Selesai'),
+(10, 1, 14, '2025-02-18', '0000-00-00', 'setrika', 'Baju (2), Celana (1)', 3, NULL, NULL, 'fkwnalfdajlwkbfd, sdfsfhvdkhab', 'siap', 'Penjemputan');
 
 -- --------------------------------------------------------
 
@@ -118,44 +121,49 @@ CREATE TABLE `harga` (
   `id_harga` int(11) NOT NULL,
   `jenis` varchar(30) NOT NULL,
   `id_agen` int(11) NOT NULL,
-  `harga` int(11) NOT NULL
+  `harga` int(11) NOT NULL,
+  `harga_baju` int(11) DEFAULT NULL,
+  `harga_celana` int(11) DEFAULT NULL,
+  `harga_jaket` int(11) DEFAULT NULL,
+  `harga_karpet` int(11) DEFAULT NULL,
+  `harga_pakaian_khusus` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `harga`
 --
 
-INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`) VALUES
-(1, 'cuci', 3, 2000),
-(2, 'setrika', 3, 1000),
-(3, 'komplit', 3, 2500),
-(4, 'cuci', 1, 5000),
-(5, 'setrika', 1, 3000),
-(6, 'komplit', 1, 7000),
-(7, 'cuci', 4, 300),
-(8, 'setrika', 4, 200),
-(9, 'komplit', 4, 400),
-(10, 'cuci', 5, 4000),
-(11, 'setrika', 5, 3000),
-(12, 'komplit', 5, 5000),
-(13, 'cuci', 6, 7000),
-(14, 'setrika', 6, 3000),
-(15, 'komplit', 6, 8000),
-(16, 'cuci', 7, 3000),
-(17, 'setrika', 7, 2000),
-(18, 'komplit', 7, 4500),
-(19, 'cuci', 8, 6000),
-(20, 'setrika', 8, 3000),
-(21, 'komplit', 8, 7500),
-(22, 'cuci', 9, 4000),
-(23, 'setrika', 9, 2000),
-(24, 'komplit', 9, 5000),
-(25, 'cuci', 10, 5000),
-(26, 'setrika', 10, 3000),
-(27, 'komplit', 10, 6000),
-(28, 'cuci', 10, 5000),
-(29, 'setrika', 10, 3000),
-(30, 'komplit', 10, 6000);
+INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`, `harga_baju`, `harga_celana`, `harga_jaket`, `harga_karpet`, `harga_pakaian_khusus`) VALUES
+(1, 'cuci', 3, 2000, NULL, NULL, NULL, NULL, NULL),
+(2, 'setrika', 3, 1000, NULL, NULL, NULL, NULL, NULL),
+(3, 'komplit', 3, 2500, NULL, NULL, NULL, NULL, NULL),
+(4, 'cuci', 1, 5000, NULL, NULL, NULL, NULL, NULL),
+(5, 'setrika', 1, 3000, NULL, NULL, NULL, NULL, NULL),
+(6, 'komplit', 1, 7000, NULL, NULL, NULL, NULL, NULL),
+(7, 'cuci', 4, 300, NULL, NULL, NULL, NULL, NULL),
+(8, 'setrika', 4, 200, NULL, NULL, NULL, NULL, NULL),
+(9, 'komplit', 4, 400, NULL, NULL, NULL, NULL, NULL),
+(10, 'cuci', 5, 4000, NULL, NULL, NULL, NULL, NULL),
+(11, 'setrika', 5, 3000, NULL, NULL, NULL, NULL, NULL),
+(12, 'komplit', 5, 5000, NULL, NULL, NULL, NULL, NULL),
+(13, 'cuci', 6, 7000, NULL, NULL, NULL, NULL, NULL),
+(14, 'setrika', 6, 3000, NULL, NULL, NULL, NULL, NULL),
+(15, 'komplit', 6, 8000, NULL, NULL, NULL, NULL, NULL),
+(16, 'cuci', 7, 3000, NULL, NULL, NULL, NULL, NULL),
+(17, 'setrika', 7, 2000, NULL, NULL, NULL, NULL, NULL),
+(18, 'komplit', 7, 4500, NULL, NULL, NULL, NULL, NULL),
+(19, 'cuci', 8, 6000, NULL, NULL, NULL, NULL, NULL),
+(20, 'setrika', 8, 3000, NULL, NULL, NULL, NULL, NULL),
+(21, 'komplit', 8, 7500, NULL, NULL, NULL, NULL, NULL),
+(22, 'cuci', 9, 4000, NULL, NULL, NULL, NULL, NULL),
+(23, 'setrika', 9, 2000, NULL, NULL, NULL, NULL, NULL),
+(24, 'komplit', 9, 5000, NULL, NULL, NULL, NULL, NULL),
+(25, 'cuci', 10, 5000, NULL, NULL, NULL, NULL, NULL),
+(26, 'setrika', 10, 3000, NULL, NULL, NULL, NULL, NULL),
+(27, 'komplit', 10, 6000, NULL, NULL, NULL, NULL, NULL),
+(28, 'cuci', 10, 5000, NULL, NULL, NULL, NULL, NULL),
+(29, 'setrika', 10, 3000, NULL, NULL, NULL, NULL, NULL),
+(30, 'komplit', 10, 6000, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -271,13 +279,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT untuk tabel `agen`
 --
 ALTER TABLE `agen`
-  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`

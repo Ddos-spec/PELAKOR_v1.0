@@ -56,6 +56,8 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Total Item</td>
                     <td style="font-weight:bold;">Berat</td>
                     <td style="font-weight:bold;">Jenis</td>
+                    <td style="font-weight:bold;">Harga Paket</td>
+                    <td style="font-weight:bold;">Harga Per Item</td>
                     <td style="font-weight:bold;">Total Bayar</td>
                     <td style="font-weight:bold;">Status Pembayaran</td>
                     <td style="font-weight:bold;">Tanggal Pesan</td>
@@ -92,6 +94,18 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     </td>
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
+                    <td>
+                        <?php
+                            $hargaPaket = getHargaPaket($cucian['jenis'], $cucian['id_agen']);
+                            echo "Rp " . number_format($hargaPaket, 0, ',', '.');
+                        ?>
+                    </td>
+                    <td>
+                        <?php
+                            $hargaPerItem = getHargaPerItem($cucian['jenis'], $cucian['id_agen']);
+                            echo "Rp " . number_format($hargaPerItem, 0, ',', '.');
+                        ?>
+                    </td>
                     <td><?= $transaksi["total_bayar"] ?></td>
                     <td>
                         <span class="payment-status <?= strtolower($transaksi['status_pembayaran']) ?>">

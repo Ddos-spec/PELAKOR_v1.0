@@ -59,6 +59,9 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td style="font-weight:bold;">Total Item</td>
                     <td style="font-weight:bold;">Berat (kg)</td>
                     <td style="font-weight:bold;">Jenis</td>
+                    <td style="font-weight:bold;">Harga Paket</td>
+                    <td style="font-weight:bold;">Harga Per Item</td>
+                    <td style="font-weight:bold;">Total Harga</td>
                     <td style="font-weight:bold;">Tanggal Dibuat</td>
                     <td style="font-weight:bold;">Status</td>
                 </tr>
@@ -86,6 +89,24 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                     <td><?= $cucian["total_item"] ?></td>
                     <td><?= $cucian["berat"] ?></td>
                     <td><?= $cucian["jenis"] ?></td>
+                    <td>
+                        <?php
+                            $hargaPaket = getHargaPaket($cucian['jenis'], $cucian['id_agen']);
+                            echo "Rp " . number_format($hargaPaket, 0, ',', '.');
+                        ?>
+                    </td>
+                    <td>
+                        <?php
+                            $hargaPerItem = getHargaPerItem($cucian['jenis'], $cucian['id_agen']);
+                            echo "Rp " . number_format($hargaPerItem, 0, ',', '.');
+                        ?>
+                    </td>
+                    <td>
+                        <?php
+                            $totalHarga = calculateTotalHarga($cucian);
+                            echo "Rp " . number_format($totalHarga, 0, ',', '.');
+                        ?>
+                    </td>
                     <td><?= $cucian["tgl_mulai"] ?></td>
                     <td><?= $cucian["status_cucian"] ?></td>
                     <td>
@@ -291,7 +312,15 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
                         <td><?= $itemName ?></td>
                         <td><?= $quantity ?></td>
                         <td>Rp <?= number_format($price, 0, ',', '.') ?></td>
-                        <td>Rp <?= number_format($price * $quantity, 0, ',', '.') ?></td>
+                    <td>
+                        <?php
+                        // Get the latest price from database
+                        $query = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$serviceType'");
+                        $latestPrice = mysqli_fetch_assoc($query);
+                        $price = $latestPrice['harga'] ?? $price; // Use latest price if available
+                        ?>
+                        Rp <?= number_format($price * $quantity, 0, ',', '.') ?>
+                    </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -313,6 +342,34 @@ if(isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])){
 </html>
 
 <?php
+
+function getHargaPaket($jenis, $idAgen) {
+    global $connect;
+    
+    $query = mysqli_query($connect, "SELECT harga_paket FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'");
+    $harga = mysqli_fetch_assoc($query);
+    
+    return $harga['harga_paket'] ?? 0;
+}
+
+function getHargaPerItem($jenis, $idAgen) {
+    global $connect;
+    
+    $query = mysqli_query($connect, "SELECT harga_per_item FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'");
+    $harga = mysqli_fetch_assoc($query);
+    
+    return $harga['harga_per_item'] ?? 0;
+}
+
+function calculateTotalHarga($cucian) {
+    global $connect;
+    
+    $hargaPaket = getHargaPaket($cucian['jenis'], $cucian['id_agen']);
+    $hargaPerItem = getHargaPerItem($cucian['jenis'], $cucian['id_agen']);
+    
+    // Calculate total based on package price + (number of items * per item price)
+    return $hargaPaket + ($cucian['total_item'] * $hargaPerItem);
+}
 
 function getItemPrice($item, $serviceType) {
     global $connect;

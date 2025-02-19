@@ -17,13 +17,10 @@ if (isset($_GET["jenis"])){
     $jenis = NULL;
 }
 
-
 // ambil data pelanggan
 $idPelanggan = $_SESSION["pelanggan"];
 $query = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
 $pelanggan = mysqli_fetch_assoc($query);
-
-
 
 ?>
 
@@ -285,7 +282,5 @@ if (isset($_POST["pesan"])){
         echo mysqli_error($connect);
     }
 }
-
-
 
 ?>

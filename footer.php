@@ -32,7 +32,7 @@
     </div>
     <div class="footer-copyright">
         <div class="container">
-            Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+            Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize & Bootstrap</a>
         </div>
     </div>
 </footer>
