@@ -171,17 +171,27 @@ $rating = calculateAgentRating($connect, $idAgen);
                     <!-- Service Type Selection -->
                     <div class="input-field">
                         <h5>Jenis Paket:</h5>
-                        <?php
-                        $serviceTypes = ['cuci', 'setrika', 'komplit'];
-                        foreach ($serviceTypes as $type):
-                            $checked = ($jenis === $type) ? 'checked' : '';
-                        ?>
-                            <label>
-                                <input type="radio" name="jenis" value="<?= $type ?>" 
-                                       <?= $checked ?> onchange="calculatePrice()" required>
-                                <span><?= ucfirst($type) ?></span>
-                            </label>
-                        <?php endforeach; ?>
+                        <div class="row">
+                            <?php
+                            $serviceTypes = [
+                                'cuci' => 'Cuci',
+                                'setrika' => 'Setrika', 
+                                'komplit' => 'Komplit'
+                            ];
+                            foreach ($serviceTypes as $type => $label):
+                                $checked = ($jenis === $type) ? 'checked' : '';
+                            ?>
+                                <div class="col s4">
+                                    <div class="card-panel hoverable">
+                                        <label>
+                                            <input type="radio" name="jenis" value="<?= $type ?>" 
+                                                   <?= $checked ?> onchange="calculatePrice()" required>
+                                            <span class="black-text"><?= $label ?></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
                     <!-- Additional Information -->
