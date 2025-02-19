@@ -1,286 +1,311 @@
 <?php
-
 session_start();
-include 'connect-db.php';
-include 'functions/functions.php';
+require_once 'connect-db.php';
+require_once 'functions/functions.php';
 
+// Authentication check
 cekPelanggan();
 
-// ambil data agen
-$idAgen = $_GET["id"];
-$query = mysqli_query($connect, "SELECT * FROM agen WHERE id_agen = '$idAgen'");
-$agen = mysqli_fetch_assoc($query);
-
-if (isset($_GET["jenis"])){
-    $jenis = $_GET["jenis"];
-}else {
-    $jenis = NULL;
+// Database helper functions
+function getAgentData($connect, $agentId) {
+    $query = mysqli_prepare($connect, "SELECT * FROM agen WHERE id_agen = ?");
+    mysqli_stmt_bind_param($query, "i", $agentId);
+    mysqli_stmt_execute($query);
+    return mysqli_fetch_assoc(mysqli_stmt_get_result($query));
 }
 
-// ambil data pelanggan
+function getCustomerData($connect, $customerId) {
+    $query = mysqli_prepare($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = ?");
+    mysqli_stmt_bind_param($query, "i", $customerId);
+    mysqli_stmt_execute($query);
+    return mysqli_fetch_assoc(mysqli_stmt_get_result($query));
+}
+
+function calculateAgentRating($connect, $agentId) {
+    $query = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ?");
+    mysqli_stmt_bind_param($query, "i", $agentId);
+    mysqli_stmt_execute($query);
+    $result = mysqli_stmt_get_result($query);
+    
+    $totalStars = 0;
+    $count = 0;
+    
+    while ($rating = mysqli_fetch_assoc($result)) {
+        $totalStars += $rating["rating"];
+        $count++;
+    }
+    
+    return $count > 0 ? ceil($totalStars / $count) : 0;
+}
+
+function createOrder($connect, $orderData) {
+    $query = mysqli_prepare($connect, 
+        "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, item_type, total_item, alamat, catatan, status_cucian) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Penjemputan')"
+    );
+    
+    mysqli_stmt_bind_param($query, "iisssiss",
+        $orderData['id_agen'],
+        $orderData['id_pelanggan'],
+        $orderData['tgl_mulai'],
+        $orderData['jenis'],
+        $orderData['item_type'],
+        $orderData['total_item'],
+        $orderData['alamat'],
+        $orderData['catatan']
+    );
+    
+    return mysqli_stmt_execute($query);
+}
+
+// Get request parameters
+$idAgen = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$jenis = filter_input(INPUT_GET, 'jenis', FILTER_SANITIZE_STRING);
 $idPelanggan = $_SESSION["pelanggan"];
-$query = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
-$pelanggan = mysqli_fetch_assoc($query);
+
+// Fetch data
+$agen = getAgentData($connect, $idAgen);
+$pelanggan = getCustomerData($connect, $idPelanggan);
+$rating = calculateAgentRating($connect, $idAgen);
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include 'headtags.html' ?>
+    <?php include 'headtags.html'; ?>
     <title>Pemesanan Laundry</title>
+    <style>
+        .item-selection {
+            margin: 20px 0;
+        }
+        .item-selection label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .item-quantity {
+            width: 60px !important;
+            margin-left: 10px !important;
+        }
+        .price-preview {
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <?php include 'header.php'; ?>
 
-    <!-- header -->
-    <?php include 'header.php' ?>
-    <!-- end header -->
-
-    <!-- body -->
-
-    <!-- info laundry -->
+    <!-- Laundry Information Section -->
     <div class="row">
         <div class="col s2 offset-s4">
-            <img src="img/logo.png" width="70%" />
-            <a id="download-button" class="btn waves-effect waves-light red darken-3" href="pesan-laundry.php?id=<?= $idAgen ?>">PESAN LAUNDRY</a>
+            <img src="img/logo.png" alt="Laundry Logo" class="responsive-img" style="width: 70%">
+            <a href="pesan-laundry.php?id=<?= htmlspecialchars($idAgen) ?>" 
+               class="btn waves-effect waves-light red darken-3">
+                PESAN LAUNDRY
+            </a>
         </div>
         <div class="col s6">
-            <h3><?= $agen["nama_laundry"] ?></h3>
+            <h3><?= htmlspecialchars($agen["nama_laundry"]) ?></h3>
             <ul>
                 <li>
-                    <?php
-                        $temp = $agen["id_agen"];
-                        $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                        $totalStar = 0;
-                        $i = 0;
-                        while ($star = mysqli_fetch_assoc($queryStar)){
-                            $totalStar += $star["rating"];
-                            $i++;
-                            $fixStar = ceil($totalStar / $i);
-                        }
-                            
-                        if ( $totalStar == 0 ) {
-                    ?>
-                        <fieldset class="bintang"><span class="starImg star-0"></span></fieldset>
-                    <?php }else { ?>
-                        <fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset>
-                    <?php } ?>
+                    <fieldset class="bintang">
+                        <span class="starImg star-<?= $rating ?>"></span>
+                    </fieldset>
                 </li>
-                <li>Alamat : <?= $agen["alamat"] . ", " . $agen["kota"] ?></li>
-                <li>No. HP : <?= $agen["telp"] ?></li>
+                <li>Alamat: <?= htmlspecialchars($agen["alamat"] . ", " . $agen["kota"]) ?></li>
+                <li>No. HP: <?= htmlspecialchars($agen["telp"]) ?></li>
             </ul>
         </div>
     </div>
-    <!-- end info laundry -->
-    
-    <!-- info pemesanan -->
+
+    <!-- Order Form Section -->
     <div class="row">
         <div class="col s10 offset-s1">
-            <form action="" method="post">
+            <form action="" method="post" id="orderForm">
+                <!-- Customer Information -->
                 <div class="col s5">
                     <h3 class="header light center">Data Diri</h3>
-                    <br>
                     <div class="input-field">
+                        <input id="nama" type="text" disabled value="<?= htmlspecialchars($pelanggan['nama']) ?>">
                         <label for="nama">Nama Penerima</label>
-                        <input id="nama" type="text" disabled value="<?= $pelanggan['nama'] ?>">
                     </div>
                     <div class="input-field">
+                        <input id="telp" type="text" disabled value="<?= htmlspecialchars($pelanggan['telp']) ?>">
                         <label for="telp">No Telp</label>
-                        <input id="telp" type="text" disabled value="<?= $pelanggan['telp'] ?>">
                     </div>
                     <div class="input-field">
+                        <textarea class="materialize-textarea" name="alamat" id="alamat" required><?= htmlspecialchars($pelanggan['alamat'] . ", " . $pelanggan['kota']) ?></textarea>
                         <label for="alamat">Alamat</label>
-                        <textarea class="materialize-textarea" name="alamat" id="alamat" cols="30" rows="10"><?= $pelanggan['alamat'] . ", " . $pelanggan['kota'] ?></textarea>
                     </div>
                 </div>
+
+                <!-- Laundry Package Information -->
                 <div class="col s5 offset-s1">
                     <h3 class="header light center">Info Paket Laundry</h3>
-                    <br>
+                    
+                    <!-- Item Selection -->
                     <div class="input-field">
                         <h5>Pilih Jenis Pakaian:</h5>
-                        <div class="item-selection">
-                            <label>
-                                <input type="checkbox" class="item-checkbox" name="items[baju]" value="baju" onchange="toggleQuantity('baju')">
-                                <span>Baju</span>
-                                <input type="number" name="quantities[baju]" id="quantity-baju" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
-                            </label>
-                            <label>
-                                <input type="checkbox" class="item-checkbox" name="items[celana]" value="celana" onchange="toggleQuantity('celana')">
-                                <span>Celana</span>
-                                <input type="number" name="quantities[celana]" id="quantity-celana" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
-                            </label>
-                            <label>
-                                <input type="checkbox" class="item-checkbox" name="items[jaket]" value="jaket" onchange="toggleQuantity('jaket')">
-                                <span>Jaket</span>
-                                <input type="number" name="quantities[jaket]" id="quantity-jaket" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
-                            </label>
-                            <label>
-                                <input type="checkbox" class="item-checkbox" name="items[karpet]" value="karpet" onchange="toggleQuantity('karpet')">
-                                <span>Karpet</span>
-                                <input type="number" name="quantities[karpet]" id="quantity-karpet" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
-                            </label>
-                            <label>
-                                <input type="checkbox" class="item-checkbox" name="items[pakaian_khusus]" value="pakaian_khusus" onchange="toggleQuantity('pakaian_khusus')">
-                                <span>Pakaian Khusus</span>
-                                <input type="number" name="quantities[pakaian_khusus]" id="quantity-pakaian_khusus" class="item-quantity" min="0" value="0" disabled onchange="calculatePrice()">
-                            </label>
-                        </div>
+                        <?php
+                        $items = ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'];
+                        foreach ($items as $item):
+                        ?>
+                            <div class="item-selection">
+                                <label>
+                                    <input type="checkbox" class="item-checkbox" 
+                                           name="items[<?= $item ?>]" value="<?= $item ?>"
+                                           onchange="toggleQuantity('<?= $item ?>')">
+                                    <span><?= ucfirst($item) ?></span>
+                                    <input type="number" name="quantities[<?= $item ?>]" 
+                                           id="quantity-<?= $item ?>" class="item-quantity"
+                                           min="0" value="0" disabled 
+                                           onchange="calculatePrice()">
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <div class="input-field">
-                        <ul>
-                            <li><label for="jenis">Jenis Paket</label></li>
-                            <li>
-                            <?php if ($jenis == NULL) : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "cuci") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" checked onchange="calculatePrice()"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "setrika") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" checked onchange="calculatePrice()"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" onchange="calculatePrice()"/><span>Komplit</span></label><li>
-                            <?php elseif ($jenis == "komplit") : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio" onchange="calculatePrice()"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio" onchange="calculatePrice()"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio" checked onchange="calculatePrice()"/><span>Komplit</span></label><li>
-                            <?php else : ?>
-                                <label><input id="jenis" name="jenis" value="cuci" type="radio"/><span>Cuci</span> </label>
-                                <label><input id="jenis" name="jenis" value="setrika" type="radio"/><span>Setrika</span> </label>
-                                <label><input id="jenis" name="jenis" value="komplit" type="radio"/><span>Komplit</span></label><li>
-                            <?php endif; ?>
 
-                        </ul>
-                    </div>
+                    <!-- Service Type Selection -->
                     <div class="input-field">
+                        <h5>Jenis Paket:</h5>
+                        <?php
+                        $serviceTypes = ['cuci', 'setrika', 'komplit'];
+                        foreach ($serviceTypes as $type):
+                            $checked = ($jenis === $type) ? 'checked' : '';
+                        ?>
+                            <label>
+                                <input type="radio" name="jenis" value="<?= $type ?>" 
+                                       <?= $checked ?> onchange="calculatePrice()" required>
+                                <span><?= ucfirst($type) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="input-field">
+                        <textarea class="materialize-textarea" name="catatan" id="catatan"></textarea>
                         <label for="catatan">Catatan</label>
-                        <textarea class="materialize-textarea" name="catatan" id="catatan" cols="30" rows="10" placeholder="Tulis catatan untuk agen"></textarea>
                     </div>
-                    <div class="input-field">
+
+                    <div class="price-preview">
                         <h4>Perkiraan Harga: <span id="pricePreview">Rp 0</span></h4>
                     </div>
+
                     <div class="input-field center">
-                        <button class="btn-large blue darken-2" type="submit" name="pesan">Buat Pesanan</button>
+                        <button class="btn-large blue darken-2" type="submit" name="pesan">
+                            Buat Pesanan
+                        </button>
                     </div>
-                    <script>
-                        let itemPrices = {};
-
-                        // Fetch prices from database
-                        function fetchPrices() {
-                            const idAgen = <?= $idAgen ?>;
-                            fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    if (Object.keys(data).length === 0) {
-                                        throw new Error('No price data available');
-                                    }
-                                    itemPrices = data;
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching prices:', error);
-                                    // Show error message to user
-                                    M.toast({html: 'Gagal memuat harga. Silakan coba lagi atau hubungi admin.', classes: 'red'});
-                                    // Disable order button
-                                    document.querySelector('button[name="pesan"]').disabled = true;
-                                });
-                        }
-
-                        // Initialize price calculation
-                        document.addEventListener('DOMContentLoaded', function() {
-                            fetchPrices();
-                            calculatePrice();
-                        });
-
-                        function toggleQuantity(itemType) {
-                            const checkbox = document.querySelector(`input[name="items[${itemType}]"]`);
-                            const quantityInput = document.getElementById(`quantity-${itemType}`);
-                            quantityInput.disabled = !checkbox.checked;
-                            if (!checkbox.checked) {
-                                quantityInput.value = 0;
-                            }
-                            calculatePrice();
-                        }
-
-                        function calculatePrice() {
-                            const serviceType = document.querySelector('input[name="jenis"]:checked').value;
-                            let totalPrice = 0;
-                            
-                            ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
-                                const quantity = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
-                                if (quantity > 0) {
-                                    totalPrice += quantity * itemPrices[item][serviceType];
-                                }
-                            });
-
-                            document.getElementById('pricePreview').innerText = `Rp ${totalPrice.toLocaleString()}`;
-                        }
-
-                        // Initialize price calculation on page load
-                        document.addEventListener('DOMContentLoaded', function() {
-                            calculatePrice();
-                        });
-                    </script>
                 </div>
             </form>
         </div>
     </div>
-    <!-- end info pemesanan -->
 
-    <!-- end body -->
+    <script>
+    let itemPrices = {};
 
-    <!-- footer -->
-    <?php include 'footer.php' ?>
-    <!-- end footer -->
-    
-</body>
-</html>
-
-<?php
-
-if (isset($_POST["pesan"])){
-    $alamat = htmlspecialchars($_POST["alamat"]);
-    $jenis = htmlspecialchars($_POST["jenis"]);
-    $catatan = htmlspecialchars($_POST["catatan"]);
-    $tgl = htmlspecialchars(date("Y-m-d H:i:s"));
-    
-    // Process items and quantities
-    $items = $_POST['items'] ?? [];
-    $quantities = $_POST['quantities'] ?? [];
-    $totalItems = 0;
-    $itemDetails = [];
-    
-    foreach ($items as $item => $value) {
-        $quantity = (int)($quantities[$item] ?? 0);
-        if ($quantity > 0) {
-            $totalItems += $quantity;
-            $itemDetails[] = ucfirst($item) . ' (' . $quantity . ')';
-        }
+    function fetchPrices() {
+        const idAgen = <?= $idAgen ?>;
+        fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
+            .then(response => response.json())
+            .then(data => {
+                itemPrices = data;
+                calculatePrice();
+            })
+            .catch(error => {
+                console.error('Error fetching prices:', error);
+                M.toast({html: 'Gagal memuat harga', classes: 'red'});
+            });
     }
-    
-    $itemType = implode(', ', $itemDetails);
 
-    $query = mysqli_query($connect, "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, item_type, total_item, alamat, catatan, status_cucian) VALUES ($idAgen, $idPelanggan, '$tgl', '$jenis', '$itemType', $totalItems, '$alamat', '$catatan', 'Penjemputan')");
+    function toggleQuantity(itemType) {
+        const checkbox = document.querySelector(`input[name="items[${itemType}]"]`);
+        const quantityInput = document.getElementById(`quantity-${itemType}`);
+        quantityInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+            quantityInput.value = 0;
+        }
+        calculatePrice();
+    }
 
-    if (mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Pesanan Berhasil Dibuat','Silahkan Pergi Ke Halaman Status Cucian','success').then(function(){
+    function calculatePrice() {
+        const serviceType = document.querySelector('input[name="jenis"]:checked')?.value;
+        if (!serviceType) return;
+
+        let totalPrice = 0;
+        ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
+            const qty = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
+            if (qty > 0 && itemPrices[item]?.[serviceType]) {
+                totalPrice += qty * itemPrices[item][serviceType];
+            }
+        });
+
+        document.getElementById('pricePreview').innerText = 
+            `Rp ${totalPrice.toLocaleString('id-ID')}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchPrices();
+        document.querySelectorAll('.item-quantity').forEach(input => {
+            input.addEventListener('change', calculatePrice);
+        });
+    });
+    </script>
+
+    <?php
+    // Order Processing
+    if (isset($_POST["pesan"])) {
+        $orderData = [
+            'id_agen' => $idAgen,
+            'id_pelanggan' => $idPelanggan,
+            'tgl_mulai' => date("Y-m-d H:i:s"),
+            'jenis' => filter_input(INPUT_POST, 'jenis', FILTER_SANITIZE_STRING),
+            'alamat' => filter_input(INPUT_POST, 'alamat', FILTER_SANITIZE_STRING),
+            'catatan' => filter_input(INPUT_POST, 'catatan', FILTER_SANITIZE_STRING),
+        ];
+
+        // Process item selections
+        $items = $_POST['items'] ?? [];
+        $quantities = $_POST['quantities'] ?? [];
+        $totalItems = 0;
+        $itemDetails = [];
+
+        foreach ($items as $item => $val) {
+            $qty = (int)($quantities[$item] ?? 0);
+            if ($qty > 0) {
+                $totalItems += $qty;
+                $itemDetails[] = ucfirst($item) . " ($qty)";
+            }
+        }
+
+        $orderData['item_type'] = implode(', ', $itemDetails);
+        $orderData['total_item'] = $totalItems;
+
+        if (createOrder($connect, $orderData)) {
+            echo "<script>
+                Swal.fire({
+                    title: 'Pesanan Berhasil Dibuat',
+                    text: 'Silahkan periksa status cucian',
+                    icon: 'success'
+                }).then(() => {
                     window.location = 'status.php';
                 });
-            </script>
-        ";
-    }else {
-        echo mysqli_error($connect);
+            </script>";
+        } else {
+            echo "<script>
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Gagal membuat pesanan',
+                    icon: 'error'
+                });
+            </script>";
+        }
     }
-}
+    ?>
 
-?>
+    <?php include 'footer.php'; ?>
+</body>
+</html>
