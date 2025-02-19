@@ -13,6 +13,11 @@ $query = "SELECT * FROM agen WHERE id_agen = '$idAgen'";
 $result = mysqli_query($connect, $query);
 $agen = mysqli_fetch_assoc($result);
 
+// Check for existing prices for the current agent
+$checkPricesQuery = "SELECT * FROM harga WHERE id_agen = '$idAgen'";
+$checkPricesResult = mysqli_query($connect, $checkPricesQuery);
+$existingPrices = mysqli_fetch_all($checkPricesResult, MYSQLI_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -39,17 +44,17 @@ $agen = mysqli_fetch_assoc($result);
                     <span class="card-title black-text">Syarat dan Ketentuan :</span>
                 </div>
                 <div class="card-content">
-                    <p>1.	Memiliki lokasi usaha laundry yang strategis dan teridentifikasi oleh google map</p>
-                    <p>2.	Agen memiliki nama usaha serta logo perusahaan agar dapat diposting di website laundryKU</p>
-                    <p>3.	Mampu memberikan layanan Laundry dengan kualitas prima dan harga yang bersaing</p>
-                    <p>4.	Memiliki driver yang bersedia untuk melakukan penjemputan dan pengantaran terhadap laundry pelanggan</p>
-                    <p>5.	Harga dari jenis laundry ditentukan berdasarkan berat per kilo (kg) ditambah dengan biaya ongkos kirim</p>
-                    <p>6.	Bersedia untuk memberikan informasi kepada pelanggan mengenai harga Laundry Kiloan</p>
-                    <p>7.	Bersedia untuk menerapkan sistem poin kepada pelanggan</p>
-                    <p>8.	Bersedia memberikan kompensasi untuk setiap kemungkinan terjadinya seperti kehilangan pakaian atau kerusakan pakaian pada saat proses Laundry dilakukan</p>
-                    <p>9.	Agen tidak diperkenankan untuk melakukan kerjasama dengan pihak Laundry lainnya</p>
-                    <p>10.	Sebagai kompensasi atas kerjasama adalah sistem bagi hasil sebesar 5%, yang diperhitungkan dari setiap 7 hari</p>
-                    <p>11.	Status agen secara otomatis dicabut apabila melanggar kesepakatan yang telah ditetapkan dalam surat perjanjian kerjasama ataupun agen ingin mengundurkan diri</p>
+                    <p>1. Memiliki lokasi usaha laundry yang strategis dan teridentifikasi oleh google map</p>
+                    <p>2. Agen memiliki nama usaha serta logo perusahaan agar dapat diposting di website laundryKU</p>
+                    <p>3. Mampu memberikan layanan Laundry dengan kualitas prima dan harga yang bersaing</p>
+                    <p>4. Memiliki driver yang bersedia untuk melakukan penjemputan dan pengantaran terhadap laundry pelanggan</p>
+                    <p>5. Harga dari jenis laundry ditentukan berdasarkan berat per kilo (kg) ditambah dengan biaya ongkos kirim</p>
+                    <p>6. Bersedia untuk memberikan informasi kepada pelanggan mengenai harga Laundry Kiloan</p>
+                    <p>7. Bersedia untuk menerapkan sistem poin kepada pelanggan</p>
+                    <p>8. Bersedia memberikan kompensasi untuk setiap kemungkinan terjadinya seperti kehilangan pakaian atau kerusakan pakaian pada saat proses Laundry dilakukan</p>
+                    <p>9. Agen tidak diperkenankan untuk melakukan kerjasama dengan pihak Laundry lainnya</p>
+                    <p>10. Sebagai kompensasi atas kerjasama adalah sistem bagi hasil sebesar 5%, yang diperhitungkan dari setiap 7 hari</p>
+                    <p>11. Status agen secara otomatis dicabut apabila melanggar kesepakatan yang telah ditetapkan dalam surat perjanjian kerjasama ataupun agen ingin mengundurkan diri</p>
                 </div>
                 <div class="card-action">
                     <a href="term.php">Baca Selengkapnya</a>
@@ -58,7 +63,6 @@ $agen = mysqli_fetch_assoc($result);
         </div>
         <!-- end term -->
 
-    
         <!-- harga -->
         <div class="col s4 offset-s1">
             <div class="card price-card">
@@ -104,7 +108,7 @@ $agen = mysqli_fetch_assoc($result);
                             <input type="number" id="harga_celana" name="harga_celana" class="validate price-input" 
                                    value="0" required min="1000">
                             <label for="harga_celana">Harga Celana (Rp)</label>
-                            <span class="helper-text" data-error="Harga minimal Rp 1000"></span>
+                            <span class="helperText" data-error="Harga minimal Rp 1000"></span>
                         </div>
 
                         <div class="input-field">
@@ -155,7 +159,7 @@ $agen = mysqli_fetch_assoc($result);
 
 function dataHarga($data) {
     global $connect, $idAgen;
-
+    
     // Validate and sanitize input
     $cuci = filter_var($data["cuci"], FILTER_SANITIZE_NUMBER_INT);
     $setrika = filter_var($data["setrika"], FILTER_SANITIZE_NUMBER_INT);
@@ -165,86 +169,70 @@ function dataHarga($data) {
     $harga_jaket = filter_var($data["harga_jaket"], FILTER_SANITIZE_NUMBER_INT);
     $harga_karpet = filter_var($data["harga_karpet"], FILTER_SANITIZE_NUMBER_INT);
     $harga_pakaian_khusus = filter_var($data["harga_pakaian_khusus"], FILTER_SANITIZE_NUMBER_INT);
-
-    // Set default minimum prices if values are 0 or invalid
-    $minPrice = 1000; // Minimum price in IDR
-    $cuci = ($cuci < $minPrice) ? $minPrice : $cuci;
-    $setrika = ($setrika < $minPrice) ? $minPrice : $setrika;
-    $komplit = ($komplit < $minPrice) ? $minPrice : $komplit;
-    $harga_baju = ($harga_baju < $minPrice) ? $minPrice : $harga_baju;
-    $harga_celana = ($harga_celana < $minPrice) ? $minPrice : $harga_celana;
-    $harga_jaket = ($harga_jaket < $minPrice) ? $minPrice : $harga_jaket;
-    $harga_karpet = ($harga_karpet < $minPrice) ? $minPrice : $harga_karpet;
-    $harga_pakaian_khusus = ($harga_pakaian_khusus < $minPrice) ? $minPrice : $harga_pakaian_khusus;
-
-    // Validate prices
-    if (!validasiHarga($cuci) || !validasiHarga($setrika) || !validasiHarga($komplit) ||
-        !validasiHarga($harga_baju) || !validasiHarga($harga_celana) || !validasiHarga($harga_jaket) ||
-        !validasiHarga($harga_karpet) || !validasiHarga($harga_pakaian_khusus)) {
-        return -1;
+    
+    // Set minimum price
+    $minPrice = 1000;
+    if ($cuci < $minPrice || $setrika < $minPrice || $komplit < $minPrice ||
+        $harga_baju < $minPrice || $harga_celana < $minPrice || $harga_jaket < $minPrice ||
+        $harga_karpet < $minPrice || $harga_pakaian_khusus < $minPrice) {
+        return [
+            'status' => false,
+            'message' => "Harga minimum adalah Rp. " . number_format($minPrice)
+        ];
     }
 
-    // Start transaction
+    // Check if prices already exist for this agent
+    $check = mysqli_query($connect, "SELECT COUNT(*) as count FROM harga WHERE id_agen = $idAgen");
+    $exists = mysqli_fetch_assoc($check)['count'] > 0;
+    
     mysqli_begin_transaction($connect);
-
+    
     try {
-        // Prepare insert queries with prepared statements
-        $queries = [
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('cuci', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('setrika', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('komplit', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('baju', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('celana', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('jaket', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('karpet', ?, ?)",
-            "INSERT INTO harga (jenis, id_agen, harga) VALUES ('pakaian_khusus', ?, ?)"
-        ];
-
-        $successCount = 0;
-        foreach ($queries as $query) {
-            $stmt = mysqli_prepare($connect, $query);
-            if ($stmt) {
-                // Bind the appropriate price based on query type
-                $price = match($query) {
-                    str_contains($query, 'cuci') => $cuci,
-                    str_contains($query, 'setrika') => $setrika,
-                    str_contains($query, 'komplit') => $komplit,
-                    str_contains($query, 'baju') => $harga_baju,
-                    str_contains($query, 'celana') => $harga_celana,
-                    str_contains($query, 'jaket') => $harga_jaket,
-                    str_contains($query, 'karpet') => $harga_karpet,
-                    str_contains($query, 'pakaian_khusus') => $harga_pakaian_khusus,
-                    default => 0
-                };
-                
-                mysqli_stmt_bind_param($stmt, "ii", $idAgen, $price);
-                if (mysqli_stmt_execute($stmt)) {
-                    $successCount++;
-                } else {
-                    throw new Exception(mysqli_stmt_error($stmt));
-                }
-                mysqli_stmt_close($stmt);
-            } else {
-                throw new Exception(mysqli_error($connect));
-            }
+        if ($exists) {
+            // Update existing prices
+            $stmt = mysqli_prepare($connect, 
+                "UPDATE harga SET harga = ?, harga_baju = ?, harga_celana = ?, harga_jaket = ?, harga_karpet = ?, harga_pakaian_khusus = ? WHERE id_agen = ?"
+            );
+        } else {
+            // Insert new prices
+            $stmt = mysqli_prepare($connect, 
+                "INSERT INTO harga (harga, harga_baju, harga_celana, harga_jaket, harga_karpet, harga_pakaian_khusus, id_agen) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+        }
+        
+        if (!$stmt) {
+            throw new Exception(mysqli_error($connect));
         }
 
-        // Commit transaction
-        mysqli_commit($connect);
-        return $successCount;
+        // Bind parameters
+        if ($exists) {
+            mysqli_stmt_bind_param($stmt, "iiiiiii", $cuci, $harga_baju, $harga_celana, $harga_jaket, $harga_karpet, $harga_pakaian_khusus, $idAgen);
+        } else {
+            mysqli_stmt_bind_param($stmt, "iiiiiii", $cuci, $harga_baju, $harga_celana, $harga_jaket, $harga_karpet, $harga_pakaian_khusus, $idAgen);
+        }
+
+        if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+            mysqli_commit($connect);
+            return ['status' => true];
+        } else {
+            throw new Exception("Gagal menyimpan harga");
+        }
 
     } catch (Exception $e) {
-        // Rollback transaction on error
         mysqli_rollback($connect);
         error_log("Error in dataHarga: " . $e->getMessage());
-        return -1;
+        return [
+            'status' => false,
+            'message' => $e->getMessage()
+        ];
     }
 }
 
 if (isset($_POST["submit"])) {
     $result = dataHarga($_POST);
     
-    if ($result > 0) {
+    if ($result['status']) {
         echo "
             <script>
                 Swal.fire({
@@ -258,23 +246,17 @@ if (isset($_POST["submit"])) {
             </script>
         ";
     } else {
-        $errorMsg = ($result == -1) ? "Terjadi kesalahan saat menyimpan data harga" : "Data harga tidak valid";
-        
         echo "
             <script>
                 Swal.fire({
                     title: 'Gagal',
-                    text: '$errorMsg',
+                    text: '".$result['message']."',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
             </script>
         ";
         
-        if($result == -1) {
-            error_log("Database error: " . mysqli_error($connect));
-        }
+        error_log("Database error: " . mysqli_error($connect));
     }
 }
-
-?>

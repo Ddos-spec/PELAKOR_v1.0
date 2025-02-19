@@ -34,7 +34,7 @@ $komplit = mysqli_fetch_assoc($komplit);
             margin-top: 1rem;
         }
         .price-card {
-            padding: 2rem;
+            padding: 2rem;     
             margin: 2rem auto;
             max-width: 800px;
         }
