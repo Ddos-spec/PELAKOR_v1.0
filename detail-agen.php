@@ -118,61 +118,99 @@ $agen = mysqli_fetch_assoc($query);
     <hr><br>
 
     <!-- komentar -->
-    <h3 class="header light center">Ulasan Pengguna</h3>
-    <br>
-
-    <div class="row">
-        <?php
-        $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen AND rating > 0");
-        while ($transaksi = mysqli_fetch_assoc($temp)) :
-            $idPelanggan = $transaksi["id_pelanggan"];
-            $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
-            $pelanggan = mysqli_fetch_assoc($temp2);
-        ?>
+    <div class="container">
+        <h4 class="header light center">Ulasan Pengguna</h4>
+        <div class="row">
+            <?php
+            $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen");
+            while ($transaksi = mysqli_fetch_assoc($temp)):
+                $idPelanggan = $transaksi["id_pelanggan"];
+                $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
+                $pelanggan = mysqli_fetch_assoc($temp2);
+            ?>
             <div class="col s12 m4">
-                <div class="card rounded small">
-                    <div class="card-image">
-                        <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" style="margin: 15px auto;" width="80" alt="foto">
-                    </div>
-                    <div class="card-content center-align" style="padding: 15px;">
-                        <h6 style="font-size: 1rem; margin: 10px 0;"><?= $pelanggan["nama"] ?></h6>
-                        <fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset>
-                        <p class="review-text" style="margin: 10px 0;">
-                            <?= $transaksi["komentar"] ?>
-                        </p>
+                <div class="card-panel grey lighten-5" style="padding: 12px; margin: 8px;">
+                    <div class="row valign-wrapper" style="margin-bottom: 0;">
+                        <div class="col s4">
+                            <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" alt="foto pengguna">
+                        </div>
+                        <div class="col s8">
+                            <span class="black-text">
+                                <strong><?= $pelanggan["nama"] ?></strong>
+                                <div class="rating-container">
+                                    <fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset>
+                                </div>
+                                <p class="grey-text text-darken-1 comment-text">
+                                    <?= $transaksi["komentar"]; ?>
+                                </p>
+                                <?php 
+                                // Show delete button only if logged in as this agent
+                                if (isset($_SESSION['agen']) && $_SESSION['agen'] == $idAgen): 
+                                    // Generate CSRF token if not exists
+                                    if (!isset($_SESSION['csrf_token'])) {
+                                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                                    }
+                                ?>
+                                <form action="delete-review.php" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus ulasan ini?')">
+                                    <input type="hidden" name="id_transaksi" value="<?= $transaksi['id_transaksi'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                    <button type="submit" class="btn red darken-2 btn-small">Hapus Ulasan</button>
+                                </form>
+                                <?php endif; ?>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        <?php endwhile; ?>
+            <?php endwhile; ?>
+        </div>
     </div>
 
     <style>
-        .card.rounded {
+        .card-panel {
             border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
         }
-        .card.rounded:hover {
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        
+        .rating-container {
+            margin-top: 3px;
         }
-        .review-text {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 80px;
-            overflow-y: auto;
-            font-size: 0.85em;
-            color: #666;
-            line-height: 1.4;
+        
+        .valign-wrapper img.circle {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
         }
-        .card-image {
-            padding: 8px;
+        
+        .comment-text {
+            font-size: 0.9rem;
+            margin-top: 3px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
         }
-        .card-content {
-            flex-grow: 1;
+        
+        @media only screen and (max-width: 600px) {
+            .card-panel {
+                padding: 10px !important;
+            }
+            
+            .valign-wrapper img.circle {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .comment-text {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Untuk layar medium */
+        @media only screen and (min-width: 601px) and (max-width: 992px) {
+            .container {
+                width: 95%;
+            }
         }
     </style>
 
