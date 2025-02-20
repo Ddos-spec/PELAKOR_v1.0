@@ -25,10 +25,17 @@ if (!$agen) {
 
 // Calculate average rating
 $temp = $agen["id_agen"];
-$queryStar = mysqli_query($connect, "SELECT AVG(rating) as avg_rating FROM transaksi WHERE id_agen = '$temp' AND rating > 0");
-$ratingData = mysqli_fetch_assoc($queryStar);
-$averageRating = $ratingData['avg_rating'] ? round($ratingData['avg_rating'], 1) : 0;
-$displayRating = $averageRating ? round($averageRating) : 0;
+$queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
+$totalStar = 0;
+$i = 0;
+while ($star = mysqli_fetch_assoc($queryStar)){
+    // Only count if rating exists
+    if ($star["rating"] != 0){
+        $totalStar += $star["rating"];
+        $i++;
+    }
+}
+$fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +60,7 @@ $displayRating = $averageRating ? round($averageRating) : 0;
             <ul>
                 <li>
                     <fieldset class="bintang">
-                        <span class="starImg star-<?= $displayRating ?>"></span>
+                        <span class="starImg star-<?= $fixStar ?>"></span>
                     </fieldset>
                 </li>
                 <li>Alamat : <?= htmlspecialchars($agen["alamat"] . ", " . $agen["kota"]) ?></li>
@@ -71,7 +78,7 @@ $displayRating = $averageRating ? round($averageRating) : 0;
             $reviewQuery = mysqli_query($connect, "SELECT t.*, p.nama, p.foto 
                                           FROM transaksi t 
                                           JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan 
-                                          WHERE t.id_agen = '$idAgen' AND (t.rating > 0 OR t.komentar != '')
+                                          WHERE t.id_agen = '$idAgen' AND t.rating > 0 AND t.komentar != ''
                                           ORDER BY t.kode_transaksi DESC");
         
             if(mysqli_num_rows($reviewQuery) > 0) {
@@ -91,7 +98,7 @@ $displayRating = $averageRating ? round($averageRating) : 0;
                                 <?php if($row["rating"] > 0): ?>
                                     <div class="rating-container">
                                         <fieldset class="bintang">
-                                            <span class="starImg star-<?= $row['rating'] ?>"></span>
+                                            <span class="starImg star-<?= ceil($row['rating']) ?>"></span>
                                         </fieldset>
                                     </div>
                                 <?php endif; ?>

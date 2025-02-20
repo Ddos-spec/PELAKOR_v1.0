@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 20 Feb 2025 pada 09.10
+-- Waktu pembuatan: 20 Feb 2025 pada 15.18
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -104,8 +104,15 @@ INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_
 (19, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Jaket (3), Karpet (3)', 6, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
 (20, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Celana (1), Jaket (1', 3, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
 (21, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (3), Celana (3)', 6, NULL, 5, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
-(22, 15, 15, '2025-02-20', '0000-00-00', 'komplit', 'Baju (3), Celana (2)', 5, NULL, NULL, 'dsfwsfegfweag, awdadawfda', '', 'Penjemputan'),
-(23, 15, 15, '2025-02-20', '0000-00-00', 'komplit', 'Baju (1), Pakaian_khusus (1)', 2, NULL, NULL, 'dsfwsfegfweag, awdadawfda', '', 'Penjemputan');
+(22, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (3), Celana (2)', 5, NULL, 2, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(23, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Pakaian_khusus (1)', 2, NULL, 4, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(24, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Celana (1), Jaket (1', 3, NULL, 3, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(25, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Celana (3), Jaket (3)', 6, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(26, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Karpet (1), Pakaian_khusus (1)', 2, NULL, 100, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(27, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Celana (1)', 2, NULL, 100, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(28, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (3), Celana (3)', 6, NULL, 1000, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(29, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Celana (1)', 2, NULL, 50, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(30, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (1), Celana (1), Jaket (1', 3, NULL, 50, 'dsfwsfegfweag, awdadawfda', '', 'Selesai');
 
 -- --------------------------------------------------------
 
@@ -187,15 +194,9 @@ CREATE TABLE `transaksi` (
 --
 
 INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `payment_status`, `rating`, `komentar`) VALUES
-(24, 13, 15, 15, '2025-02-20', '0000-00-00', 266000, 'Paid', 5, 'sangat bagus sekali '),
-(25, 14, 15, 15, '2025-02-20', '2025-02-20', 35000, 'Paid', 5, 'sipnakdjblawhd;wakndawndlnaldnalcnaldnclandlkanfdwanldfhlfn;nd;ahndlanwd wakdbwmd;samd;ha;dmalcn;ahfg;am?lcn;fh;fn;ewjfowef w.abflewrf.nwe;ofhewanf.ewnrfherfnme.fnlhf'),
-(26, 15, 15, 15, '2025-02-20', '2025-02-20', 25000, 'Paid', NULL, '0'),
-(27, 16, 15, 15, '2025-02-20', '2025-02-20', 57000, 'Paid', NULL, '0'),
-(28, 17, 15, 15, '2025-02-20', '2025-02-20', 36000, 'Paid', NULL, '0'),
-(29, 18, 15, 15, '2025-02-20', '2025-02-20', 510000, 'Paid', NULL, '0'),
-(30, 19, 15, 15, '2025-02-20', '2025-02-20', 80000, 'Paid', NULL, '0'),
-(31, 20, 15, 15, '2025-02-20', '2025-02-20', 55000, 'Paid', NULL, '0'),
-(32, 21, 15, 15, '2025-02-20', '2025-02-20', 40000, 'Paid', 5, 'wah sangat bagus ');
+(39, 28, 15, 15, '2025-02-20', '2025-02-20', 5015000, 'Paid', 10, '0'),
+(40, 29, 15, 15, '2025-02-20', '2025-02-20', 255000, 'Paid', 2, '0'),
+(41, 30, 15, 15, '2025-02-20', '2025-02-20', 255000, 'Paid', 8, '0');
 
 --
 -- Indexes for dumped tables
@@ -257,7 +258,7 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -275,7 +276,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

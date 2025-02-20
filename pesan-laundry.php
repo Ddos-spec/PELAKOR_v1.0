@@ -22,7 +22,7 @@ function getCustomerData($connect, $customerId) {
 }
 
 function calculateAgentRating($connect, $agentId) {
-    $query = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ?");
+    $query = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ? AND rating > 0");
     mysqli_stmt_bind_param($query, "i", $agentId);
     mysqli_stmt_execute($query);
     $result = mysqli_stmt_get_result($query);
@@ -31,7 +31,7 @@ function calculateAgentRating($connect, $agentId) {
     $count = 0;
     
     while ($rating = mysqli_fetch_assoc($result)) {
-        $totalStars += $rating["rating"];
+        $totalStars += $rating["rating"]; 
         $count++;
     }
     

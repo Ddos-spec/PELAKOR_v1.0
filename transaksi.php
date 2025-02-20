@@ -140,36 +140,48 @@ function calculateTotalHarga($transaksi) {
                                     <button class="btn red">Invoice</button>
                                 </td>
                             <?php else: ?>
-                                <?php if (empty($transaksi["rating"]) || empty($transaksi["komentar"])): ?>
-                                    <td colspan="2">
-                                        <form method="post" action="">
-                                            <input type="hidden" name="kode_transaksi" value="<?= $transaksi['kode_transaksi'] ?>">
-                                            <select name="rating" class="browser-default" required>
-                                                <option value="" disabled selected>Pilih Rating</option>
-                                                <option value="1">⭐</option>
-                                                <option value="2">⭐⭐</option>
-                                                <option value="3">⭐⭐⭐</option>
-                                                <option value="4">⭐⭐⭐⭐</option>
-                                                <option value="5">⭐⭐⭐⭐⭐</option>
-                                            </select>
-                                            <textarea name="komentar" placeholder="Tulis ulasan Anda (maksimal 100 karakter)..." maxlength="100" oninput="countChars(this)" required></textarea>
-                                            <small id="charCount">0/100 karakter</small>
-                                            <script>
-                                                function countChars(textarea) {
-                                                    const charCount = textarea.value.length;
-                                                    document.getElementById('charCount').textContent = `${charCount}/100 karakter`;
-                                                    if (charCount > 100) {
-                                                        textarea.value = textarea.value.substring(0, 100);
-                                                    }
-                                                }
-                                            </script>
-                                            <button type="submit" class="btn blue" name="submit_rating">Kirim Ulasan</button>
+                                <td>
+                                    <?php if ($transaksi["rating"] == 0): ?>
+                                        <form action="" method="post" class="review-form">
+                                            <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
+                                            
+                                            <div class="input-field">
+                                                <select class="browser-default" name="rating" required>
+                                                    <option value="" disabled selected>Pilih Rating</option>
+                                                    <option value="2">1</option>
+                                                    <option value="4">2</option>
+                                                    <option value="6">3</option>
+                                                    <option value="8">4</option>
+                                                    <option value="10">5</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="input-field">
+                                                <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
+                                            </div>
+                                            
+                                            <div class="center">
+                                                <button class="btn blue darken-2" type="submit" name="submitReview">
+                                                    Kirim Ulasan
+                                                </button>
+                                            </div>
                                         </form>
-                                    </td>
-                                <?php else: ?>
-                                    <td><?= htmlspecialchars($transaksi["rating"]) ?></td>
-                                    <td><?= htmlspecialchars($transaksi["komentar"]) ?></td>
-                                <?php endif; ?>
+                                    <?php else: ?>
+                                        <?php
+                                            $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                            $star = mysqli_fetch_assoc($star);
+                                            $star = $star["rating"];
+                                        ?>
+                                        <fieldset class="bintang">
+                                            <span class="starImg star-<?= $star ?>"></span>
+                                        </fieldset>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($transaksi["komentar"] != ""): ?>
+                                        <?= htmlspecialchars($transaksi["komentar"]) ?>
+                                    <?php endif; ?>
+                                </td>
                             <?php endif; ?>
                         </tr>
                     <?php endwhile; ?>
@@ -178,47 +190,31 @@ function calculateTotalHarga($transaksi) {
         </div>
     </div>
 <?php
-// Handle rating submission
-if (isset($_POST['submit_rating']) && !isset($_SESSION['rating_submitted'])) {
-    $kode_transaksi = $_POST['kode_transaksi'];
-    $rating = intval($_POST['rating']);
-    $komentar = mysqli_real_escape_string($connect, $_POST['komentar']);
-    
-    $update_query = "UPDATE transaksi SET rating = $rating, komentar = '$komentar' 
-                    WHERE kode_transaksi = $kode_transaksi";
-    
-    if (mysqli_query($connect, $update_query)) {
-        $_SESSION['rating_submitted'] = true;
-        echo "<script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Ulasan Berhasil Dikirim!',
-                text: 'Terima kasih atas ulasan Anda',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'transaksi.php';
-                }
-            });
-        </script>";
-        exit();
-    } else {
-        echo "<script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal Mengirim Ulasan',
-                text: 'Silakan coba lagi',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'OK'
-            });
-        </script>";
-    }
-}
+// Handle review submission
+if (isset($_POST["submitReview"])) {
+    $rating = $_POST["rating"];
+    $komentar = htmlspecialchars($_POST["komentar"]);
+    $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-// Clear rating submission flag on page load
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    unset($_SESSION['rating_submitted']);
+    // Update both rating and comment
+    $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
+    mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
+    
+    if (mysqli_stmt_execute($updateReview)) {
+        echo "
+            <script>
+                Swal.fire('Penilaian Berhasil','Ulasan Berhasil Di Tambahkan','success').then(function() {
+                    window.location = 'transaksi.php';
+                });
+            </script>
+        ";
+    } else {
+        echo "
+            <script>
+                Swal.fire('Error','Gagal menambahkan ulasan','error');
+            </script>
+        ";
+    }
 }
 
 include 'footer.php'; 
