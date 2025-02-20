@@ -152,7 +152,17 @@ function calculateTotalHarga($transaksi) {
                                                 <option value="4">⭐⭐⭐⭐</option>
                                                 <option value="5">⭐⭐⭐⭐⭐</option>
                                             </select>
-                                            <textarea name="komentar" placeholder="Tulis ulasan Anda..." required></textarea>
+                                            <textarea name="komentar" placeholder="Tulis ulasan Anda (maksimal 100 karakter)..." maxlength="100" oninput="countChars(this)" required></textarea>
+                                            <small id="charCount">0/100 karakter</small>
+                                            <script>
+                                                function countChars(textarea) {
+                                                    const charCount = textarea.value.length;
+                                                    document.getElementById('charCount').textContent = `${charCount}/100 karakter`;
+                                                    if (charCount > 100) {
+                                                        textarea.value = textarea.value.substring(0, 100);
+                                                    }
+                                                }
+                                            </script>
                                             <button type="submit" class="btn blue" name="submit_rating">Kirim Ulasan</button>
                                         </form>
                                     </td>
@@ -178,13 +188,28 @@ if (isset($_POST['submit_rating'])) {
                     WHERE kode_transaksi = $kode_transaksi";
     
     if (mysqli_query($connect, $update_query)) {
-        echo "<script>
-            M.toast({html: 'Ulasan berhasil dikirim!'});
-            setTimeout(function(){ location.reload(); }, 1000);
+            echo "<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Ulasan Berhasil Dikirim!',
+                text: 'Terima kasih atas ulasan Anda',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            });
         </script>";
     } else {
-        echo "<script>
-            M.toast({html: 'Gagal mengirim ulasan. Silakan coba lagi.'});
+            echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Mengirim Ulasan',
+                text: 'Silakan coba lagi',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
         </script>";
     }
 }

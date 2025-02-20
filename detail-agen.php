@@ -123,53 +123,58 @@ $agen = mysqli_fetch_assoc($query);
 
     <div class="row">
         <?php
-
-        $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen");
-        while ( $transaksi = mysqli_fetch_assoc($temp) ) :
-        
-        $idPelanggan = $transaksi["id_pelanggan"];
-        $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
-        $pelanggan = mysqli_fetch_assoc($temp2);
-
+        $temp = mysqli_query($connect, "SELECT * FROM transaksi WHERE id_agen = $idAgen AND rating > 0");
+        while ($transaksi = mysqli_fetch_assoc($temp)) :
+            $idPelanggan = $transaksi["id_pelanggan"];
+            $temp2 = mysqli_query($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = $idPelanggan");
+            $pelanggan = mysqli_fetch_assoc($temp2);
         ?>
-
-
-        <div class="container">
-        <div class="col s3 offset-s1">
-        <table border=0>
-            <tr>
-                <td width=100px rowspan=3><img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" width=100px alt="foto"></td>
-                <td><?= "<h6 class='light'>" . $pelanggan["nama"] . "</h6>";?></td>
-            </tr>
-            <tr>
-                <td><fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset></td>
-            </tr>
-            <tr>
-                <td><?= $transaksi["komentar"]; ?></td>
-            </tr>
-        </table>
-        </div>
-        </div>
-
-
-
-
-
-
-        <!-- <div class="col s5 offset-s1">
-            <div class="col s2">
-                <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" width=100% alt="foto">
+            <div class="col s12 m4">
+                <div class="card rounded small">
+                    <div class="card-image">
+                        <img src="img/pelanggan/<?= $pelanggan['foto'] ?>" class="circle responsive-img" style="margin: 15px auto;" width="80" alt="foto">
+                    </div>
+                    <div class="card-content center-align" style="padding: 15px;">
+                        <h6 style="font-size: 1rem; margin: 10px 0;"><?= $pelanggan["nama"] ?></h6>
+                        <fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset>
+                        <p class="review-text" style="margin: 10px 0;">
+                            <?= $transaksi["komentar"] ?>
+                        </p>
+                    </div>
+                </div>
             </div>
-
-            <?= "<h6 class='light'>" . $pelanggan["nama"] . "</h6>";?>
-
-            <div class="col s4">
-                <fieldset class="bintang"><span class="starImg star-<?= $transaksi['rating'] ?>"></span></fieldset>
-                <?= $transaksi["komentar"]; ?>
-            </div>
-        </div> -->
         <?php endwhile; ?>
     </div>
+
+    <style>
+        .card.rounded {
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card.rounded:hover {
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        }
+        .review-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 80px;
+            overflow-y: auto;
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+        }
+        .card-image {
+            padding: 8px;
+        }
+        .card-content {
+            flex-grow: 1;
+        }
+    </style>
 
     <?php include "footer.php"; ?>
 
