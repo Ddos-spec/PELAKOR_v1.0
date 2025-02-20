@@ -179,7 +179,7 @@ function calculateTotalHarga($transaksi) {
     </div>
 <?php
 // Handle rating submission
-if (isset($_POST['submit_rating'])) {
+if (isset($_POST['submit_rating']) && !isset($_SESSION['rating_submitted'])) {
     $kode_transaksi = $_POST['kode_transaksi'];
     $rating = intval($_POST['rating']);
     $komentar = mysqli_real_escape_string($connect, $_POST['komentar']);
@@ -188,7 +188,8 @@ if (isset($_POST['submit_rating'])) {
                     WHERE kode_transaksi = $kode_transaksi";
     
     if (mysqli_query($connect, $update_query)) {
-            echo "<script>
+        $_SESSION['rating_submitted'] = true;
+        echo "<script>
             Swal.fire({
                 icon: 'success',
                 title: 'Ulasan Berhasil Dikirim!',
@@ -197,12 +198,13 @@ if (isset($_POST['submit_rating'])) {
                 confirmButtonText: 'OK'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    location.reload();
+                    window.location.href = 'transaksi.php';
                 }
             });
         </script>";
+        exit();
     } else {
-            echo "<script>
+        echo "<script>
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal Mengirim Ulasan',
@@ -212,6 +214,11 @@ if (isset($_POST['submit_rating'])) {
             });
         </script>";
     }
+}
+
+// Clear rating submission flag on page load
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    unset($_SESSION['rating_submitted']);
 }
 
 include 'footer.php'; 
