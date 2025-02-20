@@ -38,13 +38,14 @@ $transaction = mysqli_fetch_assoc($query);
 ob_start();
 ?>
 <style>
-    body { font-family: DejaVu Sans, sans-serif; }
-    .invoice { width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .invoice { width: 80%; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
     .header { text-align: center; margin-bottom: 30px; }
+    .header h2 { margin: 0; }
     .details { margin-bottom: 20px; }
     .details table { width: 100%; border-collapse: collapse; }
-    .details td, .details th { padding: 8px; border: 1px solid #ddd; }
-    .total { text-align: right; margin-top: 20px; }
+    .details th, .details td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    .total { text-align: right; margin-top: 20px; font-size: 1.2em; }
 </style>
 <page>
     <div class="invoice">
@@ -87,7 +88,7 @@ ob_start();
         </div>
 
         <div class="total">
-            <h3>Total Bayar: Rp <?= number_format(calculateTotalHarga($transaction), 0, ',', '.') ?></h3>
+            <strong>Total Bayar: Rp <?= number_format(calculateTotalHarga($transaction), 0, ',', '.') ?></strong>
         </div>
     </div>
 </page>
@@ -100,7 +101,7 @@ use Spipu\Html2Pdf\Html2Pdf;
 try {
     $html2pdf = new Html2Pdf('P', 'A4', 'en');
     $html2pdf->writeHTML($content);
-    $html2pdf->output('invoice.pdf');
+    $html2pdf->output('invoice.pdf', 'D'); // 'D' forces download
 } catch (Html2PdfException $e) {
     echo $e;
     exit;
