@@ -144,7 +144,7 @@ function calculateTotalHarga($transaksi) {
                             <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
                             <?php if ($login === "Agen"): ?>
                                 <td>
-                                    <button class="btn red">Invoice</button>
+<a href="invoice.php?id=<?= $transaksi['kode_transaksi'] ?>" class="btn red" target="_blank">Invoice</a>
                                 </td>
                             <?php elseif ($login === "Admin"): ?>
                                 <td>

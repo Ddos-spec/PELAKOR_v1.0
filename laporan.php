@@ -3,66 +3,122 @@ session_start();
 require_once 'connect-db.php';
 require_once 'functions/functions.php';
 
-// Fungsi untuk mendapatkan harga paket
-function getHargaPaket($jenis, $idAgen) {
-    global $connect;
-    $jenisEscaped = mysqli_real_escape_string($connect, $jenis);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenisEscaped'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
+// Jika fungsi getHargaPaket() belum ada, definisikan fungsi–fungsi yang diperlukan
+if (!function_exists('getHargaPaket')) {
+    function getHargaPaket($jenis, $idAgen) {
+        global $connect;
+        $jenisEscaped = mysqli_real_escape_string($connect, $jenis);
+        $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenisEscaped'");
+        $row = mysqli_fetch_assoc($q);
+        return $row['harga'] ?? 0;
+    }
 }
-
-// Fungsi untuk mendapatkan harga per item
-function getPerItemPrice($item, $idAgen) {
-    global $connect;
-    $itemEscaped = mysqli_real_escape_string($connect, $item);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$itemEscaped'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
+if (!function_exists('getPerItemPrice')) {
+    function getPerItemPrice($item, $idAgen) {
+        global $connect;
+        $itemEscaped = mysqli_real_escape_string($connect, $item);
+        $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$itemEscaped'");
+        $row = mysqli_fetch_assoc($q);
+        return $row['harga'] ?? 0;
+    }
 }
-
-// Fungsi untuk menghitung total per item
-function getTotalPerItem($itemType, $idAgen) {
-    $total = 0;
-    $items = explode(', ', $itemType);
-    foreach ($items as $it) {
-        if (trim($it) === "") continue;
-        if (preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
-            $item = strtolower(trim($matches[1]));
-            $qty = (int)$matches[2];
-            $price = getPerItemPrice($item, $idAgen);
-            $total += $price * $qty;
+if (!function_exists('getTotalPerItem')) {
+    function getTotalPerItem($itemType, $idAgen) {
+        $total = 0;
+        $items = explode(', ', $itemType);
+        foreach ($items as $it) {
+            if (trim($it) === "") continue;
+            if (preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
+                $item = strtolower(trim($matches[1]));
+                $qty = (int)$matches[2];
+                $price = getPerItemPrice($item, $idAgen);
+                $total += $price * $qty;
+            }
         }
+        return $total;
     }
-    return $total;
+}
+if (!function_exists('calculateTotalHarga')) {
+    function calculateTotalHarga($transaksi) {
+        if (empty($transaksi["berat"])) {
+            return 0;
+        }
+        $paket = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]) * $transaksi["berat"];
+        $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]);
+        return $paket + $totalPerItem;
+    }
 }
 
-// Fungsi untuk menghitung total harga
-function calculateTotalHarga($transaksi) {
-    if (empty($transaksi["berat"])) {
-        return 0;
-    }
-    $paket = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]) * $transaksi["berat"];
-    $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]);
-    return $paket + $totalPerItem;
-}
-
-// Tentukan tipe login dan ambil data transaksi yang sudah selesai (payment_status = 'Paid')
+// Pastikan hanya Admin atau Agen yang dapat mengakses
 if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     $login = "Admin";
-    $query = mysqli_query($connect, "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai 
-        FROM transaksi t 
-        JOIN cucian c ON t.id_cucian = c.id_cucian 
-        WHERE t.payment_status = 'Paid'");
 } elseif (isset($_SESSION["login-agen"]) && isset($_SESSION["agen"])) {
     $login = "Agen";
-    $idAgen = intval($_SESSION["agen"]);
-    $query = mysqli_query($connect, "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai 
-        FROM transaksi t 
-        JOIN cucian c ON t.id_cucian = c.id_cucian 
-        WHERE t.id_agen = $idAgen AND t.payment_status = 'Paid'");
 } else {
     header("Location: login.php");
+    exit();
+}
+
+// Build filter conditions
+$conditions = "t.payment_status = 'Paid'";
+if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
+    $start_date = mysqli_real_escape_string($connect, $_GET['start_date']);
+    $conditions .= " AND c.tgl_mulai >= '$start_date'";
+}
+if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
+    $end_date = mysqli_real_escape_string($connect, $_GET['end_date']);
+    $conditions .= " AND c.tgl_mulai <= '$end_date'";
+}
+if ($login == "Admin" && isset($_GET['agent_id']) && !empty($_GET['agent_id'])) {
+    $agent_id = intval($_GET['agent_id']);
+    $conditions .= " AND t.id_agen = $agent_id";
+}
+if ($login == "Agen") {
+    $idAgen = intval($_SESSION["agen"]);
+    $conditions .= " AND t.id_agen = $idAgen";
+}
+
+// Execute query
+$queryStr = "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai 
+    FROM transaksi t 
+    JOIN cucian c ON t.id_cucian = c.id_cucian 
+    WHERE $conditions
+    ORDER BY c.tgl_mulai DESC";
+$query = mysqli_query($connect, $queryStr);
+
+// Jika ini request AJAX, keluarkan baris tabel saja dan exit
+if (isset($_GET['ajax']) && $_GET['ajax'] == 'true') {
+    while ($transaksi = mysqli_fetch_assoc($query)) {
+        $agentName = '';
+        if ($login != "Pelanggan") {
+            $agenQuery = mysqli_query($connect, "SELECT nama_laundry FROM agen WHERE id_agen = " . intval($transaksi["id_agen"]));
+            $agenRow = mysqli_fetch_assoc($agenQuery);
+            $agentName = $agenRow["nama_laundry"] ?? '';
+        }
+        $pelName = '';
+        if ($login != "Agen") {
+            $pelQuery = mysqli_query($connect, "SELECT nama FROM pelanggan WHERE id_pelanggan = " . intval($transaksi["id_pelanggan"]));
+            $pelRow = mysqli_fetch_assoc($pelQuery);
+            $pelName = $pelRow["nama"] ?? '';
+        }
+        echo '<tr>';
+        echo '  <td>' . htmlspecialchars($transaksi["kode_transaksi"]) . '</td>';
+        if ($login != "Pelanggan") {
+            echo '  <td>' . htmlspecialchars($agentName) . '</td>';
+        }
+        if ($login != "Agen") {
+            echo '  <td>' . htmlspecialchars($pelName) . '</td>';
+        }
+        echo '  <td>' . htmlspecialchars($transaksi["total_item"]) . '</td>';
+        echo '  <td>' . htmlspecialchars($transaksi["berat"]) . '</td>';
+        echo '  <td>' . htmlspecialchars($transaksi["jenis"]) . '</td>';
+        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') . '</td>';
+        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') . '</td>';
+        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi), 0, ',', '.') . '</td>';
+        echo '  <td>' . htmlspecialchars($transaksi["tgl_mulai"]) . '</td>';
+        echo '  <td>' . htmlspecialchars($transaksi["tgl_selesai"]) . '</td>';
+        echo '</tr>';
+    }
     exit();
 }
 ?>
@@ -72,125 +128,145 @@ if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
-    <title>Laporan - <?= htmlspecialchars($login) ?></title>
+    <title>Laporan Transaksi - <?= htmlspecialchars($login) ?></title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .table-container {
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
-    <div class="container">
-        <h3 class="text-center my-4">Laporan Transaksi</h3>
-        <div class="row mb-4">
+    <div class="container my-4">
+        <h3 class="text-center mb-4">Laporan Transaksi</h3>
+        <div class="row mb-3">
             <div class="col-md-8">
-                <form method="GET" action="">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Dari</span>
-                        <input type="date" class="form-control" id="start_date" name="start_date">
-                        <span class="input-group-text">Sampai</span>
-                        <input type="date" class="form-control" id="end_date" name="end_date">
-                        <button class="btn btn-primary" type="submit">Filter</button>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-text">Harga Min</span>
-                        <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0">
-                        <span class="input-group-text">Harga Max</span>
-                        <input type="number" class="form-control" id="max_price" name="max_price" placeholder="0">
-                        <button class="btn btn-primary" type="submit">Filter Harga</button>
+                <form id="filterForm" method="GET" action="">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label for="start_date" class="form-label">Dari Tanggal</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="<?= isset($_GET['start_date']) ? $_GET['start_date'] : '' ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end_date" class="form-label">Sampai Tanggal</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="<?= isset($_GET['end_date']) ? $_GET['end_date'] : '' ?>">
+                        </div>
+                        <?php if ($login == "Admin"): ?>
+                        <div class="col-md-4">
+                            <label for="agent_id" class="form-label">Filter Agen</label>
+                            <select class="form-select" id="agent_id" name="agent_id">
+                                <option value="">-- Semua Agen --</option>
+                                <?php
+                                $agenListQuery = mysqli_query($connect, "SELECT DISTINCT t.id_agen, a.nama_laundry FROM transaksi t JOIN agen a ON t.id_agen = a.id_agen WHERE t.payment_status = 'Paid' ORDER BY a.nama_laundry ASC");
+                                while ($row = mysqli_fetch_assoc($agenListQuery)) {
+                                    $selected = (isset($_GET['agent_id']) && $_GET['agent_id'] == $row['id_agen']) ? 'selected' : '';
+                                    echo '<option value="' . htmlspecialchars($row['id_agen']) . '" ' . $selected . '>' . htmlspecialchars($row['nama_laundry']) . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </form>
-            </div>
-            <div class="col-md-4 text-end">
-                <button class="btn btn-success" onclick="window.print()">Cetak Laporan</button>
+                <div class="mt-3">
+                    <a href="cetak.php?<?= http_build_query($_GET) ?>" class="btn btn-success" target="_blank">Cetak Laporan</a>
+                </div>
             </div>
         </div>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Kode Transaksi</th>
-                    <?php if ($login != "Pelanggan"): ?>
-                        <th>Agen</th>
-                    <?php endif; ?>
-                    <?php if ($login != "Agen"): ?>
-                        <th>Pelanggan</th>
-                    <?php endif; ?>
-                    <th>Total Item</th>
-                    <th>Berat</th>
-                    <th>Jenis</th>
-                    <th>Harga Paket</th>
-                    <th>Total Per Item</th>
-                    <th>Total Bayar</th>
-                    <th>Tanggal Pesan</th>
-                    <th>Tanggal Selesai</th>
-                    <th>Detail</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($transaksi = mysqli_fetch_assoc($query)): ?>
+        <div class="table-container">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
                     <tr>
-                        <td><?= htmlspecialchars($transaksi["kode_transaksi"]) ?></td>
-                        <?php if ($login != "Pelanggan"):
+                        <th>Kode Transaksi</th>
+                        <?php if ($login != "Pelanggan"): ?>
+                            <th>Agen</th>
+                        <?php endif; ?>
+                        <?php if ($login != "Agen"): ?>
+                            <th>Pelanggan</th>
+                        <?php endif; ?>
+                        <th>Total Item</th>
+                        <th>Berat</th>
+                        <th>Jenis</th>
+                        <th>Harga Paket</th>
+                        <th>Total Per Item</th>
+                        <th>Total Bayar</th>
+                        <th>Tanggal Pesan</th>
+                        <th>Tanggal Selesai</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody">
+                    <?php
+                    // Reset pointer hasil query agar dapat digunakan kembali
+                    mysqli_data_seek($query, 0);
+                    while ($transaksi = mysqli_fetch_assoc($query)) {
+                        $agentName = '';
+                        if ($login != "Pelanggan") {
                             $agenQuery = mysqli_query($connect, "SELECT nama_laundry FROM agen WHERE id_agen = " . intval($transaksi["id_agen"]));
                             $agenRow = mysqli_fetch_assoc($agenQuery);
-                        ?>
-                            <td><?= htmlspecialchars($agenRow["nama_laundry"] ?? '') ?></td>
-                        <?php endif; ?>
-                        <?php if ($login != "Agen"):
+                            $agentName = $agenRow["nama_laundry"] ?? '';
+                        }
+                        $pelName = '';
+                        if ($login != "Agen") {
                             $pelQuery = mysqli_query($connect, "SELECT nama FROM pelanggan WHERE id_pelanggan = " . intval($transaksi["id_pelanggan"]));
                             $pelRow = mysqli_fetch_assoc($pelQuery);
-                        ?>
-                            <td><?= htmlspecialchars($pelRow["nama"] ?? '') ?></td>
-                        <?php endif; ?>
-                        <td><?= htmlspecialchars($transaksi["total_item"]) ?></td>
-                        <td><?= htmlspecialchars($transaksi["berat"] ?? '-') ?></td>
-                        <td><?= htmlspecialchars($transaksi["jenis"]) ?></td>
-                        <td><?= "Rp " . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                        <td><?= "Rp " . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                        <td><?= "Rp " . number_format(calculateTotalHarga($transaksi), 0, ',', '.') ?></td>
-                        <td><?= htmlspecialchars($transaksi["tgl_mulai"]) ?></td>
-                        <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
-                        <td>
-                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#detailModal" data-item="<?= htmlspecialchars($transaksi["item_type"]) ?>">Detail</button>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal Detail Item -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detail Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul id="itemDetailList"></ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
+                            $pelName = $pelRow["nama"] ?? '';
+                        }
+                        echo '<tr>';
+                        echo '  <td>' . htmlspecialchars($transaksi["kode_transaksi"]) . '</td>';
+                        if ($login != "Pelanggan") {
+                            echo '  <td>' . htmlspecialchars($agentName) . '</td>';
+                        }
+                        if ($login != "Agen") {
+                            echo '  <td>' . htmlspecialchars($pelName) . '</td>';
+                        }
+                        echo '  <td>' . htmlspecialchars($transaksi["total_item"]) . '</td>';
+                        echo '  <td>' . htmlspecialchars($transaksi["berat"]) . '</td>';
+                        echo '  <td>' . htmlspecialchars($transaksi["jenis"]) . '</td>';
+                        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') . '</td>';
+                        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') . '</td>';
+                        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi), 0, ',', '.') . '</td>';
+                        echo '  <td>' . htmlspecialchars($transaksi["tgl_mulai"]) . '</td>';
+                        echo '  <td>' . htmlspecialchars($transaksi["tgl_selesai"]) . '</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
     </div>
-
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var detailModal = document.getElementById('detailModal');
-        detailModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var itemType = button.getAttribute('data-item');
-            var itemList = itemType.split(', ');
-            var itemDetailList = document.getElementById('itemDetailList');
-            itemDetailList.innerHTML = '';
-            itemList.forEach(function (item) {
-                var li = document.createElement('li');
-                li.textContent = item;
-                itemDetailList.appendChild(li);
+        // Real-time filtering dengan fetch API
+        document.getElementById('start_date').addEventListener('change', filterReport);
+        document.getElementById('end_date').addEventListener('change', filterReport);
+        <?php if ($login == "Admin"): ?>
+        document.getElementById('agent_id').addEventListener('change', filterReport);
+        <?php endif; ?>
+
+        function filterReport() {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            <?php if ($login == "Admin"): ?>
+            const agentId = document.getElementById('agent_id').value;
+            <?php else: ?>
+            const agentId = '';
+            <?php endif; ?>
+            const params = new URLSearchParams({
+                ajax: 'true',
+                start_date: startDate,
+                end_date: endDate,
+                <?php if ($login == "Admin"): ?>
+                agent_id: agentId,
+                <?php endif; ?>
             });
-        });
-    });
+            fetch('laporan.php?' + params.toString())
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('reportBody').innerHTML = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }
     </script>
 </body>
 </html>
