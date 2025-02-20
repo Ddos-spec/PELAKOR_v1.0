@@ -63,7 +63,6 @@ function getTotalPerItem($itemType, $idAgen) {
 }
 
 function calculateTotalHarga($transaksi) {
-    // Jika belum ada berat, kembalikan 0 atau handle sesuai kebutuhan
     if (empty($transaksi["berat"])) {
         return 0;
     }
@@ -85,6 +84,11 @@ function calculateTotalHarga($transaksi) {
     <div class="row">
         <h3 class="header col s12 light center">Riwayat Transaksi</h3>
         <div class="col s10 offset-s1">
+            <?php if ($login === "Agen" || $login === "Admin"): ?>
+                <div class="right-align" style="margin-bottom: 20px;">
+                    <a href="laporan.php" class="btn blue">Laporan</a>
+                </div>
+            <?php endif; ?>
             <table border="1" cellpadding="10" class="responsive-table centered">
                 <thead>
                     <tr>
@@ -105,6 +109,9 @@ function calculateTotalHarga($transaksi) {
                         <th>Tanggal Selesai</th>
                         <?php if ($login === "Agen"): ?>
                             <th>Invoice</th>
+                        <?php elseif ($login === "Admin"): ?>
+                            <th>Rating</th>
+                            <th>Komentar</th>
                         <?php else: ?>
                             <th>Rating</th>
                             <th>Komentar</th>
@@ -139,12 +146,11 @@ function calculateTotalHarga($transaksi) {
                                 <td>
                                     <button class="btn red">Invoice</button>
                                 </td>
-                            <?php else: ?>
+                            <?php elseif ($login === "Admin"): ?>
                                 <td>
                                     <?php if ($transaksi["rating"] == 0): ?>
                                         <form action="" method="post" class="review-form">
                                             <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
-                                            
                                             <div class="input-field">
                                                 <select class="browser-default" name="rating" required>
                                                     <option value="" disabled selected>Pilih Rating</option>
@@ -155,11 +161,49 @@ function calculateTotalHarga($transaksi) {
                                                     <option value="10">5</option>
                                                 </select>
                                             </div>
-                                            
                                             <div class="input-field">
                                                 <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
                                             </div>
-                                            
+                                            <div class="center">
+                                                <button class="btn blue darken-2" type="submit" name="submitReview">
+                                                    Kirim Ulasan
+                                                </button>
+                                            </div>
+                                        </form>
+                                    <?php else: ?>
+                                        <?php
+                                            $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                            $star = mysqli_fetch_assoc($star);
+                                            $star = $star["rating"];
+                                        ?>
+                                        <fieldset class="bintang">
+                                            <span class="starImg star-<?= $star ?>"></span>
+                                        </fieldset>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($transaksi["komentar"] != ""): ?>
+                                        <?= htmlspecialchars($transaksi["komentar"]) ?>
+                                    <?php endif; ?>
+                                </td>
+                            <?php else: ?>
+                                <td>
+                                    <?php if ($transaksi["rating"] == 0): ?>
+                                        <form action="" method="post" class="review-form">
+                                            <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
+                                            <div class="input-field">
+                                                <select class="browser-default" name="rating" required>
+                                                    <option value="" disabled selected>Pilih Rating</option>
+                                                    <option value="2">1</option>
+                                                    <option value="4">2</option>
+                                                    <option value="6">3</option>
+                                                    <option value="8">4</option>
+                                                    <option value="10">5</option>
+                                                </select>
+                                            </div>
+                                            <div class="input-field">
+                                                <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
+                                            </div>
                                             <div class="center">
                                                 <button class="btn blue darken-2" type="submit" name="submitReview">
                                                     Kirim Ulasan
@@ -196,7 +240,6 @@ if (isset($_POST["submitReview"])) {
     $komentar = htmlspecialchars($_POST["komentar"]);
     $kodeTransaksiRating = $_POST["kodeTransaksi"];
 
-    // Update both rating and comment
     $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
     mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
     
