@@ -70,6 +70,9 @@ function calculateTotalHarga($transaksi) {
     $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]);
     return $paket + $totalPerItem;
 }
+
+// Simpan data transaksi ke dalam array agar bisa digunakan kembali untuk modal
+$transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,6 +112,7 @@ function calculateTotalHarga($transaksi) {
                         <th>Tanggal Selesai</th>
                         <?php if ($login === "Agen"): ?>
                             <th>Invoice</th>
+                            <th>Detail</th>
                         <?php elseif ($login === "Admin"): ?>
                             <th>Rating</th>
                             <th>Komentar</th>
@@ -119,7 +123,7 @@ function calculateTotalHarga($transaksi) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($transaksi = mysqli_fetch_assoc($query)): ?>
+                    <?php foreach ($transactions as $transaksi): ?>
                         <tr>
                             <td><?= htmlspecialchars($transaksi["kode_transaksi"]) ?></td>
                             <?php if ($login != "Pelanggan"):
@@ -144,7 +148,10 @@ function calculateTotalHarga($transaksi) {
                             <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
                             <?php if ($login === "Agen"): ?>
                                 <td>
-<a href="invoice.php?id=<?= $transaksi['kode_transaksi'] ?>" class="btn red" target="_blank">Invoice</a>
+                                    <a href="invoice.php?id=<?= $transaksi['kode_transaksi'] ?>" class="btn red" target="_blank">Invoice</a>
+                                </td>
+                                <td>
+                                    <button class="btn modal-trigger" data-target="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>">Detail</button>
                                 </td>
                             <?php elseif ($login === "Admin"): ?>
                                 <td>
@@ -170,12 +177,11 @@ function calculateTotalHarga($transaksi) {
                                                 </button>
                                             </div>
                                         </form>
-                                    <?php else: ?>
-                                        <?php
-                                            $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                            $star = mysqli_fetch_assoc($star);
-                                            $star = $star["rating"];
-                                        ?>
+                                    <?php else: 
+                                        $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                        $star = mysqli_fetch_assoc($star);
+                                        $star = $star["rating"];
+                                    ?>
                                         <fieldset class="bintang">
                                             <span class="starImg star-<?= $star ?>"></span>
                                         </fieldset>
@@ -210,12 +216,11 @@ function calculateTotalHarga($transaksi) {
                                                 </button>
                                             </div>
                                         </form>
-                                    <?php else: ?>
-                                        <?php
-                                            $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                            $star = mysqli_fetch_assoc($star);
-                                            $star = $star["rating"];
-                                        ?>
+                                    <?php else: 
+                                        $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                        $star = mysqli_fetch_assoc($star);
+                                        $star = $star["rating"];
+                                    ?>
                                         <fieldset class="bintang">
                                             <span class="starImg star-<?= $star ?>"></span>
                                         </fieldset>
@@ -228,7 +233,7 @@ function calculateTotalHarga($transaksi) {
                                 </td>
                             <?php endif; ?>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -262,5 +267,57 @@ if (isset($_POST["submitReview"])) {
 
 include 'footer.php'; 
 ?>
+<?php if ($login === "Agen"): ?>
+<!-- Modals untuk detail order (hanya Agen) -->
+<?php foreach ($transactions as $transaksi): ?>
+    <div id="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>" class="modal">
+      <div class="modal-content">
+        <h4>Detail Order #<?= htmlspecialchars($transaksi['id_cucian']) ?></h4>
+        <table class="striped">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Harga per Item</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $items = explode(', ', $transaksi['item_type']);
+            foreach($items as $item) {
+                if(trim($item) == "") continue;
+                if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
+                    $itemName = trim($matches[1]);
+                    $quantity = (int)$matches[2];
+                    $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen']);
+                    $total = $price * $quantity;
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($itemName) ?></td>
+                        <td><?= $quantity ?></td>
+                        <td>Rp <?= number_format($price, 0, ',', '.') ?></td>
+                        <td>Rp <?= number_format($total, 0, ',', '.') ?></td>
+                    </tr>
+                    <?php
+                }
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close btn">Close</a>
+      </div>
+    </div>
+<?php endforeach; ?>
+<?php endif; ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var modals = document.querySelectorAll('.modal');
+      M.Modal.init(modals);
+    });
+</script>
 </body>
 </html>
