@@ -171,7 +171,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'true') {
                     </div>
                 </form>
                 <div class="mt-3">
-                    <a href="cetak.php?<?= http_build_query($_GET) ?>" class="btn btn-success" target="_blank">Cetak Laporan</a>
+                    <a href="cetak-laporan.php?<?= http_build_query($_GET) ?>" class="btn btn-success" target="_blank">Cetak Laporan</a>
                 </div>
             </div>
         </div>
