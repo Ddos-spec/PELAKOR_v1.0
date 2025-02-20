@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 19 Feb 2025 pada 19.20
+-- Waktu pembuatan: 20 Feb 2025 pada 05.06
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -64,7 +64,7 @@ CREATE TABLE `agen` (
 --
 
 INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`) VALUES
-(15, 'Pelakor Kilat', 'Kilat', '14314123', 'kilat@gmail.com', 'adfqawda', 'awdadawd', '12313', 'default.png', '$2y$10$XlmpB5GCTNobxSZGQ.p91uB8yoGxcRjf618DDcbhxoBNiHfut3fN6');
+(15, 'Pelakor Kilat', 'Kilat', '14314123', 'kilat@gmail.com', 'adfqawda', 'awdadawd', '12313', 'default.png', '$2y$10$6us22rh5XtBLOtHV6vhGPe26BOm/M8f/ty9xUyiJBCucfxqDkel5y');
 
 -- --------------------------------------------------------
 
@@ -93,7 +93,14 @@ CREATE TABLE `cucian` (
 --
 
 INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `item_type`, `total_item`, `preview_price`, `berat`, `alamat`, `catatan`, `status_cucian`) VALUES
-(11, 15, 15, '2025-02-19', '0000-00-00', 'komplit', 'Baju (1), Jaket (1)', 2, NULL, NULL, 'dsfwsfegfweag, awdadawfda', '', 'Penjemputan');
+(11, 15, 15, '2025-02-19', '0000-00-00', 'komplit', 'Baju (1), Jaket (1)', 2, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(12, 15, 15, '2025-02-19', '0000-00-00', 'komplit', 'Baju (5), Celana (5)', 10, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(13, 15, 15, '2025-02-20', '0000-00-00', 'komplit', 'Baju (5), Karpet (1)', 6, NULL, 50, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(14, 15, 15, '2025-02-20', '0000-00-00', 'setrika', 'Baju (4), Celana (4)', 8, NULL, 5, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(15, 15, 15, '2025-02-20', '2025-02-20', 'cuci', 'Baju (3), Celana (3)', 6, NULL, 5, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(16, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Celana (1), Jaket (1)', 2, NULL, 10, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(17, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Karpet (1), Pakaian_khusus (1)', 2, NULL, 5, 'dsfwsfegfweag, awdadawfda', '', 'Selesai'),
+(18, 15, 15, '2025-02-20', '2025-02-20', 'komplit', 'Baju (2), Celana (2)', 4, NULL, 100, 'dsfwsfegfweag, awdadawfda', '', 'Selesai');
 
 -- --------------------------------------------------------
 
@@ -171,6 +178,18 @@ CREATE TABLE `transaksi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data untuk tabel `transaksi`
+--
+
+INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `payment_status`, `rating`, `komentar`) VALUES
+(24, 13, 15, 15, '2025-02-20', '0000-00-00', 266000, 'Paid', NULL, '0'),
+(25, 14, 15, 15, '2025-02-20', '2025-02-20', 35000, 'Paid', NULL, '0'),
+(26, 15, 15, 15, '2025-02-20', '2025-02-20', 25000, 'Paid', NULL, '0'),
+(27, 16, 15, 15, '2025-02-20', '2025-02-20', 57000, 'Paid', NULL, '0'),
+(28, 17, 15, 15, '2025-02-20', '2025-02-20', 36000, 'Paid', NULL, '0'),
+(29, 18, 15, 15, '2025-02-20', '2025-02-20', 510000, 'Paid', NULL, '0');
+
+--
 -- Indexes for dumped tables
 --
 
@@ -230,7 +249,7 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -248,7 +267,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
