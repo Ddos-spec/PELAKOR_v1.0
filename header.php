@@ -1,7 +1,7 @@
 <nav class="blue darken2">
     <div class="container">
         <div class="nav-wrapper">
-            <a id="logo-container" href="index.php" class="brand-logo"><i class="material-icons left large">home</i>LaundryKu</a>
+            <a id="logo-container" href="index.php" class="brand-logo"><i class="material-icons left large">home</i>Pelakorku</a>
             <ul class="right hide-on-med-and-down">
                 <li> 
                 <?php
