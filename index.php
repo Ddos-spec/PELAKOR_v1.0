@@ -1,175 +1,154 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 
-
-//konfirgurasi pagination
+//konfigurasi pagination
 $jumlahDataPerHalaman = 3;
 $query = mysqli_query($connect,"SELECT * FROM agen");
 $jumlahData = mysqli_num_rows($query);
-//ceil() = pembulatan ke atas
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+$halamanAktif = isset($_GET["page"]) ? $_GET["page"] : 1;
+$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-//menentukan halaman aktif
-//$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-if ( isset($_GET["page"])){
-    $halamanAktif = $_GET["page"];
-}else{
-    $halamanAktif = 1;
-}
-
-//data awal
-$awalData = ( $jumlahDataPerHalaman * $halamanAktif ) - $jumlahDataPerHalaman;
-
-//fungsi memasukkan data di db ke array
+//Query dasar untuk mengambil data agen
 $agen = mysqli_query($connect,"SELECT * FROM agen LIMIT $awalData, $jumlahDataPerHalaman");
-
-
-
-//ketika tombol cari ditekan
-if ( isset($_POST["cari"])) {
-    $keyword = htmlspecialchars($_POST["keyword"]);
-
-    $query = "SELECT * FROM agen WHERE 
-        kota LIKE '%$keyword%' OR
-        nama_laundry LIKE '%$keyword%'
-        LIMIT $awalData, $jumlahDataPerHalaman
-    ";
-
-    $agen = mysqli_query($connect,$query);
-
-    //konfirgurasi pagination
-    $jumlahDataPerHalaman = 3;
-    $jumlahData = mysqli_num_rows($agen);
-    //ceil() = pembulatan ke atas
-    $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
-    //menentukan halaman aktif
-    //$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-    if ( isset($_GET["page"])){
-        $halamanAktif = $_GET["page"];
-    }else{
-        $halamanAktif = 1;
-    }
-}
-
-
-if (isset($_POST["submitSorting"])){
-    $sorting = $_POST["sorting"];
-
-    $agen = mysqli_query($connect, "SELECT * FROM agen JOIN harga ON agen.id_agen = harga.id_agen WHERE harga.jenis = 'komplit' ORDER BY harga.harga ASC LIMIT $awalData, $jumlahDataPerHalaman");
-}
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
     <title>Laundryku</title>
     <?php include 'headtags.html' ?>
+    <style>
+        .agent-card {
+            height: 100%;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .agent-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 1rem auto;
+        }
+        .rating-stars {
+            color: #ffd700;
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .search-container {
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+        .agent-info {
+            padding: 1rem;
+            flex-grow: 1;
+        }
+        .agent-contact {
+            margin-top: auto;
+            padding: 1rem;
+        }
+        .pagination {
+            margin: 2rem 0;
+        }
+        #noResults {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
     <?php include 'header.php'; ?>
 
-        <div class="container">
-            <br>
-            <h1 class="header center orange-text"><img src="img/banner.png" width=70% alt=""></h1>
-            <div class="row center">
-                <h5 class="header col s12 light">Solusi Laundry Praktis Tanpa Keluar Rumah</h5>
-            </div>
-
-            <!-- menu -->
-            <div class="row center">
-                <div id="body">
-                    <?php if ( isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"]) ) : ?>
-                        <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="pelanggan.php">Profil Saya</a>
-                            <?php 
-                            $idPelanggan = $_SESSION['pelanggan'];
-                            $cek = mysqli_query($connect,"SELECT * FROM cucian WHERE id_pelanggan = $idPelanggan AND status_cucian != 'Selesai'");
-                            if (mysqli_num_rows($cek) > 0){
-                                $status = "Status Cucian<i class='material-icons right'>notifications_active</i>";
-                            }else {
-                                $status = "Status Cucian";
-                            }
-
-                            $cek = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_pelanggan = $idPelanggan AND rating = 0 OR komentar = ''");
-                            if (mysqli_num_rows($cek) > 0){
-                                $transaksi = "Riwayat Transaksi<i class='material-icons right'>notifications_active</i>";
-                            }else {
-                                $transaksi = "Riwayat Transaksi";
-                            }
-
-                            ?>
-
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="status.php"><?= $status ?></a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="transaksi.php"><?= $transaksi ?></a>
-                        </div>
-                    <?php elseif ( isset($_SESSION["login-agen"]) && isset($_SESSION["agen"]) ) : ?>
-                        <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                        <?php
-                        $idAgen = $_SESSION['agen'];
-                        $cek = mysqli_query($connect,"SELECT * FROM cucian WHERE id_agen = $idAgen AND status_cucian != 'Selesai'");
-                        if (mysqli_num_rows($cek) > 0){
-                            $status = "Status Cucian<i class='material-icons right'>notifications_active</i>";
-                        }else {
-                            $status = "Status Cucian";
-                        }
-                        ?>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="agen.php">Profil Saya</a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="status.php"><?= $status ?></a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="transaksi.php">Riwayat Transaksi</a>
-                        </div>
-                    <?php elseif ( isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]) ) : ?>
-                        <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="admin.php">Profil Saya</a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="status.php">Status Cucian</a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="transaksi.php">Riwayat Transaksi</a>
-                            <br><br>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="list-agen.php">Data Agen</a>
-                            <a id="download-button" class="btn-large waves-effect waves-light blue darken-3" href="list-pelanggan.php">Data Pelanggan</a>
-                        </div>
-                    <?php else : ?>
-                        <div class="hero__btn" data-animation="fadeInRight" data-delay="1s">
-                            <a href="registrasi.php" id="download-button" class="btn-large waves-effect waves-light blue darken-3">Daftar Sekarang</a>
-                        </div>
-                    <?php endif ?>
-                </div>
-            <!-- end menu -->
-            </div>
-            <br>
+    <div class="container">
+        <br>
+        <h1 class="header center orange-text">
+            <img src="img/banner.png" width="70%" alt="Laundryku Banner">
+        </h1>
+        <div class="row center">
+            <h5 class="header col s12 light">Solusi Laundry Praktis Tanpa Keluar Rumah</h5>
         </div>
 
+        <!-- Menu Buttons Section -->
+        <div class="row center">
+            <?php include 'menu-buttons.php'; ?>
+        </div>
 
-    <!-- searching -->
-    <div class="col s12 center">
-        <div class="input-field inline">
-            <input type="text" size=40 name="keyword" placeholder="Kota / Kabupaten" id="keyword" autofocus autocomplete="off">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="input-field">
+                <i class="material-icons prefix">search</i>
+                <input type="text" id="keyword" placeholder="Cari berdasarkan nama laundry atau kota..." 
+                       class="validate" autocomplete="off">
+                <label for="keyword">Pencarian</label>
+            </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="grey-text">
+            <h5>Tidak ada hasil yang ditemukan</h5>
+        </div>
+
+        <!-- Agent List Container -->
+        <div class="row" id="agentContainer">
+            <!-- Agents will be loaded here dynamically -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="row center">
+            <ul class="pagination">
+                <?php if($halamanAktif > 1) : ?>
+                    <li class="waves-effect">
+                        <a href="?page=<?= $halamanAktif - 1 ?>">
+                            <i class="material-icons">chevron_left</i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php for($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                    <li class="waves-effect <?= $i == $halamanAktif ? 'active blue' : '' ?>">
+                        <a href="?page=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <?php if($halamanAktif < $jumlahHalaman) : ?>
+                    <li class="waves-effect">
+                        <a href="?page=<?= $halamanAktif + 1 ?>">
+                            <i class="material-icons">chevron_right</i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
         </div>
     </div>
-    <!-- end searching -->
 
+    <?php include "footer.php" ?>
+
+    <!-- Initialize Materialize Components -->
+    <script src="materialize/js/materialize.min.js"></script>
+    
+    <!-- Custom JavaScript for Real-time Search -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('keyword');
-        const agentListContainer = document.querySelector('.row.card');
+        const agentContainer = document.getElementById('agentContainer');
+        const noResults = document.getElementById('noResults');
+        
+        // Load initial data
+        fetchAgents('');
 
+        // Add input event listener for real-time search
         searchInput.addEventListener('input', function(e) {
             const keyword = e.target.value.trim();
-            
-            // Prevent AJAX call if keyword is too short
-            if (keyword.length < 2) {
-                // Show all agents if search is cleared
-                if (keyword.length === 0) {
-                    fetchAgents('');
-                }
-                return;
-            }
-
             fetchAgents(keyword);
         });
 
@@ -179,140 +158,60 @@ if (isset($_POST["submitSorting"])){
                 .then(data => {
                     updateAgentList(data);
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                .catch(error => console.error('Error:', error));
         }
 
         function updateAgentList(agents) {
-            agentListContainer.innerHTML = '';
-
+            agentContainer.innerHTML = '';
+            
+            if (agents.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
             agents.forEach(agent => {
-                const agentCard = `
-                    <div class="col s12 m4">
-                        <div class="icon-block center">
-                            <h2 class="center light-blue-text">
-                                <a href="detail-agen.php?id=${agent.id_agen}">
-                                    <img src="img/agen/${agent.foto}" class="circle resposive-img" width=60% />
-                                </a>
-                            </h2>
-                            <h5 class="center">
-                                <a href="detail-agen.php?id=${agent.id_agen}">${agent.nama_laundry}</a>
-                            </h5>
-                            <p class="light">
-                                Alamat : ${agent.alamat}, ${agent.kota}
-                                <br/>Telp : ${agent.telp}
-                            </p>
-                        </div>
-                    </div>`;
-                agentListContainer.insertAdjacentHTML('beforeend', agentCard);
+                const agentCard = createAgentCard(agent);
+                agentContainer.innerHTML += agentCard;
+            });
+
+            // Initialize any Materialize components in the new content
+            const ratings = document.querySelectorAll('.rating-stars');
+            ratings.forEach(rating => {
+                const stars = rating.getAttribute('data-rating');
+                rating.innerHTML = '★'.repeat(stars) + '☆'.repeat(5 - stars);
             });
         }
 
-        // Prevent list disappearance on Ctrl/Alt key press
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey || e.altKey) {
-                e.preventDefault();
-            }
-        });
-    });
-    </script>
-
-    <div id="container">
-        <!-- pagination -->
-        <div id="search">
-            <ul class="pagination center">
-            <?php if( $halamanAktif > 1 ) : ?>
-                <li class="disabled-effect blue darken-1">
-                    <!-- halaman pertama -->
-                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
-                </li>
-            <?php endif; ?>
-            <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
-                <?php if( $i == $halamanAktif ) : ?>
-                    <li class="active grey"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php else : ?>
-                    <li class="waves-effect blue darken-1"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php endif; ?>
-            <?php endfor; ?>
-            <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-                <li class="waves-effect blue darken-1">
-                    <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
-                </li>
-            <?php endif; ?>
-            </ul>
-        </div>
-        <!-- pagination -->
-
-
-        <!-- sorting -->
-        <!-- <div class="row">
-            <div class="col s4 offset-s4">
-                <form action="" method="post">
-                    <label for="sorting">Sorting</label>
-                    <select class="browser-default" name="sorting" id="sorting">
-                        <option disabled>Sorting</option>
-                        <option value="hargaDown">Harga Terendah</option>
-                    </select>
-                    <div class="center"><button class="btn blue darken-2" type="submit" name="submitSorting"><i class="material-icons">send</i></button></div>
-                </form>
-            </div>
-        </div> -->
-        <!-- end sorting -->
-
-        <!-- list agen -->
-    
-        <div class="container">
-            <div class="section">
-
-                <!--   Icon Section   -->
-                <div class="row card">
-                    <?php foreach ( $agen as $dataAgen) : ?>
-                        <div class="col s12 m4">
-                            <div class="icon-block center">
-                                <h2 class="center light-blue-text"><a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><img src="img/agen/<?= $dataAgen['foto'] ?>" class="circle resposive-img" width=60% /></a></h2>
-                                <h5 class="center"><a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>"><?= $dataAgen["nama_laundry"] ?></a></h5>
-                                <?php
-                                    $temp = $dataAgen["id_agen"];
-                                    $queryStar = mysqli_query($connect,"SELECT * FROM transaksi WHERE id_agen = '$temp'");
-                                    $totalStar = 0;
-                                    $i = 0;
-                                    while ($star = mysqli_fetch_assoc($queryStar)){
-
-                                        // kalau belum kasi rating gk dihitung
-                                        if ($star["rating"] != 0){
-                                            $totalStar += $star["rating"];
-                                            $i++;
-                                            $fixStar = ceil($totalStar / $i);
-                                        }
-                                    }
-                                        
-                                    if ( $totalStar == 0 ) {
-                                ?>
-                                    <center><fieldset class="bintang"><span class="starImg star-0"></span></fieldset></center>
-                                <?php }else { ?>
-                                    <center><fieldset class="bintang"><span class="starImg star-<?= $fixStar ?>"></span></fieldset></center>
-                                <?php } ?>
-
-                                <p class="light">
-                                    Alamat : <?= $dataAgen["alamat"] . ", " . $dataAgen["kota"]  ?>
-                                    <br/>Telp : <?= $dataAgen["telp"] ?></p>
+        function createAgentCard(agent) {
+            return `
+                <div class="col s12 m4">
+                    <div class="card agent-card">
+                        <div class="card-content center-align">
+                            <img src="img/agen/${agent.foto}" class="agent-image" alt="${agent.nama_laundry}">
+                            <div class="agent-info">
+                                <span class="card-title">${agent.nama_laundry}</span>
+                                <div class="rating-stars" data-rating="${agent.rating || 0}"></div>
+                                <p class="grey-text">
+                                    <i class="material-icons tiny">location_on</i> ${agent.alamat}, ${agent.kota}
+                                </p>
+                                <p class="grey-text">
+                                    <i class="material-icons tiny">phone</i> ${agent.telp}
                                 </p>
                             </div>
+                            <div class="agent-contact">
+                                <a href="detail-agen.php?id=${agent.id_agen}" 
+                                   class="btn waves-effect waves-light blue darken-2">
+                                    Lihat Detail
+                                </a>
+                            </div>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
                 </div>
-
-            </div>
-            <br><br>
-        </div>
-    </div>
-
-    <!-- footer -->
-    <?php include "footer.php" ?>
-    <!-- end footer -->
-
+            `;
+        }
+    });
+    </script>
 </body>
-    <script src="js/script.js"></script>
-    <script src="js/scriptAjax.js"></script>
 </html>

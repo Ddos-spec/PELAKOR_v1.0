@@ -2,14 +2,26 @@
 session_start();
 include '../connect-db.php';
 
-// Handle agent list request
+header('Content-Type: application/json');
+
+// Handle agent list request dengan rating
 if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
-    $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+    $keyword = isset($_GET['keyword']) ? mysqli_real_escape_string($connect, $_GET['keyword']) : '';
     
-    // Build query with keyword search
-    $query = "SELECT * FROM agen WHERE 
-        kota LIKE '%$keyword%' OR
-        nama_laundry LIKE '%$keyword%'";
+    // Query untuk mendapatkan data agen dengan rating
+    $query = "SELECT a.*, 
+              COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating
+              FROM agen a 
+              LEFT JOIN transaksi t ON a.id_agen = t.id_agen";
+    
+    if (!empty($keyword)) {
+        $query .= " WHERE a.nama_laundry LIKE '%$keyword%' 
+                    OR a.kota LIKE '%$keyword%' 
+                    OR a.alamat LIKE '%$keyword%'";
+    }
+    
+    $query .= " GROUP BY a.id_agen 
+                ORDER BY a.nama_laundry ASC";
     
     $result = mysqli_query($connect, $query);
     $agents = [];
@@ -17,15 +29,15 @@ if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
     while ($row = mysqli_fetch_assoc($result)) {
         $agents[] = [
             'id_agen' => $row['id_agen'],
-            'nama_laundry' => $row['nama_laundry'],
-            'alamat' => $row['alamat'],
-            'kota' => $row['kota'],
-            'telp' => $row['telp'],
-            'foto' => $row['foto']
+            'nama_laundry' => htmlspecialchars($row['nama_laundry']),
+            'alamat' => htmlspecialchars($row['alamat']),
+            'kota' => htmlspecialchars($row['kota']),
+            'telp' => htmlspecialchars($row['telp']),
+            'foto' => htmlspecialchars($row['foto']),
+            'rating' => round($row['rating'])
         ];
     }
     
-    header('Content-Type: application/json');
     echo json_encode($agents);
     exit;
 }
@@ -42,9 +54,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
         $prices[$row['jenis']] = $row['harga'];
     }
     
-    // Return prices in JSON format
-    header('Content-Type: application/json');
-    echo json_encode([
+    // Default price structure
+    $defaultPrices = [
         'baju' => [
             'cuci' => $prices['cuci'] ?? 5000,
             'setrika' => $prices['setrika'] ?? 3000,
@@ -70,7 +81,12 @@ if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
             'setrika' => $prices['setrika'] ?? 6000,
             'komplit' => $prices['komplit'] ?? 12000
         ]
-    ]);
+    ];
+    
+    echo json_encode($defaultPrices);
     exit;
 }
+
+// Return error if action not specified
+echo json_encode(['error' => 'Invalid action']);
 ?>
