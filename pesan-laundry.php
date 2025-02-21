@@ -85,6 +85,21 @@ $rating = calculateAgentRating($connect, $idAgen);
             border-radius: 50%;
             border: 2px solid #ddd;
         }
+        /* Flex container untuk menyatukan foto & detail agen dalam satu baris */
+        .agent-info-container {
+            display: flex;
+            align-items: center; /* Vertikal tengah */
+            gap: 20px; /* Jarak horizontal antar elemen */
+            margin-bottom: 20px; /* Spasi bawah agar rapi */
+        }
+        .agent-details h3 {
+            margin: 0; /* Hilangkan margin default agar lebih rapat */
+        }
+        .agent-details ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
         .item-selection {
             margin: 20px 0;
         }
@@ -107,22 +122,26 @@ $rating = calculateAgentRating($connect, $idAgen);
     <?php include 'header.php'; ?>
 
     <!-- Laundry Information Section -->
-    <div class="row">
-        <!-- Foto Profil Agen, tampil sebagai bulat sempurna -->
-        <div class="col s2 offset-s4">
-            <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="profile-img" alt="Laundry Logo">
-        </div>
-        <div class="col s6">
-            <h3><?= htmlspecialchars($agen["nama_laundry"]) ?></h3>
-            <ul>
-                <li>
-                    <fieldset class="bintang">
-                        <span class="starImg star-<?= $rating ?>"></span>
-                    </fieldset>
-                </li>
-                <li>Alamat: <?= htmlspecialchars($agen["alamat"] . ", " . $agen["kota"]) ?></li>
-                <li>No. HP: <?= htmlspecialchars($agen["telp"]) ?></li>
-            </ul>
+    <div class="container">
+        <div class="row">
+            <!-- Agent info container: foto & detail dalam satu baris -->
+            <div class="agent-info-container col s12">
+                <div>
+                    <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="profile-img" alt="Laundry Logo">
+                </div>
+                <div class="agent-details">
+                    <h3><?= htmlspecialchars($agen["nama_laundry"]) ?></h3>
+                    <ul>
+                        <li>
+                            <fieldset class="bintang">
+                                <span class="starImg star-<?= $rating ?>"></span>
+                            </fieldset>
+                        </li>
+                        <li>Alamat: <?= htmlspecialchars($agen["alamat"] . ", " . $agen["kota"]) ?></li>
+                        <li>No. HP: <?= htmlspecialchars($agen["telp"]) ?></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
