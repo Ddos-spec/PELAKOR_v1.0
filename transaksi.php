@@ -30,48 +30,7 @@ if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     exit();
 }
 
-// Fungsi tambahan untuk menghitung harga
-function getHargaPaket($jenis, $idAgen) {
-    global $connect;
-    $jenisEscaped = mysqli_real_escape_string($connect, $jenis);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenisEscaped'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
-}
-
-function getPerItemPrice($item, $idAgen) {
-    global $connect;
-    $itemEscaped = mysqli_real_escape_string($connect, $item);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$itemEscaped'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
-}
-
-function getTotalPerItem($itemType, $idAgen) {
-    $total = 0;
-    $items = explode(', ', $itemType);
-    foreach ($items as $it) {
-        if (trim($it) === "") continue;
-        if (preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
-            $item = strtolower(trim($matches[1]));
-            $qty = (int)$matches[2];
-            $price = getPerItemPrice($item, $idAgen);
-            $total += $price * $qty;
-        }
-    }
-    return $total;
-}
-
-function calculateTotalHarga($transaksi) {
-    if (empty($transaksi["berat"])) {
-        return 0;
-    }
-    $paket = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]) * $transaksi["berat"];
-    $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]);
-    return $paket + $totalPerItem;
-}
-
-// Simpan data transaksi ke dalam array agar bisa digunakan kembali untuk modal
+// Simpan data transaksi ke dalam array agar bisa digunakan untuk modal detail
 $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -79,8 +38,9 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php include "headtags.html"; ?>
+    <?php include 'headtags.html'; ?>
     <title>Transaksi - <?= htmlspecialchars($login) ?></title>
+    <!-- Pastikan file CSS dan JS untuk Materialize (atau library modal yang digunakan) sudah terinclude -->
 </head>
 <body>
     <?php include 'header.php'; ?>
@@ -178,9 +138,9 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                             </div>
                                         </form>
                                     <?php else: 
-                                        $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $star = mysqli_fetch_assoc($star);
-                                        $star = $star["rating"];
+                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                        $starRow = mysqli_fetch_assoc($starResult);
+                                        $star = $starRow["rating"];
                                     ?>
                                         <fieldset class="bintang">
                                             <span class="starImg star-<?= $star ?>"></span>
@@ -217,9 +177,9 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                             </div>
                                         </form>
                                     <?php else: 
-                                        $star = mysqli_query($connect, "SELECT * FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $star = mysqli_fetch_assoc($star);
-                                        $star = $star["rating"];
+                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
+                                        $starRow = mysqli_fetch_assoc($starResult);
+                                        $star = $starRow["rating"];
                                     ?>
                                         <fieldset class="bintang">
                                             <span class="starImg star-<?= $star ?>"></span>
@@ -238,86 +198,87 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
             </table>
         </div>
     </div>
-<?php
-// Handle review submission
-if (isset($_POST["submitReview"])) {
-    $rating = $_POST["rating"];
-    $komentar = htmlspecialchars($_POST["komentar"]);
-    $kodeTransaksiRating = $_POST["kodeTransaksi"];
-
-    $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
-    mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
-    
-    if (mysqli_stmt_execute($updateReview)) {
-        echo "
-            <script>
-                Swal.fire('Penilaian Berhasil','Ulasan Berhasil Di Tambahkan','success').then(function() {
-                    window.location = 'transaksi.php';
-                });
-            </script>
-        ";
-    } else {
-        echo "
-            <script>
-                Swal.fire('Error','Gagal menambahkan ulasan','error');
-            </script>
-        ";
-    }
-}
-
-include 'footer.php'; 
-?>
-<?php if ($login === "Agen"): ?>
-<!-- Modals untuk detail order (hanya Agen) -->
-<?php foreach ($transactions as $transaksi): ?>
-    <div id="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>" class="modal">
-      <div class="modal-content">
-        <h4>Detail Order #<?= htmlspecialchars($transaksi['id_cucian']) ?></h4>
-        <table class="striped">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Harga per Item</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            $items = explode(', ', $transaksi['item_type']);
-            foreach($items as $item) {
-                if(trim($item) == "") continue;
-                if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
-                    $itemName = trim($matches[1]);
-                    $quantity = (int)$matches[2];
-                    $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen']);
-                    $total = $price * $quantity;
-                    ?>
-                    <tr>
-                        <td><?= htmlspecialchars($itemName) ?></td>
-                        <td><?= $quantity ?></td>
-                        <td>Rp <?= number_format($price, 0, ',', '.') ?></td>
-                        <td>Rp <?= number_format($total, 0, ',', '.') ?></td>
-                    </tr>
-                    <?php
+    <?php if ($login === "Agen"): ?>
+    <!-- Modals untuk detail order (hanya Agen) -->
+    <?php foreach ($transactions as $transaksi): ?>
+        <div id="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>" class="modal">
+          <div class="modal-content">
+            <h4>Detail Order #<?= htmlspecialchars($transaksi['id_cucian']) ?></h4>
+            <table class="striped">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Harga per Item</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                $items = explode(', ', $transaksi['item_type']);
+                foreach($items as $item) {
+                    if(trim($item) == "") continue;
+                    if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
+                        $itemName = trim($matches[1]);
+                        $quantity = (int)$matches[2];
+                        $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen']);
+                        $total = $price * $quantity;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($itemName) ?></td>
+                            <td><?= $quantity ?></td>
+                            <td>Rp <?= number_format($price, 0, ',', '.') ?></td>
+                            <td>Rp <?= number_format($total, 0, ',', '.') ?></td>
+                        </tr>
+                        <?php
+                    }
                 }
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-close btn">Close</a>
-      </div>
-    </div>
-<?php endforeach; ?>
-<?php endif; ?>
+                ?>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <a href="#!" class="modal-close btn">Close</a>
+          </div>
+        </div>
+    <?php endforeach; ?>
+    <?php endif; ?>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var modals = document.querySelectorAll('.modal');
-      M.Modal.init(modals);
-    });
-</script>
+    <script>
+        // Inisialisasi modal menggunakan Materialize (pastikan library Materialize sudah diinclude)
+        document.addEventListener('DOMContentLoaded', function() {
+          var modals = document.querySelectorAll('.modal');
+          M.Modal.init(modals);
+        });
+    </script>
+    <?php
+    // Handle review submission
+    if (isset($_POST["submitReview"])) {
+        $rating = $_POST["rating"];
+        $komentar = htmlspecialchars($_POST["komentar"]);
+        $kodeTransaksiRating = $_POST["kodeTransaksi"];
+    
+        $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
+        mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
+        
+        if (mysqli_stmt_execute($updateReview)) {
+            echo "
+                <script>
+                    Swal.fire('Penilaian Berhasil','Ulasan Berhasil Di Tambahkan','success').then(function() {
+                        window.location = 'transaksi.php';
+                    });
+                </script>
+            ";
+        } else {
+            echo "
+                <script>
+                    Swal.fire('Error','Gagal menambahkan ulasan','error');
+                </script>
+            ";
+        }
+    }
+    
+    include 'footer.php'; 
+    ?>
 </body>
 </html>

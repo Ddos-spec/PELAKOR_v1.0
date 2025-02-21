@@ -2,6 +2,35 @@
 session_start();
 include '../connect-db.php';
 
+// Handle agent list request
+if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
+    $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+    
+    // Build query with keyword search
+    $query = "SELECT * FROM agen WHERE 
+        kota LIKE '%$keyword%' OR
+        nama_laundry LIKE '%$keyword%'";
+    
+    $result = mysqli_query($connect, $query);
+    $agents = [];
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $agents[] = [
+            'id_agen' => $row['id_agen'],
+            'nama_laundry' => $row['nama_laundry'],
+            'alamat' => $row['alamat'],
+            'kota' => $row['kota'],
+            'telp' => $row['telp'],
+            'foto' => $row['foto']
+        ];
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode($agents);
+    exit;
+}
+
+// Handle price list request
 if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
     $idAgen = intval($_GET['idAgen']);
     

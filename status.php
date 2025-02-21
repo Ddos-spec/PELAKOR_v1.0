@@ -121,35 +121,7 @@ function handleStatusUpdate($connect) {
 handleWeightUpdate($connect);
 handleStatusUpdate($connect);
 
-// Fungsi perhitungan harga
-function getHargaPaket($jenis, $idAgen) {
-    global $connect;
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
-}
 
-function getPerItemPrice($item, $idAgen) {
-    global $connect;
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$item'");
-    $row = mysqli_fetch_assoc($q);
-    return $row['harga'] ?? 0;
-}
-
-function getTotalPerItem($itemType, $idAgen) {
-    $total = 0;
-    $items = explode(', ', $itemType);
-    foreach($items as $it) {
-        if(trim($it) == "") continue;
-        if(preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
-            $item = strtolower(trim($matches[1]));
-            $qty = (int)$matches[2];
-            $price = getPerItemPrice($item, $idAgen);
-            $total += $price * $qty;
-        }
-    }
-    return $total;
-}
 
 function calculateTotalHarga($order) {
     if (is_null($order['berat'])) return null;

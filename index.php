@@ -146,13 +146,77 @@ if (isset($_POST["submitSorting"])){
 
 
     <!-- searching -->
-    <form class="col s12 center" action="" method="post">
+    <div class="col s12 center">
         <div class="input-field inline">
             <input type="text" size=40 name="keyword" placeholder="Kota / Kabupaten" id="keyword" autofocus autocomplete="off">
-            <!-- <a href="#search"><button type="submit" class="btn waves-effect blue darken-2" id="cariData" name="cari"><i class="material-icons">search</i></button></a> -->
         </div>
-    </form>
+    </div>
     <!-- end searching -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('keyword');
+        const agentListContainer = document.querySelector('.row.card');
+
+        searchInput.addEventListener('input', function(e) {
+            const keyword = e.target.value.trim();
+            
+            // Prevent AJAX call if keyword is too short
+            if (keyword.length < 2) {
+                // Show all agents if search is cleared
+                if (keyword.length === 0) {
+                    fetchAgents('');
+                }
+                return;
+            }
+
+            fetchAgents(keyword);
+        });
+
+        function fetchAgents(keyword) {
+            fetch(`ajax/agen.php?action=getAgents&keyword=${encodeURIComponent(keyword)}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateAgentList(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function updateAgentList(agents) {
+            agentListContainer.innerHTML = '';
+
+            agents.forEach(agent => {
+                const agentCard = `
+                    <div class="col s12 m4">
+                        <div class="icon-block center">
+                            <h2 class="center light-blue-text">
+                                <a href="detail-agen.php?id=${agent.id_agen}">
+                                    <img src="img/agen/${agent.foto}" class="circle resposive-img" width=60% />
+                                </a>
+                            </h2>
+                            <h5 class="center">
+                                <a href="detail-agen.php?id=${agent.id_agen}">${agent.nama_laundry}</a>
+                            </h5>
+                            <p class="light">
+                                Alamat : ${agent.alamat}, ${agent.kota}
+                                <br/>Telp : ${agent.telp}
+                            </p>
+                        </div>
+                    </div>`;
+                agentListContainer.insertAdjacentHTML('beforeend', agentCard);
+            });
+        }
+
+        // Prevent list disappearance on Ctrl/Alt key press
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.altKey) {
+                e.preventDefault();
+            }
+        });
+    });
+    </script>
 
     <div id="container">
         <!-- pagination -->
