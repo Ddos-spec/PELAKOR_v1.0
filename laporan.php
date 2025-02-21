@@ -3,52 +3,6 @@ session_start();
 require_once 'connect-db.php';
 require_once 'functions/functions.php';
 
-// Jika fungsi getHargaPaket() belum ada, definisikan fungsi–fungsi yang diperlukan
-if (!function_exists('getHargaPaket')) {
-    function getHargaPaket($jenis, $idAgen) {
-        global $connect;
-        $jenisEscaped = mysqli_real_escape_string($connect, $jenis);
-        $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenisEscaped'");
-        $row = mysqli_fetch_assoc($q);
-        return $row['harga'] ?? 0;
-    }
-}
-if (!function_exists('getPerItemPrice')) {
-    function getPerItemPrice($item, $idAgen) {
-        global $connect;
-        $itemEscaped = mysqli_real_escape_string($connect, $item);
-        $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$itemEscaped'");
-        $row = mysqli_fetch_assoc($q);
-        return $row['harga'] ?? 0;
-    }
-}
-if (!function_exists('getTotalPerItem')) {
-    function getTotalPerItem($itemType, $idAgen) {
-        $total = 0;
-        $items = explode(', ', $itemType);
-        foreach ($items as $it) {
-            if (trim($it) === "") continue;
-            if (preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
-                $item = strtolower(trim($matches[1]));
-                $qty = (int)$matches[2];
-                $price = getPerItemPrice($item, $idAgen);
-                $total += $price * $qty;
-            }
-        }
-        return $total;
-    }
-}
-if (!function_exists('calculateTotalHarga')) {
-    function calculateTotalHarga($transaksi) {
-        if (empty($transaksi["berat"])) {
-            return 0;
-        }
-        $paket = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]) * $transaksi["berat"];
-        $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]);
-        return $paket + $totalPerItem;
-    }
-}
-
 // Pastikan hanya Admin atau Agen yang dapat mengakses
 if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     $login = "Admin";
@@ -112,9 +66,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'true') {
         echo '  <td>' . htmlspecialchars($transaksi["total_item"]) . '</td>';
         echo '  <td>' . htmlspecialchars($transaksi["berat"]) . '</td>';
         echo '  <td>' . htmlspecialchars($transaksi["jenis"]) . '</td>';
-        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') . '</td>';
-        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') . '</td>';
-        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi), 0, ',', '.') . '</td>';
+        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect), 0, ',', '.') . '</td>';
+        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect), 0, ',', '.') . '</td>';
+        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi, $connect), 0, ',', '.') . '</td>';
         echo '  <td>' . htmlspecialchars($transaksi["tgl_mulai"]) . '</td>';
         echo '  <td>' . htmlspecialchars($transaksi["tgl_selesai"]) . '</td>';
         echo '</tr>';
@@ -224,9 +178,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == 'true') {
                         echo '  <td>' . htmlspecialchars($transaksi["total_item"]) . '</td>';
                         echo '  <td>' . htmlspecialchars($transaksi["berat"]) . '</td>';
                         echo '  <td>' . htmlspecialchars($transaksi["jenis"]) . '</td>';
-                        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') . '</td>';
-                        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') . '</td>';
-                        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi), 0, ',', '.') . '</td>';
+                        echo '  <td>Rp ' . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect), 0, ',', '.') . '</td>';
+                        echo '  <td>Rp ' . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect), 0, ',', '.') . '</td>';
+                        echo '  <td>Rp ' . number_format(calculateTotalHarga($transaksi, $connect), 0, ',', '.') . '</td>';
                         echo '  <td>' . htmlspecialchars($transaksi["tgl_mulai"]) . '</td>';
                         echo '  <td>' . htmlspecialchars($transaksi["tgl_selesai"]) . '</td>';
                         echo '</tr>';

@@ -40,7 +40,6 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include 'headtags.html'; ?>
     <title>Transaksi - <?= htmlspecialchars($login) ?></title>
-    <!-- Pastikan file CSS dan JS untuk Materialize (atau library modal yang digunakan) sudah terinclude -->
 </head>
 <body>
     <?php include 'header.php'; ?>
@@ -101,9 +100,9 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                             <td><?= htmlspecialchars($transaksi["total_item"]) ?></td>
                             <td><?= htmlspecialchars($transaksi["berat"] ?? '-') ?></td>
                             <td><?= htmlspecialchars($transaksi["jenis"]) ?></td>
-                            <td><?= "Rp " . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                            <td><?= "Rp " . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                            <td><?= "Rp " . number_format(calculateTotalHarga($transaksi), 0, ',', '.') ?></td>
+                            <td><?= "Rp " . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect), 0, ',', '.') ?></td>
+                            <td><?= "Rp " . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect), 0, ',', '.') ?></td>
+                            <td><?= "Rp " . number_format(calculateTotalHarga($transaksi, $connect), 0, ',', '.') ?></td>
                             <td><?= htmlspecialchars($transaksi["tgl_mulai"]) ?></td>
                             <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
                             <?php if ($login === "Agen"): ?>
@@ -221,7 +220,7 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                     if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
                         $itemName = trim($matches[1]);
                         $quantity = (int)$matches[2];
-                        $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen']);
+                        $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen'], $connect);
                         $total = $price * $quantity;
                         ?>
                         <tr>
