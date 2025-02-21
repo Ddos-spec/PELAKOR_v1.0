@@ -76,6 +76,7 @@ function handleStatusUpdate($connect) {
     $status = $_POST["status_cucian"];
     $inputBerat = isset($_POST['berat']) ? $_POST['berat'] : null;
     
+    // Update status di tabel cucian
     $stmt = mysqli_prepare($connect, "UPDATE cucian SET status_cucian = ? WHERE id_cucian = ?");
     mysqli_stmt_bind_param($stmt, "si", $status, $id);
     mysqli_stmt_execute($stmt);
@@ -85,7 +86,12 @@ function handleStatusUpdate($connect) {
        $orderQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $id");
        $order = mysqli_fetch_assoc($orderQuery);
        if($order) {
+          // Update berat jika kosong dan ada input berat
           if(empty($order['berat']) && !empty($inputBerat)) {
+              $updateBerat = mysqli_prepare($connect, "UPDATE cucian SET berat = ? WHERE id_cucian = ?");
+              mysqli_stmt_bind_param($updateBerat, "di", $inputBerat, $id);
+              mysqli_stmt_execute($updateBerat);
+              mysqli_stmt_close($updateBerat);
               $order['berat'] = $inputBerat;
           }
           $tgl_selesai = $order['tgl_selesai'];
@@ -94,13 +100,28 @@ function handleStatusUpdate($connect) {
               mysqli_query($connect, "UPDATE cucian SET tgl_selesai = '$tgl_selesai' WHERE id_cucian = $id");
           }
           
-          $total_bayar = calculateTotalHarga($order, $connect);  // Note: passing $connect here
+          // Hitung total bayar (harga paket + total per item)
+          $total_bayar = calculateTotalHarga($order, $connect);
           $payment_status = 'Paid';
           $rating = NULL;
           $komentar = '';
           
-          $stmt2 = mysqli_prepare($connect, "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, payment_status, rating, komentar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-          mysqli_stmt_bind_param($stmt2, "iiisssiss", $order['id_cucian'], $order['id_agen'], $order['id_pelanggan'], $order['tgl_mulai'], $tgl_selesai, $total_bayar, $payment_status, $rating, $komentar);
+          // Insert ke tabel transaksi
+          $stmt2 = mysqli_prepare($connect, 
+              "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, payment_status, rating, komentar)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+          );
+          mysqli_stmt_bind_param($stmt2, "iiissdiss",
+              $order['id_cucian'],
+              $order['id_agen'],
+              $order['id_pelanggan'],
+              $order['tgl_mulai'],
+              $tgl_selesai,
+              $total_bayar,
+              $payment_status,
+              $rating,
+              $komentar
+          );
           mysqli_stmt_execute($stmt2);
           mysqli_stmt_close($stmt2);
        }
@@ -111,9 +132,11 @@ function handleStatusUpdate($connect) {
     exit();
 }
 
+// Jalankan form handlers
 handleWeightUpdate($connect);
 handleStatusUpdate($connect);
 
+// Ambil data cucian
 $orders = fetchOrders($connect, $login, $userId);
 ?>
 <!DOCTYPE html>
@@ -199,8 +222,18 @@ $orders = fetchOrders($connect, $login, $userId);
               <?php endif; ?>
             </td>
             <td><?= htmlspecialchars($order['jenis']) ?></td>
-            <td>Rp <?= number_format(getHargaPaket($order['jenis'], $order['id_agen'], $connect), 0, ',', '.') ?></td>
-            <td>Rp <?= number_format(getTotalPerItem($order['item_type'], $order['id_agen'], $connect), 0, ',', '.') ?></td>
+            <td>
+              <?php
+                $paketPrice = getHargaPaket($order['jenis'], $order['id_agen'], $connect);
+                echo "Rp " . number_format($paketPrice, 0, ',', '.');
+              ?>
+            </td>
+            <td>
+              <?php
+                $itemTotal = getTotalPerItem($order['item_type'], $order['id_agen'], $connect);
+                echo "Rp " . number_format($itemTotal, 0, ',', '.');
+              ?>
+            </td>
             <td>
               <?php 
               $totalHarga = calculateTotalHarga($order, $connect);

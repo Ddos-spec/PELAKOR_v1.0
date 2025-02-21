@@ -8,24 +8,30 @@ cekPelanggan();
 
 // Database helper functions
 function getAgentData($connect, $agentId) {
-    $query = mysqli_prepare($connect, "SELECT * FROM agen WHERE id_agen = ?");
-    mysqli_stmt_bind_param($query, "i", $agentId);
-    mysqli_stmt_execute($query);
-    return mysqli_fetch_assoc(mysqli_stmt_get_result($query));
+    $stmt = mysqli_prepare($connect, "SELECT * FROM agen WHERE id_agen = ?");
+    mysqli_stmt_bind_param($stmt, "i", $agentId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $data = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $data;
 }
 
 function getCustomerData($connect, $customerId) {
-    $query = mysqli_prepare($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = ?");
-    mysqli_stmt_bind_param($query, "i", $customerId);
-    mysqli_stmt_execute($query);
-    return mysqli_fetch_assoc(mysqli_stmt_get_result($query));
+    $stmt = mysqli_prepare($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = ?");
+    mysqli_stmt_bind_param($stmt, "i", $customerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $data = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $data;
 }
 
 function calculateAgentRating($connect, $agentId) {
-    $query = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ? AND rating > 0");
-    mysqli_stmt_bind_param($query, "i", $agentId);
-    mysqli_stmt_execute($query);
-    $result = mysqli_stmt_get_result($query);
+    $stmt = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ? AND rating > 0");
+    mysqli_stmt_bind_param($stmt, "i", $agentId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
     
     $totalStars = 0;
     $count = 0;
@@ -34,17 +40,18 @@ function calculateAgentRating($connect, $agentId) {
         $totalStars += $rating["rating"]; 
         $count++;
     }
+    mysqli_stmt_close($stmt);
     
     return $count > 0 ? ceil($totalStars / $count) : 0;
 }
 
 function createOrder($connect, $orderData) {
-    $query = mysqli_prepare($connect, 
+    $stmt = mysqli_prepare($connect, 
         "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, item_type, total_item, alamat, catatan, status_cucian) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Penjemputan')"
     );
     
-    mysqli_stmt_bind_param($query, "iisssiss",
+    mysqli_stmt_bind_param($stmt, "iisssiss",
         $orderData['id_agen'],
         $orderData['id_pelanggan'],
         $orderData['tgl_mulai'],
@@ -55,7 +62,9 @@ function createOrder($connect, $orderData) {
         $orderData['catatan']
     );
     
-    return mysqli_stmt_execute($query);
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $result;
 }
 
 // Get request parameters
@@ -88,12 +97,12 @@ $rating = calculateAgentRating($connect, $idAgen);
         /* Flex container untuk menyatukan foto & detail agen dalam satu baris */
         .agent-info-container {
             display: flex;
-            align-items: center; /* Vertikal tengah */
-            gap: 20px; /* Jarak horizontal antar elemen */
-            margin-bottom: 20px; /* Spasi bawah agar rapi */
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
         }
         .agent-details h3 {
-            margin: 0; /* Hilangkan margin default agar lebih rapat */
+            margin: 0;
         }
         .agent-details ul {
             list-style-type: none;
@@ -315,27 +324,38 @@ $rating = calculateAgentRating($connect, $idAgen);
             }
         }
 
-        $orderData['item_type'] = implode(', ', $itemDetails);
-        $orderData['total_item'] = $totalItems;
-
-        if (createOrder($connect, $orderData)) {
-            echo "<script>
-                Swal.fire({
-                    title: 'Pesanan Berhasil Dibuat',
-                    text: 'Silahkan periksa status cucian',
-                    icon: 'success'
-                }).then(() => {
-                    window.location = 'status.php';
-                });
-            </script>";
-        } else {
+        // Cek apakah ada item yang dipilih
+        if ($totalItems <= 0) {
             echo "<script>
                 Swal.fire({
                     title: 'Error',
-                    text: 'Gagal membuat pesanan',
+                    text: 'Tidak ada item yang dipilih',
                     icon: 'error'
                 });
             </script>";
+        } else {
+            $orderData['item_type'] = implode(', ', $itemDetails);
+            $orderData['total_item'] = $totalItems;
+
+            if (createOrder($connect, $orderData)) {
+                echo "<script>
+                    Swal.fire({
+                        title: 'Pesanan Berhasil Dibuat',
+                        text: 'Silahkan periksa status cucian',
+                        icon: 'success'
+                    }).then(() => {
+                        window.location = 'status.php';
+                    });
+                </script>";
+            } else {
+                echo "<script>
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Gagal membuat pesanan',
+                        icon: 'error'
+                    });
+                </script>";
+            }
         }
     }
     ?>

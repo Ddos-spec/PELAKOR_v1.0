@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     let timeoutId = null;
 
-    // Muat data awal (opsional), jika ingin langsung menampilkan data pertama kali tanpa reload:
+    // Muat data awal (AJAX akan menimpa data server-side saat page load)
     loadAgents('', currentPage);
 
     // Real-time search handler dengan debounce
@@ -22,13 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`ajax/agen.php?action=getAgents&keyword=${encodeURIComponent(keyword)}&page=${page}`)
             .then(response => response.json())
             .then(data => {
-                // Pastikan data tidak error
                 if (data.error) {
                     console.error(data.error);
                     return;
                 }
                 updateAgentList(data.agents);
-                updatePagination(data.pagination);
+                updatePagination(data.pagination, keyword);
             })
             .catch(error => console.error('Error:', error));
     }
@@ -78,17 +77,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updatePagination(paginationData) {
+    function updatePagination(paginationData, keyword) {
         if (!paginationContainer) return;
 
-        const { currentPage, totalPages } = paginationData;
+        const { currentPage: currentFromServer, totalPages } = paginationData;
         let paginationHTML = '';
 
         // Tombol "previous"
-        if (currentPage > 1) {
+        if (currentFromServer > 1) {
             paginationHTML += `
                 <li class="waves-effect">
-                    <a href="#!" data-page="${currentPage - 1}">
+                    <a href="#!" data-page="${currentFromServer - 1}">
                         <i class="material-icons">chevron_left</i>
                     </a>
                 </li>
@@ -98,17 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Nomor halaman
         for (let i = 1; i <= totalPages; i++) {
             paginationHTML += `
-                <li class="waves-effect ${i == currentPage ? 'active blue' : ''}">
+                <li class="waves-effect ${i == currentFromServer ? 'active blue' : ''}">
                     <a href="#!" data-page="${i}">${i}</a>
                 </li>
             `;
         }
 
         // Tombol "next"
-        if (currentPage < totalPages) {
+        if (currentFromServer < totalPages) {
             paginationHTML += `
                 <li class="waves-effect">
-                    <a href="#!" data-page="${currentPage + 1}">
+                    <a href="#!" data-page="${currentFromServer + 1}">
                         <i class="material-icons">chevron_right</i>
                     </a>
                 </li>
@@ -122,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 currentPage = parseInt(this.dataset.page);
-                loadAgents(searchInput.value.trim(), currentPage);
+                loadAgents(keyword, currentPage);
             });
         });
     }

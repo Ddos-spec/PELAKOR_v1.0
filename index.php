@@ -2,7 +2,7 @@
 session_start();
 include 'connect-db.php';
 
-// Konfigurasi pagination
+// Konfigurasi pagination server-side
 $jumlahDataPerHalaman = 3;
 $query = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating 
                                 FROM agen a 
@@ -10,10 +10,10 @@ $query = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 
                                 GROUP BY a.id_agen");
 $jumlahData = mysqli_num_rows($query);
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-$halamanAktif = isset($_GET["page"]) ? $_GET["page"] : 1;
+$halamanAktif = isset($_GET["page"]) ? (int)$_GET["page"] : 1;
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 
-// Query untuk mengambil data agen dengan rating
+// Query data agen untuk tampilan awal (server-side)
 $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating 
                                FROM agen a 
                                LEFT JOIN transaksi t ON a.id_agen = t.id_agen 
@@ -73,7 +73,7 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
             <h5 class="header col s12 light">"Solusi Laundry Praktis Tanpa Keluar Rumah"</h5>
         </div>
 
-        <!-- Menu Buttons Section -->
+        <!-- Menu Buttons Section (contoh) -->
         <div class="row center">
             <div id="body">
                 <?php if (isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"])) : ?>
@@ -136,6 +136,7 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
 
         <!-- Agent List Container -->
         <div class="row" id="agentContainer">
+            <!-- Data awal server-side -->
             <?php foreach($agen as $dataAgen): ?>
                 <div class="col s12 m4">
                     <div class="card agent-card">
@@ -164,24 +165,24 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
             <?php endforeach; ?>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination (server-side, sudah dimodifikasi untuk AJAX) -->
         <div class="row center">
             <ul class="pagination">
                 <?php if($halamanAktif > 1) : ?>
                     <li class="waves-effect">
-                        <a href="?page=<?= $halamanAktif - 1 ?>"><i class="material-icons">chevron_left</i></a>
+                        <a href="#!" data-page="<?= $halamanAktif - 1 ?>"><i class="material-icons">chevron_left</i></a>
                     </li>
                 <?php endif; ?>
 
                 <?php for($i = 1; $i <= $jumlahHalaman; $i++) : ?>
                     <li class="waves-effect <?= $i == $halamanAktif ? 'active blue' : '' ?>">
-                        <a href="?page=<?= $i ?>"><?= $i ?></a>
+                        <a href="#!" data-page="<?= $i ?>"><?= $i ?></a>
                     </li>
                 <?php endfor; ?>
 
                 <?php if($halamanAktif < $jumlahHalaman) : ?>
                     <li class="waves-effect">
-                        <a href="?page=<?= $halamanAktif + 1 ?>"><i class="material-icons">chevron_right</i></a>
+                        <a href="#!" data-page="<?= $halamanAktif + 1 ?>"><i class="material-icons">chevron_right</i></a>
                     </li>
                 <?php endif; ?>
             </ul>
@@ -192,6 +193,7 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
 
     <script src="materialize/js/materialize.min.js"></script>
     <script src="js/script.js"></script>
+    <!-- File scriptAjax.js menangani pencarian & pagination AJAX -->
     <script src="js/scriptAjax.js"></script>
 </body>
 </html>
