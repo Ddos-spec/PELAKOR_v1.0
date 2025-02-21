@@ -44,7 +44,7 @@ if (!empty($transaction['item_type'])) {
         if (preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
             $itemName = trim($matches[1]);
             $quantity = (int)$matches[2];
-            $pricePerItem = getHargaPaket(strtolower($itemName), $transaction['id_agen']);
+            $pricePerItem = getHargaPaket(strtolower($itemName), $transaction['id_agen'], $connect);
             $items[] = [
                 'name' => $itemName,
                 'quantity' => $quantity,
@@ -57,7 +57,7 @@ if (!empty($transaction['item_type'])) {
 
 // Calculate totals
 $subtotalItems = array_sum(array_column($items, 'total'));
-$weightPrice = getHargaPaket($transaction['jenis'], $transaction['id_agen']) * $transaction['berat'];
+$weightPrice = getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect) * $transaction['berat'];
 $totalPrice = $subtotalItems + $weightPrice;
 
 ob_start();
@@ -181,7 +181,7 @@ ob_start();
                                 <br>
                                 <small class="text-muted">
                                     <?= $transaction['berat'] ?> kg x 
-                                    Rp <?= number_format(getHargaPaket($transaction['jenis'], $transaction['id_agen']), 0, ',', '.') ?>
+                                    Rp <?= number_format(getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect), 0, ',', '.') ?>
                                 </small>
                             </td>
                             <td class="text-end">Rp <?= number_format($weightPrice, 0, ',', '.') ?></td>

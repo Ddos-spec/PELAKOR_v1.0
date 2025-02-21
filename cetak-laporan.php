@@ -30,7 +30,7 @@ if ($login == "Agen") {
     $conditions .= " AND t.id_agen = $idAgen";
 }
 
-$queryStr = "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai 
+$queryStr = "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai, c.id_pelanggan 
     FROM transaksi t 
     JOIN cucian c ON t.id_cucian = c.id_cucian 
     WHERE $conditions
@@ -39,42 +39,35 @@ $query = mysqli_query($connect, $queryStr);
 
 ob_start();
 ?>
-<style>
-    body { font-family: DejaVu Sans, sans-serif; font-size: 10pt; }
-    .header { text-align: center; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    table, th, td { border: 1px solid #000; }
-    th, td { padding: 5px; text-align: left; }
-    th { background-color: #eee; }
-    /* Modal styling untuk tampilan web */
-    #detailModal {
-        position: fixed;
-        top: 30%;
-        left: 50%;
-        transform: translate(-50%, -30%);
-        border: 1px solid #000;
-        background: #fff;
-        padding: 15px;
-        z-index: 9999;
-        display: none;
-        width: 300px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-    }
-    #detailModal h4 { margin-top: 0; }
-    #modalClose {
-        float: right;
-        cursor: pointer;
-        font-weight: bold;
-    }
-</style>
-<page>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Laporan Transaksi</title>
+    <style>
+        /* Mengurangi ukuran font dan margin agar tabel muat */
+        body { font-family: DejaVu Sans, sans-serif; font-size: 8pt; margin: 0; padding: 0; }
+        .header { text-align: center; margin-bottom: 5px; }
+        .header h2 { margin: 0; padding: 3px 0; }
+        .period { margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
+        table, th, td { border: 1px solid #000; }
+        th, td { padding: 3px; text-align: left; }
+        th { background-color: #eee; }
+        /* Styling untuk nested table detail item */
+        .nested-table { width: 100%; border-collapse: collapse; }
+        .nested-table th, .nested-table td { border: 1px solid #000; padding: 2px; }
+        .nested-table th { background-color: #ddd; }
+    </style>
+</head>
+<body>
     <div class="header">
         <h2>Laporan Transaksi</h2>
-        <?php 
-        if (isset($start_date) && isset($end_date)) {
-            echo "<p>Periode: " . htmlspecialchars($start_date) . " s/d " . htmlspecialchars($end_date) . "</p>";
-        }
-        ?>
+        <?php if (isset($start_date) && isset($end_date)): ?>
+            <div class="period">
+                <p>Periode: <?= htmlspecialchars($start_date) ?> s/d <?= htmlspecialchars($end_date) ?></p>
+            </div>
+        <?php endif; ?>
     </div>
     <table>
         <thead>
@@ -94,23 +87,28 @@ ob_start();
                 <th>Total Bayar</th>
                 <th>Tanggal Pesan</th>
                 <th>Tanggal Selesai</th>
-                <th>Detail</th>
             </tr>
         </thead>
         <tbody>
             <?php while ($transaksi = mysqli_fetch_assoc($query)): 
+                // Dapatkan nama agen (jika diperlukan)
                 $agentName = '';
                 if ($login != "Pelanggan") {
                     $agenQuery = mysqli_query($connect, "SELECT nama_laundry FROM agen WHERE id_agen = " . intval($transaksi["id_agen"]));
                     $agenRow = mysqli_fetch_assoc($agenQuery);
                     $agentName = $agenRow["nama_laundry"] ?? '';
                 }
+                // Dapatkan nama pelanggan (jika diperlukan)
                 $pelName = '';
                 if ($login != "Agen") {
                     $pelQuery = mysqli_query($connect, "SELECT nama FROM pelanggan WHERE id_pelanggan = " . intval($transaksi["id_pelanggan"]));
                     $pelRow = mysqli_fetch_assoc($pelQuery);
                     $pelName = $pelRow["nama"] ?? '';
                 }
+                // Hitung nilai summary
+                $hargaPaket = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect);
+                $totalPerItem = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect);
+                $totalBayar = calculateTotalHarga($transaksi, $connect);
             ?>
             <tr>
                 <td><?= htmlspecialchars($transaksi["kode_transaksi"]) ?></td>
@@ -123,44 +121,65 @@ ob_start();
                 <td><?= htmlspecialchars($transaksi["total_item"]) ?></td>
                 <td><?= htmlspecialchars($transaksi["berat"]) ?></td>
                 <td><?= htmlspecialchars($transaksi["jenis"]) ?></td>
-                <td>Rp <?= number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                <td>Rp <?= number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"]), 0, ',', '.') ?></td>
-                <td>Rp <?= number_format(calculateTotalHarga($transaksi), 0, ',', '.') ?></td>
+                <td>Rp <?= number_format($hargaPaket, 0, ',', '.') ?></td>
+                <td>Rp <?= number_format($totalPerItem, 0, ',', '.') ?></td>
+                <td>Rp <?= number_format($totalBayar, 0, ',', '.') ?></td>
                 <td><?= htmlspecialchars($transaksi["tgl_mulai"]) ?></td>
                 <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
-                <td>
-                    <button type="button" class="detail-btn" data-items="<?= htmlspecialchars($transaksi["item_type"]) ?>" style="padding:3px 6px; font-size:9pt;">Detail</button>
+            </tr>
+            <?php 
+                // Jika ada detail item, tampilkan tabel detail di bawah baris transaksi
+                if (!empty($transaksi['item_type'])) {
+                    $items = [];
+                    $itemTypes = explode(', ', $transaksi['item_type']);
+                    foreach ($itemTypes as $item) {
+                        if (preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
+                            $itemName = trim($matches[1]);
+                            $quantity = (int)$matches[2];
+                            $pricePerItem = getHargaPaket(strtolower($itemName), $transaksi['id_agen'], $connect);
+                            $items[] = [
+                                'name' => $itemName,
+                                'quantity' => $quantity,
+                                'price' => $pricePerItem,
+                                'total' => $pricePerItem * $quantity
+                            ];
+                        }
+                    }
+                    if (!empty($items)) {
+            ?>
+            <tr>
+                <!-- Gunakan colspan = 11 karena header memiliki 11 kolom -->
+                <td colspan="11">
+                    <table class="nested-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Jumlah</th>
+                                <th>Harga Satuan</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($items as $itm): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($itm['name']) ?></td>
+                                <td style="text-align:center;"><?= $itm['quantity'] ?></td>
+                                <td style="text-align:right;">Rp <?= number_format($itm['price'], 0, ',', '.') ?></td>
+                                <td style="text-align:right;">Rp <?= number_format($itm['total'], 0, ',', '.') ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
-            <?php endwhile; ?>
+            <?php 
+                    }
+                }
+            endwhile; ?>
         </tbody>
     </table>
-
-    <!-- Modal Minimalis untuk Detail Item (hanya untuk tampilan web) -->
-    <div id="detailModal">
-        <span id="modalClose">&times;</span>
-        <h4>Item Detail</h4>
-        <div id="modalContent" style="margin-top:10px;"></div>
-    </div>
-</page>
-<script>
-// Skrip modal untuk tampilan web (tidak aktif di PDF)
-document.addEventListener('DOMContentLoaded', function(){
-    var buttons = document.getElementsByClassName('detail-btn');
-    for(var i=0; i<buttons.length; i++){
-         buttons[i].addEventListener('click', function(){
-              var items = this.getAttribute('data-items');
-              // Ubah koma menjadi baris baru
-              var content = items.replace(/, /g, "<br>");
-              document.getElementById('modalContent').innerHTML = content;
-              document.getElementById('detailModal').style.display = 'block';
-         });
-    }
-    document.getElementById('modalClose').addEventListener('click', function(){
-         document.getElementById('detailModal').style.display = 'none';
-    });
-});
-</script>
+</body>
+</html>
 <?php
 $content = ob_get_clean();
 
@@ -168,12 +187,13 @@ require_once 'vendor/autoload.php';
 use Spipu\Html2Pdf\Html2Pdf;
 
 try {
-    $html2pdf = new Html2Pdf('P', 'A4', 'en');
+    // Menggunakan orientasi Landscape agar lebar halaman lebih besar
+    $html2pdf = new Html2Pdf('L', 'A4', 'en', true, 'UTF-8', array(10,10,10,10));
     $html2pdf->writeHTML($content);
-    // Output PDF dan force download
+    // Parameter 'D' memaksa file PDF di-download
     $html2pdf->output('laporan.pdf', 'D');
 } catch (Exception $e) {
-    echo $e;
+    echo $e->getMessage();
     exit;
 }
 ?>
