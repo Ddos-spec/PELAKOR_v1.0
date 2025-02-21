@@ -3,6 +3,7 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
+// Validasi login
 cekAdmin();
 
 $jumlahDataPerHalaman = 6; // 3 card per row, 2 rows
@@ -18,19 +19,6 @@ if (isset($_GET["page"])){
 
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelanggan DESC LIMIT $awalData, $jumlahDataPerHalaman");
-
-// Jika masih menggunakan pencarian via form POST, kode di bawah tidak lagi dipakai:
-// if (isset($_POST["cari"])) {
-//     $keyword = htmlspecialchars($_POST["keyword"]);
-//     $query = "SELECT * FROM pelanggan WHERE 
-//         nama LIKE '%$keyword%' OR
-//         kota LIKE '%$keyword%' OR
-//         email LIKE '%$keyword%' OR
-//         alamat LIKE '%$keyword%'
-//         ORDER BY id_pelanggan DESC
-//         LIMIT $awalData, $jumlahDataPerHalaman";
-//     $pelanggan = mysqli_query($connect,$query);
-// }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,19 +59,19 @@ $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelangga
     <div class="container">
         <h3 class="header light center">List Pelanggan</h3>
         
-        <!-- Updated Searching -->
+        <!-- Searching -->
         <div class="row">
             <div class="col s12 center">
                 <div class="input-field inline">
-                    <input type="text" id="searchPelanggan" placeholder="Cari pelanggan...">
+                    <!-- Name "keyword" agar kita bisa tangkap di JS -->
+                    <input type="text" name="keyword" placeholder="Cari pelanggan...">
                     <i class="material-icons prefix">search</i>
                 </div>
             </div>
         </div>
 
         <!-- Card Container -->
-        <!-- Pastikan container khusus untuk card dipisahkan (misal baris kedua) -->
-        <div class="row">
+        <div class="row card-container">
             <?php foreach ($pelanggan as $dataPelanggan) : ?>
             <div class="col s12 m6 l4">
                 <div class="card">
@@ -111,9 +99,9 @@ $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelangga
             <?php endforeach ?>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination (server-side default) -->
         <div class="row center">
-            <ul class="pagination">
+            <ul class="pagination pagination-default">
                 <?php if($halamanAktif > 1) : ?>
                     <li class="waves-effect">
                         <a href="?page=<?= $halamanAktif - 1; ?>">
@@ -163,51 +151,69 @@ $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelangga
 
     <?php include "footer.php"; ?>
 
-    <!-- Script JavaScript untuk pencarian -->
+    <!-- Script JavaScript untuk pencarian AJAX + pagination -->
     <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchPelanggan');
-    // Mengasumsikan baris kedua di dalam container adalah card container
-    const cardContainer = document.querySelectorAll('.container .row')[1];
-    
-    searchInput.addEventListener('keyup', function() {
-        const keyword = this.value.trim();
-        searchPelanggan(keyword);
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+
+    const searchInput = document.querySelector('input[name="keyword"]');
+    const cardContainer = document.querySelector('.card-container');
+    const paginationDefault = document.querySelector('.pagination-default'); 
+    let currentPage = 1;
+    let timeoutId = null;
+
+    // Hilangkan pagination default saat AJAX dipakai
+    paginationDefault.style.display = 'none';
+
+    // Event listener pencarian (debounce 300ms)
+    searchInput.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            currentPage = 1;
+            searchData(this.value, currentPage);
+        }, 300);
     });
 
-    function searchPelanggan(keyword) {
-        fetch(`ajax/cari.php?action=searchPelanggan&keyword=${encodeURIComponent(keyword)}`)
+    function searchData(keyword, page) {
+        fetch(`ajax/cari.php?type=pelanggan&keyword=${encodeURIComponent(keyword)}&page=${page}`)
             .then(response => response.json())
-            .then(data => updatePelangganList(data))
+            .then(json => {
+                if(json.error) {
+                    console.error(json.error);
+                    return;
+                }
+                updateList(json.data);
+                updatePagination(json.totalPages, json.currentPage, keyword);
+            })
             .catch(error => console.error('Error:', error));
     }
 
-    function updatePelangganList(customers) {
+    function updateList(items) {
         cardContainer.innerHTML = '';
         
-        if(customers.length === 0) {
-            cardContainer.innerHTML = '<div class="col s12 center"><p>Tidak ada hasil yang ditemukan</p></div>';
+        if(!items || items.length === 0) {
+            cardContainer.innerHTML = '<div class="col s12 center"><h5>Tidak ada hasil yang ditemukan</h5></div>';
             return;
         }
 
-        customers.forEach(customer => {
-            // Gunakan template card yang sama seperti sebelumnya
+        items.forEach(item => {
             const card = `
                 <div class="col s12 m6 l4">
                     <div class="card">
-                        <div class="card-image" onclick="showDetails(${JSON.stringify(customer)})">
-                            <img src="img/pelanggan/${customer.foto || 'default.jpg'}" alt="${customer.nama}">
+                        <div class="card-image" onclick="showDetails(${JSON.stringify(item)})">
+                            <img src="img/pelanggan/${item.foto || 'default.jpg'}" alt="${item.nama}">
                         </div>
                         <div class="card-content">
-                            <span class="card-title truncate">${customer.nama}</span>
+                            <span class="card-title truncate">${item.nama}</span>
                             <div class="card-contact">
-                                <i class="material-icons tiny">phone</i> ${customer.telp}
+                                <i class="material-icons tiny">phone</i> ${item.telp}
                             </div>
                             <div class="card-action">
-                                <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=${customer.id_pelanggan}&type=pelanggan">
+                                <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=${item.id_pelanggan}&type=pelanggan">
                                     <i class="material-icons">lock_reset</i>
                                 </a>
-                                <a class="btn red darken-2" href="list-pelanggan.php?hapus=${customer.id_pelanggan}" 
+                                <a class="btn red darken-2" href="list-pelanggan.php?hapus=${item.id_pelanggan}" 
                                    onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
                                     <i class="material-icons">delete</i>
                                 </a>
@@ -219,30 +225,73 @@ document.addEventListener('DOMContentLoaded', function() {
             cardContainer.insertAdjacentHTML('beforeend', card);
         });
     }
-});
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var elems = document.querySelectorAll('.modal');
-            var instances = M.Modal.init(elems);
-        });
+    function updatePagination(totalPages, currentPage, keyword) {
+        // Buat pagination baru di bawah container
+        paginationDefault.innerHTML = '';
+        paginationDefault.style.display = 'block';
 
-        function showDetails(data) {
-            document.getElementById('modal-id-pelanggan').textContent = data.id_pelanggan;
-            document.getElementById('modal-email').textContent = data.email;
-            document.getElementById('modal-kota').textContent = data.kota;
-            document.getElementById('modal-alamat').textContent = data.alamat;
-            
-            var modal = M.Modal.getInstance(document.getElementById('detailModal'));
-            modal.open();
+        let paginationHTML = '';
+
+        // Tombol previous
+        if(currentPage > 1) {
+            paginationHTML += `
+                <li class="waves-effect">
+                    <a href="#!" data-page="${currentPage - 1}">
+                        <i class="material-icons">chevron_left</i>
+                    </a>
+                </li>
+            `;
         }
-    </script>
 
+        // Nomor halaman
+        for(let i = 1; i <= totalPages; i++) {
+            paginationHTML += `
+                <li class="waves-effect ${i === currentPage ? 'active blue darken-2' : ''}">
+                    <a href="#!" data-page="${i}">${i}</a>
+                </li>
+            `;
+        }
+
+        // Tombol next
+        if(currentPage < totalPages) {
+            paginationHTML += `
+                <li class="waves-effect">
+                    <a href="#!" data-page="${currentPage + 1}">
+                        <i class="material-icons">chevron_right</i>
+                    </a>
+                </li>
+            `;
+        }
+
+        paginationDefault.innerHTML = paginationHTML;
+
+        // Event click pada pagination
+        document.querySelectorAll('.pagination-default a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = parseInt(this.dataset.page);
+                searchData(keyword, page);
+            });
+        });
+    }
+});
+
+function showDetails(data) {
+    document.getElementById('modal-id-pelanggan').textContent = data.id_pelanggan;
+    document.getElementById('modal-email').textContent = data.email;
+    document.getElementById('modal-kota').textContent = data.kota;
+    document.getElementById('modal-alamat').textContent = data.alamat;
+    
+    var modal = M.Modal.getInstance(document.getElementById('detailModal'));
+    modal.open();
+}
+    </script>
 </body>
 </html>
 
 <?php
+// Proses hapus data pelanggan
 if (isset($_GET["hapus"])){
     $idPelanggan = $_GET["hapus"];
     $query = mysqli_query($connect, "DELETE FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");

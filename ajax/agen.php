@@ -4,28 +4,41 @@ include '../connect-db.php';
 
 header('Content-Type: application/json');
 
-// Handle agent list request dengan rating
+// Handle agent list request dengan rating + pagination
 if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
     $keyword = isset($_GET['keyword']) ? mysqli_real_escape_string($connect, $_GET['keyword']) : '';
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $jumlahDataPerHalaman = 3; // Sesuaikan dengan index.php
+    $awalData = ($jumlahDataPerHalaman * $page) - $jumlahDataPerHalaman;
     
-    // Query untuk mendapatkan data agen dengan rating
-    $query = "SELECT a.*, 
-              COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating
-              FROM agen a 
-              LEFT JOIN transaksi t ON a.id_agen = t.id_agen";
+    // Base query untuk menghitung total data (sebelum LIMIT)
+    $baseQuery = "SELECT a.*, 
+                  COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating
+                  FROM agen a 
+                  LEFT JOIN transaksi t ON a.id_agen = t.id_agen";
     
+    // Tambahkan kondisi pencarian jika keyword tidak kosong
     if (!empty($keyword)) {
-        $query .= " WHERE a.nama_laundry LIKE '%$keyword%' 
-                    OR a.kota LIKE '%$keyword%' 
-                    OR a.alamat LIKE '%$keyword%'";
+        $baseQuery .= " WHERE a.nama_laundry LIKE '%$keyword%'
+                        OR a.kota LIKE '%$keyword%'
+                        OR a.alamat LIKE '%$keyword%'";
     }
     
-    $query .= " GROUP BY a.id_agen 
-                ORDER BY a.nama_laundry ASC";
+    $baseQuery .= " GROUP BY a.id_agen";
     
+    // Hitung total data
+    $countQuery = "SELECT COUNT(*) as total FROM ($baseQuery) as subquery";
+    $countResult = mysqli_query($connect, $countQuery);
+    $rowCount = mysqli_fetch_assoc($countResult);
+    $totalData = $rowCount ? (int)$rowCount['total'] : 0;
+    $totalPages = ceil($totalData / $jumlahDataPerHalaman);
+
+    // Query final dengan LIMIT
+    $query = $baseQuery . " ORDER BY a.nama_laundry ASC
+                            LIMIT $awalData, $jumlahDataPerHalaman";
     $result = mysqli_query($connect, $query);
     $agents = [];
-    
+
     while ($row = mysqli_fetch_assoc($result)) {
         $agents[] = [
             'id_agen' => $row['id_agen'],
@@ -37,12 +50,21 @@ if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
             'rating' => round($row['rating'])
         ];
     }
-    
-    echo json_encode($agents);
+
+    // Kembalikan data + info pagination
+    echo json_encode([
+        'agents' => $agents,
+        'pagination' => [
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalRecords' => $totalData,
+            'perPage' => $jumlahDataPerHalaman
+        ]
+    ]);
     exit;
 }
 
-// Handle price list request
+// Handle price list request (tetap seperti sebelumnya)
 if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
     $idAgen = intval($_GET['idAgen']);
     
