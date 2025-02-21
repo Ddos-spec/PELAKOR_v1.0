@@ -1,62 +1,35 @@
 <?php
-
 session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
 cekAdmin();
 
-//konfirgurasi pagination
-$jumlahDataPerHalaman = 5;
+$jumlahDataPerHalaman = 6; // Changed to 6 to show 2 complete rows
 $query = mysqli_query($connect,"SELECT * FROM pelanggan");
 $jumlahData = mysqli_num_rows($query);
-//ceil() = pembulatan ke atas
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
-//menentukan halaman aktif
-//$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-if ( isset($_GET["page"])){
+if (isset($_GET["page"])){
     $halamanAktif = $_GET["page"];
-}else{
+} else {
     $halamanAktif = 1;
 }
 
-//data awal
-$awalData = ( $jumlahDataPerHalaman * $halamanAktif ) - $jumlahDataPerHalaman;
-
-//fungsi memasukkan data di db ke array
+$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelanggan DESC LIMIT $awalData, $jumlahDataPerHalaman");
 
-//ketika tombol cari ditekan
-if ( isset($_POST["cari"])) {
+if (isset($_POST["cari"])) {
     $keyword = htmlspecialchars($_POST["keyword"]);
-
     $query = "SELECT * FROM pelanggan WHERE 
         nama LIKE '%$keyword%' OR
         kota LIKE '%$keyword%' OR
         email LIKE '%$keyword%' OR
         alamat LIKE '%$keyword%'
         ORDER BY id_pelanggan DESC
-        LIMIT $awalData, $jumlahDataPerHalaman
-        ";
-
+        LIMIT $awalData, $jumlahDataPerHalaman";
     $pelanggan = mysqli_query($connect,$query);
-
-    //konfirgurasi pagination
-    $jumlahDataPerHalaman = 3;
-    $jumlahData = mysqli_num_rows($pelanggan);
-    //ceil() = pembulatan ke atas
-    $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
-
-    //menentukan halaman aktif
-    //$halamanAktif = ( isset($_GET["page"]) ) ? $_GET["page"] : 1; = versi simple
-    if ( isset($_GET["page"])){
-        $halamanAktif = $_GET["page"];
-    }else{
-        $halamanAktif = 1;
-    }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -66,107 +39,174 @@ if ( isset($_POST["cari"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
     <title>List Pelanggan</title>
+    <style>
+        .card-image { 
+            height: 250px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+        .card-action {
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal {
+            max-height: 80% !important;
+        }
+        .card-contact {
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- header -->
     <?php include 'header.php'; ?>
-    <!-- end header -->
 
-    <h3 class="header light center">List Pelanggan</h3>
-    <br>
-
-    <!-- searching -->
-    <form class="col s12 center" action="" method="post">
-        <div class="input-field inline">
-            <input type="text" size=40 name="keyword" placeholder="Keyword">
-            <button type="submit" class="btn waves-effect blue darken-2" name="cari"><i class="material-icons">send</i></button>
+    <div class="container">
+        <h3 class="header light center">List Pelanggan</h3>
+        
+        <!-- searching -->
+        <div class="row">
+            <form class="col s12 center" action="" method="post">
+                <div class="input-field inline">
+                    <input type="text" size=40 name="keyword" placeholder="Keyword">
+                    <button type="submit" class="btn waves-effect blue darken-2" name="cari">
+                        <i class="material-icons">search</i>
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
-    <!-- end searching -->
 
-    <div class="row">
-        <div class="col s10 offset-s1">
+        <!-- Card Container -->
+        <div class="row">
+            <?php foreach ($pelanggan as $dataPelanggan) : ?>
+            <div class="col s12 m6 l4">
+                <div class="card">
+                    <div class="card-image" onclick="showDetails(<?= htmlspecialchars(json_encode($dataPelanggan)) ?>)">
+                        <img src="https://via.placeholder.com/300x300/randomimage.jpg" alt="Pelanggan">
+                        <span class="card-rating">
+                            <i class="material-icons">star</i> 4.5
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title"><?= $dataPelanggan["nama"] ?></span>
+                        <div class="card-contact">
+                            <i class="material-icons tiny">phone</i> <?= $dataPelanggan["telp"] ?>
+                        </div>
+                        <div class="card-action">
+                            <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=<?= $dataPelanggan['id_pelanggan'] ?>&type=pelanggan">
+                                <i class="material-icons">lock_reset</i>
+                            </a>
+                            <a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" 
+                               onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach ?>
+        </div>
 
-            <!-- pagination -->
-            <ul class="pagination center">
-            <?php if( $halamanAktif > 1 ) : ?>
-                <li class="disabled-effect blue darken-1">
-                    <!-- halaman pertama -->
-                    <a href="?page=<?= $halamanAktif - 1; ?>"><i class="material-icons">chevron_left</i></a>
-                </li>
-            <?php endif; ?>
-            <?php for( $i = 1; $i <= $jumlahHalaman; $i++ ) : ?>
-                <?php if( $i == $halamanAktif ) : ?>
-                    <li class="active grey"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
-                <?php else : ?>
-                    <li class="waves-effect blue darken-1"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+        <!-- Pagination -->
+        <div class="row center">
+            <ul class="pagination">
+                <?php if($halamanAktif > 1) : ?>
+                    <li class="waves-effect">
+                        <a href="?page=<?= $halamanAktif - 1; ?>">
+                            <i class="material-icons">chevron_left</i>
+                        </a>
+                    </li>
                 <?php endif; ?>
-            <?php endfor; ?>
-            <?php if( $halamanAktif < $jumlahHalaman ) : ?>
-                <li class="waves-effect blue darken-1">
-                    <a class="page-link" href="?page=<?= $halamanAktif + 1; ?>"><i class="material-icons">chevron_right</i></a>
-                </li>
-            <?php endif; ?>
-            </ul>
-            <!-- pagination -->
-
-            <table cellpadding=10 border=1>
-                <tr>
-                    <th>ID Pelanggan</th>
-                    <th>Nama</th>
-                    <th>No Telp</th>
-                    <th>Email</th>
-                    <th>Kota</th>
-                    <th>Alamat Lengkap</th>
-                    <th>Aksi</th>
-                </tr>
-
-                <?php foreach ($pelanggan as $dataPelanggan) : ?>
                 
-                <tr>
-                    <td><?= $dataPelanggan["id_pelanggan"] ?></td>
-                    <td><?= $dataPelanggan["nama"] ?></td>
-                    <td><?= $dataPelanggan["telp"] ?></td>
-                    <td><?= $dataPelanggan["email"] ?></td>
-                    <td><?= $dataPelanggan["kota"] ?></td>
-                    <td><?= $dataPelanggan["alamat"] ?></td>
-                    <td>
-                        <a class="btn red darken-2" href="list-pelanggan.php?hapus=<?= $dataPelanggan['id_pelanggan'] ?>" onclick="return confirm('Apakah anda yakin ingin menghapus data ?')"><i class="material-icons">delete</i></a>
-                        <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=<?= $dataPelanggan['id_pelanggan'] ?>&type=pelanggan"><i class="material-icons">lock_reset</i></a>
-                    </td>
-                </tr>
-
-                <?php endforeach ?>
-            </table>
-            
+                <?php for($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                    <?php if($i == $halamanAktif) : ?>
+                        <li class="active blue darken-2"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+                    <?php else : ?>
+                        <li class="waves-effect"><a href="?page=<?= $i; ?>"><?= $i ?></a></li>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                
+                <?php if($halamanAktif < $jumlahHalaman) : ?>
+                    <li class="waves-effect">
+                        <a href="?page=<?= $halamanAktif + 1; ?>">
+                            <i class="material-icons">chevron_right</i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
         </div>
     </div>
 
-    <?php include "footer.php"; ?>
+<!-- Modal Detail -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <h4>Detail Pelanggan</h4>
+        <div class="row">
+            <div class="col s12">
+                <ul class="collection">
+                    <li class="collection-item">ID Pelanggan: <span id="modal-id-pelanggan"></span></li>
+                    <li class="collection-item">Email: <span id="modal-email"></span></li>
+                    <li class="collection-item">Kota: <span id="modal-kota"></span></li>
+                    <li class="collection-item">Alamat: <span id="modal-alamat"></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Tutup</a>
+    </div>
+</div>
+
+<?php include "footer.php"; ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        var instances = M.Modal.init(elems);
+    });
+
+    function showDetails(data) {
+        document.getElementById('modal-id-pelanggan').textContent = data.id_pelanggan;
+        document.getElementById('modal-email').textContent = data.email;
+        document.getElementById('modal-kota').textContent = data.kota;
+        document.getElementById('modal-alamat').textContent = data.alamat;
+        
+        var modal = M.Modal.getInstance(document.getElementById('detailModal'));
+        modal.open();
+    }
+</script>
+
 </body>
 </html>
 
 <?php
-
 if (isset($_GET["hapus"])){
-    // ambil id pelangan
-    $idPelanggan = $_GET["hapus"];
+$idPelanggan = $_GET["hapus"];
+$query = mysqli_query($connect, "DELETE FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
 
-    // hapus data
-    $query = mysqli_query($connect, "DELETE FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
-
-    // langsung arahin ke halaman sebelumnya
-    // buat alert setelah semua halaman tampil
-    if ( mysqli_affected_rows($connect) > 0 ){
-        echo "
-            <script>
-                Swal.fire('Data Pelanggan Berhasil Di Hapus','','success').then(function(){
-                    window.location = 'list-pelanggan.php';
-                });
-            </script>
-        ";
-    }
+if (mysqli_affected_rows($connect) > 0){
+    echo "
+        <script>
+            Swal.fire('Data Pelanggan Berhasil Di Hapus','','success').then(function(){
+                window.location = 'list-pelanggan.php';
+            });
+        </script>
+    ";
 }
-
+}
 ?>

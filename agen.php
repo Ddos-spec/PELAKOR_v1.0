@@ -40,7 +40,7 @@ $idAgen = $agen["id_agen"];
             <br><br>
             <form action="" method="post" enctype="multipart/form-data">
                 <div class="center">
-                    <img src="img/agen/<?= $agen['foto'] ?>" class="circle responsive-img" width=25% alt="">
+                    <img src="img/agen/<?= $agen['foto'] ?>" class="profile-image circle" alt="">
                 </div>
                 <div class="file-field input-field">
                     <div class="btn blue darken-2">

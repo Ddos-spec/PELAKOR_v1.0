@@ -48,7 +48,7 @@ $data = mysqli_fetch_assoc($data);
             <form action="" method="post" enctype="multipart/form-data">
                 <div class="input-field inline">
                     <div class="center">
-                        <img src="img/pelanggan/<?= $data['foto'] ?>" class="circle responsive-img" width=25% alt="">
+                        <img src="img/pelanggan/<?= $data['foto'] ?>" class="profile-image circle" alt="">
                     </div>
                     <div class="file-field input-field">
                         <div class="btn blue darken-2">
