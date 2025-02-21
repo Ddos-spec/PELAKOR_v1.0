@@ -74,40 +74,33 @@ function handleStatusUpdate($connect) {
     
     $id = $_POST["id_cucian"];
     $status = $_POST["status_cucian"];
-    // Ambil berat dari form status (hidden input)
     $inputBerat = isset($_POST['berat']) ? $_POST['berat'] : null;
     
-    // Update status di tabel cucian
     $stmt = mysqli_prepare($connect, "UPDATE cucian SET status_cucian = ? WHERE id_cucian = ?");
     mysqli_stmt_bind_param($stmt, "si", $status, $id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     
-    // Jika status diupdate menjadi "Selesai", pindahkan data ke tabel transaksi
     if($status === "Selesai"){
        $orderQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $id");
        $order = mysqli_fetch_assoc($orderQuery);
        if($order) {
-          // Jika berat pada order kosong, gunakan nilai yang dikirim dari form
           if(empty($order['berat']) && !empty($inputBerat)) {
               $order['berat'] = $inputBerat;
           }
-          // Perbaiki tgl_selesai: jika 0000-00-00, ganti dengan tanggal saat ini dan update tabel cucian
           $tgl_selesai = $order['tgl_selesai'];
           if ($tgl_selesai == '0000-00-00') {
               $tgl_selesai = date("Y-m-d");
               mysqli_query($connect, "UPDATE cucian SET tgl_selesai = '$tgl_selesai' WHERE id_cucian = $id");
           }
           
-          // Hitung total bayar: (harga paket * berat) + total per item
-          $total_bayar = calculateTotalHarga($order);
+          $total_bayar = calculateTotalHarga($order, $connect);  // Note: passing $connect here
           $payment_status = 'Paid';
-          $rating = NULL; // rating belum ada
+          $rating = NULL;
           $komentar = '';
           
-          // Masukkan data ke tabel transaksi
           $stmt2 = mysqli_prepare($connect, "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, payment_status, rating, komentar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-          mysqli_stmt_bind_param($stmt2, "iiississi", $order['id_cucian'], $order['id_agen'], $order['id_pelanggan'], $order['tgl_mulai'], $tgl_selesai, $total_bayar, $payment_status, $rating, $komentar);
+          mysqli_stmt_bind_param($stmt2, "iiisssiss", $order['id_cucian'], $order['id_agen'], $order['id_pelanggan'], $order['tgl_mulai'], $tgl_selesai, $total_bayar, $payment_status, $rating, $komentar);
           mysqli_stmt_execute($stmt2);
           mysqli_stmt_close($stmt2);
        }
@@ -120,16 +113,6 @@ function handleStatusUpdate($connect) {
 
 handleWeightUpdate($connect);
 handleStatusUpdate($connect);
-
-
-
-function calculateTotalHarga($order) {
-    if (is_null($order['berat'])) return null;
-    // Total harga = (harga paket * berat) + total per item
-    $paket = getHargaPaket($order["jenis"], $order["id_agen"]) * $order["berat"];
-    $totalPerItem = getTotalPerItem($order["item_type"] ?? '', $order["id_agen"]);
-    return $paket + $totalPerItem;
-}
 
 $orders = fetchOrders($connect, $login, $userId);
 ?>
@@ -206,7 +189,6 @@ $orders = fetchOrders($connect, $login, $userId);
               if($login === "Agen" && is_null($order['berat'])): ?>
                 <form action="" method="post">
                   <input type="hidden" name="id_cucian" value="<?= htmlspecialchars($order['id_cucian']) ?>">
-                  <!-- Sertakan juga berat saat ini (jika ada) agar bisa dipakai di status update -->
                   <input type="number" name="berat" size="3" step="0.1" required>
                   <button class="btn blue darken-2" type="submit" name="simpanBerat">
                     <i class="material-icons">send</i>
@@ -217,11 +199,11 @@ $orders = fetchOrders($connect, $login, $userId);
               <?php endif; ?>
             </td>
             <td><?= htmlspecialchars($order['jenis']) ?></td>
-            <td>Rp <?= number_format(getHargaPaket($order['jenis'], $order['id_agen']), 0, ',', '.') ?></td>
-            <td>Rp <?= number_format(getTotalPerItem($order['item_type'], $order['id_agen']), 0, ',', '.') ?></td>
+            <td>Rp <?= number_format(getHargaPaket($order['jenis'], $order['id_agen'], $connect), 0, ',', '.') ?></td>
+            <td>Rp <?= number_format(getTotalPerItem($order['item_type'], $order['id_agen'], $connect), 0, ',', '.') ?></td>
             <td>
               <?php 
-              $totalHarga = calculateTotalHarga($order);
+              $totalHarga = calculateTotalHarga($order, $connect);
               echo is_null($totalHarga) ? '-' : "Rp " . number_format($totalHarga, 0, ',', '.');
               ?>
             </td>
@@ -236,7 +218,6 @@ $orders = fetchOrders($connect, $login, $userId);
               <td>
                 <form action="" method="post">
                   <input type="hidden" name="id_cucian" value="<?= htmlspecialchars($order['id_cucian']) ?>">
-                  <!-- Sertakan berat dalam form status update agar nilai berat yang terbaru ikut dipakai -->
                   <input type="hidden" name="berat" value="<?= htmlspecialchars($order['berat']) ?>">
                   <select class="browser-default" name="status_cucian" required>
                     <option value="" disabled selected>Status :</option>
@@ -288,7 +269,7 @@ $orders = fetchOrders($connect, $login, $userId);
                 if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
                     $itemName = trim($matches[1]);
                     $quantity = (int)$matches[2];
-                    $price = getPerItemPrice(strtolower($itemName), $order['id_agen']);
+                    $price = getPerItemPrice(strtolower($itemName), $order['id_agen'], $connect);
                     $total = $price * $quantity;
                     ?>
                     <tr>

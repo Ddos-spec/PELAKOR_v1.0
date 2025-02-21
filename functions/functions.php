@@ -1,7 +1,4 @@
-
-
 <?php
-
 
 // USERNAME
 function validasiUsername($objek){
@@ -117,19 +114,12 @@ function validasiNama($objek){
     }
 }
 
-
-
-
-
-
 // SESSION
 
 // admin
 function cekAdmin(){
     if ( isset($_SESSION["login-admin"]) && isset($_SESSION["admin"]) ){
-
         $idAdmin = $_SESSION["admin"];
-        
     }else {
         echo "
             <script>
@@ -140,11 +130,9 @@ function cekAdmin(){
     }
 }
 
-
 // agen
 function cekAgen(){
     if (isset($_SESSION["login-agen"]) && isset($_SESSION["agen"]) ){
-
         $idAgen = $_SESSION["agen"];
     }else {
         echo "
@@ -156,11 +144,9 @@ function cekAgen(){
     }
 }
 
-
 // pengguna
 function cekPelanggan(){
     if ( isset($_SESSION["login-pelanggan"]) && isset($_SESSION["pelanggan"]) ){
-
         $idPelanggan = $_SESSION["pelanggan"];
     }else {
         echo "
@@ -171,7 +157,6 @@ function cekPelanggan(){
         exit;
     }
 }
-
 
 // login
 function cekLogin(){
@@ -197,48 +182,41 @@ function cekBelumLogin(){
     }
 }
 
-function getHargaPaket($jenis, $idAgen) {
-    global $connect;
-    $jenisEscaped = mysqli_real_escape_string($connect, $jenis);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenisEscaped'");
+function getHargaPaket($jenis, $idAgen, $connect) {
+    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'");
     $row = mysqli_fetch_assoc($q);
     return $row['harga'] ?? 0;
 }
 
-function getPerItemPrice($item, $idAgen) {
-    global $connect;
-    $itemEscaped = mysqli_real_escape_string($connect, $item);
-    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$itemEscaped'");
+function getPerItemPrice($item, $idAgen, $connect) {
+    $q = mysqli_query($connect, "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$item'");
     $row = mysqli_fetch_assoc($q);
     return $row['harga'] ?? 0;
 }
 
-function getTotalPerItem($itemType, $idAgen) {
-    if (empty($itemType)) return 0;
-    
+function getTotalPerItem($itemType, $idAgen, $connect) {
     $total = 0;
+    if (empty($itemType)) return $total;
+    
     $items = explode(', ', $itemType);
-    foreach ($items as $it) {
-        if (trim($it) === "") continue;
-        if (preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
+    foreach($items as $it) {
+        if(trim($it) == "") continue;
+        if(preg_match('/([^(]+)\((\d+)\)/', $it, $matches)) {
             $item = strtolower(trim($matches[1]));
             $qty = (int)$matches[2];
-            $price = getPerItemPrice($item, $idAgen);
+            $price = getPerItemPrice($item, $idAgen, $connect);
             $total += $price * $qty;
         }
     }
     return $total;
 }
 
-function calculateTotalHarga($transaksi) {
-    if (!isset($transaksi['berat']) || !isset($transaksi['jenis']) || !isset($transaksi['id_agen'])) {
-        return 0;
-    }
-    
-    $weightPrice = getHargaPaket($transaksi['jenis'], $transaksi['id_agen']) * $transaksi['berat'];
-    $itemsPrice = getTotalPerItem($transaksi['item_type'] ?? '', $transaksi['id_agen']);
-    
-    return $weightPrice + $itemsPrice;
+function calculateTotalHarga($order, $connect) {
+    if (is_null($order['berat'])) return null;
+    // Total harga = (harga paket * berat) + total per item
+    $paket = getHargaPaket($order["jenis"], $order["id_agen"], $connect) * $order["berat"];
+    $totalPerItem = getTotalPerItem($order["item_type"] ?? '', $order["id_agen"], $connect);
+    return $paket + $totalPerItem;
 }
 
 ?>
