@@ -5,7 +5,7 @@ include 'functions/functions.php';
 
 cekAdmin();
 
-$jumlahDataPerHalaman = 6; // Changed to 6 to show 2 complete rows
+$jumlahDataPerHalaman = 6; // 3 card per row, 2 rows
 $query = mysqli_query($connect,"SELECT * FROM pelanggan");
 $jumlahData = mysqli_num_rows($query);
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
@@ -50,25 +50,17 @@ if (isset($_POST["cari"])) {
             height: 100%;
             object-fit: cover;
         }
-        .card-rating {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-        }
         .card-action {
             display: flex;
             justify-content: space-between;
+            padding: 10px;
         }
         .modal {
             max-height: 80% !important;
         }
         .card-contact {
+            margin: 10px 0;
             color: #666;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -97,13 +89,11 @@ if (isset($_POST["cari"])) {
             <div class="col s12 m6 l4">
                 <div class="card">
                     <div class="card-image" onclick="showDetails(<?= htmlspecialchars(json_encode($dataPelanggan)) ?>)">
-                        <img src="https://via.placeholder.com/300x300/randomimage.jpg" alt="Pelanggan">
-                        <span class="card-rating">
-                            <i class="material-icons">star</i> 4.5
-                        </span>
+                        <img src="img/pelanggan/<?= !empty($dataPelanggan['foto']) ? $dataPelanggan['foto'] : 'default.jpg' ?>" 
+                             alt="<?= $dataPelanggan["nama"] ?>">
                     </div>
                     <div class="card-content">
-                        <span class="card-title"><?= $dataPelanggan["nama"] ?></span>
+                        <span class="card-title truncate"><?= $dataPelanggan["nama"] ?></span>
                         <div class="card-contact">
                             <i class="material-icons tiny">phone</i> <?= $dataPelanggan["telp"] ?>
                         </div>
@@ -152,61 +142,61 @@ if (isset($_POST["cari"])) {
         </div>
     </div>
 
-<!-- Modal Detail -->
-<div id="detailModal" class="modal">
-    <div class="modal-content">
-        <h4>Detail Pelanggan</h4>
-        <div class="row">
-            <div class="col s12">
-                <ul class="collection">
-                    <li class="collection-item">ID Pelanggan: <span id="modal-id-pelanggan"></span></li>
-                    <li class="collection-item">Email: <span id="modal-email"></span></li>
-                    <li class="collection-item">Kota: <span id="modal-kota"></span></li>
-                    <li class="collection-item">Alamat: <span id="modal-alamat"></span></li>
-                </ul>
+    <!-- Modal Detail -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <h4>Detail Pelanggan</h4>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collection">
+                        <li class="collection-item">ID Pelanggan: <span id="modal-id-pelanggan"></span></li>
+                        <li class="collection-item">Email: <span id="modal-email"></span></li>
+                        <li class="collection-item">Kota: <span id="modal-kota"></span></li>
+                        <li class="collection-item">Alamat: <span id="modal-alamat"></span></li>
+                    </ul>
+                </div>
             </div>
         </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Tutup</a>
+        </div>
     </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Tutup</a>
-    </div>
-</div>
 
-<?php include "footer.php"; ?>
+    <?php include "footer.php"; ?>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var elems = document.querySelectorAll('.modal');
-        var instances = M.Modal.init(elems);
-    });
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems);
+        });
 
-    function showDetails(data) {
-        document.getElementById('modal-id-pelanggan').textContent = data.id_pelanggan;
-        document.getElementById('modal-email').textContent = data.email;
-        document.getElementById('modal-kota').textContent = data.kota;
-        document.getElementById('modal-alamat').textContent = data.alamat;
-        
-        var modal = M.Modal.getInstance(document.getElementById('detailModal'));
-        modal.open();
-    }
-</script>
+        function showDetails(data) {
+            document.getElementById('modal-id-pelanggan').textContent = data.id_pelanggan;
+            document.getElementById('modal-email').textContent = data.email;
+            document.getElementById('modal-kota').textContent = data.kota;
+            document.getElementById('modal-alamat').textContent = data.alamat;
+            
+            var modal = M.Modal.getInstance(document.getElementById('detailModal'));
+            modal.open();
+        }
+    </script>
 
 </body>
 </html>
 
 <?php
 if (isset($_GET["hapus"])){
-$idPelanggan = $_GET["hapus"];
-$query = mysqli_query($connect, "DELETE FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
-
-if (mysqli_affected_rows($connect) > 0){
-    echo "
-        <script>
-            Swal.fire('Data Pelanggan Berhasil Di Hapus','','success').then(function(){
-                window.location = 'list-pelanggan.php';
-            });
-        </script>
-    ";
-}
+    $idPelanggan = $_GET["hapus"];
+    $query = mysqli_query($connect, "DELETE FROM pelanggan WHERE id_pelanggan = '$idPelanggan'");
+    
+    if (mysqli_affected_rows($connect) > 0){
+        echo "
+            <script>
+                Swal.fire('Data Pelanggan Berhasil Di Hapus','','success').then(function(){
+                    window.location = 'list-pelanggan.php';
+                });
+            </script>
+        ";
+    }
 }
 ?>

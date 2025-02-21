@@ -7,7 +7,7 @@ include 'functions/functions.php';
 cekAdmin();
 
 //konfirgurasi pagination
-$jumlahDataPerHalaman = 6; // Changed to 6 to show 2 complete rows
+$jumlahDataPerHalaman = 6; // 3 card per row, 2 rows
 $query = mysqli_query($connect,"SELECT * FROM agen");
 $jumlahData = mysqli_num_rows($query);
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
@@ -47,24 +47,26 @@ if (isset($_POST["cari"])) {
             height: 250px;
             overflow: hidden;
             cursor: pointer;
+            position: relative;
         }
         .card-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .card-rating {
+        .rating-stars {
             position: absolute;
             top: 10px;
             right: 10px;
             background: rgba(0,0,0,0.7);
-            color: white;
+            color: #ffd700;
             padding: 5px 10px;
             border-radius: 15px;
         }
         .card-action {
             display: flex;
             justify-content: space-between;
+            padding: 10px;
         }
         .modal {
             max-height: 80% !important;
@@ -96,13 +98,17 @@ if (isset($_POST["cari"])) {
             <div class="col s12 m6 l4">
                 <div class="card">
                     <div class="card-image" onclick="showDetails(<?= htmlspecialchars(json_encode($dataAgen)) ?>)">
-                        <img src="https://via.placeholder.com/300x300/randomimage.jpg" alt="Agen">
-                        <span class="card-rating">
-                            <i class="material-icons">star</i> 4.5
-                        </span>
+                        <img src="img/agen/<?= !empty($dataAgen['foto']) ? $dataAgen['foto'] : 'default.jpg' ?>" 
+                             alt="<?= $dataAgen["nama_laundry"] ?>">
+                        <div class="rating-stars">
+                            <?php 
+                            $rating = isset($dataAgen['rating']) ? (int)$dataAgen['rating'] : 0;
+                            echo str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
+                            ?>
+                        </div>
                     </div>
                     <div class="card-content">
-                        <span class="card-title"><?= $dataAgen["nama_laundry"] ?></span>
+                        <span class="card-title truncate"><?= $dataAgen["nama_laundry"] ?></span>
                         <div class="card-action">
                             <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=<?= $dataAgen['id_agen'] ?>&type=agen">
                                 <i class="material-icons">lock_reset</i>
@@ -188,7 +194,6 @@ if (isset($_POST["cari"])) {
             modal.open();
         }
     </script>
-
 </body>
 </html>
 
