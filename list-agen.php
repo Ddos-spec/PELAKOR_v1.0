@@ -3,10 +3,10 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// validasi login
+// Validasi login
 cekAdmin();
 
-//konfirgurasi pagination
+// Konfigurasi pagination
 $jumlahDataPerHalaman = 6; // 3 card per row, 2 rows
 $query = mysqli_query($connect,"SELECT * FROM agen");
 $jumlahData = mysqli_num_rows($query);
@@ -21,20 +21,20 @@ if (isset($_GET["page"])){
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 $agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
 
-if (isset($_POST["cari"])) {
-    $keyword = htmlspecialchars($_POST["keyword"]);
-    $query = "SELECT * FROM agen WHERE 
-        nama_laundry LIKE '%$keyword%' OR
-        nama_pemilik LIKE '%$keyword%' OR
-        kota LIKE '%$keyword%' OR
-        email LIKE '%$keyword%' OR
-        alamat LIKE '%$keyword%'
-        ORDER BY id_agen DESC
-        LIMIT $awalData, $jumlahDataPerHalaman";
-    $agen = mysqli_query($connect,$query);
-}
+// Jika masih menggunakan pencarian via form POST, kode di bawah tidak lagi dipakai:
+// if (isset($_POST["cari"])) {
+//     $keyword = htmlspecialchars($_POST["keyword"]);
+//     $query = "SELECT * FROM agen WHERE 
+//         nama_laundry LIKE '%$keyword%' OR
+//         nama_pemilik LIKE '%$keyword%' OR
+//         kota LIKE '%$keyword%' OR
+//         email LIKE '%$keyword%' OR
+//         alamat LIKE '%$keyword%'
+//         ORDER BY id_agen DESC
+//         LIMIT $awalData, $jumlahDataPerHalaman";
+//     $agen = mysqli_query($connect,$query);
+// }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,16 +80,14 @@ if (isset($_POST["cari"])) {
     <div class="container">
         <h3 class="header light center">List Agen</h3>
         
-        <!-- searching -->
+        <!-- Updated Searching -->
         <div class="row">
-            <form class="col s12 center" action="" method="post">
+            <div class="col s12 center">
                 <div class="input-field inline">
-                    <input type="text" size=40 name="keyword" placeholder="Keyword">
-                    <button type="submit" class="btn waves-effect blue darken-2" name="cari">
-                        <i class="material-icons">search</i>
-                    </button>
+                    <input type="text" id="searchAgen" placeholder="Cari agen...">
+                    <i class="material-icons prefix">search</i>
                 </div>
-            </form>
+            </div>
         </div>
 
         <!-- Card Container -->
@@ -176,6 +174,65 @@ if (isset($_POST["cari"])) {
     </div>
 
     <?php include "footer.php"; ?>
+
+    <!-- Script JavaScript untuk pencarian -->
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchAgen');
+    // Mengasumsikan baris kedua di dalam container adalah card container
+    const cardContainer = document.querySelectorAll('.container .row')[1];
+    
+    searchInput.addEventListener('keyup', function() {
+        const keyword = this.value.trim();
+        searchAgen(keyword);
+    });
+
+    function searchAgen(keyword) {
+        fetch(`ajax/cari.php?action=searchAgen&keyword=${encodeURIComponent(keyword)}`)
+            .then(response => response.json())
+            .then(data => updateAgenList(data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    function updateAgenList(agents) {
+        cardContainer.innerHTML = '';
+        
+        if(agents.length === 0) {
+            cardContainer.innerHTML = '<div class="col s12 center"><p>Tidak ada hasil yang ditemukan</p></div>';
+            return;
+        }
+
+        agents.forEach(agent => {
+            // Gunakan template card yang sama seperti sebelumnya
+            const card = `
+                <div class="col s12 m6 l4">
+                    <div class="card">
+                        <div class="card-image" onclick="showDetails(${JSON.stringify(agent)})">
+                            <img src="img/agen/${agent.foto || 'default.jpg'}" alt="${agent.nama_laundry}">
+                            <div class="rating-stars">
+                                ${'★'.repeat(agent.rating)}${'☆'.repeat(5-agent.rating)}
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title truncate">${agent.nama_laundry}</span>
+                            <div class="card-action">
+                                <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=${agent.id_agen}&type=agen">
+                                    <i class="material-icons">lock_reset</i>
+                                </a>
+                                <a class="btn red darken-2" href="list-agen.php?hapus=${agent.id_agen}" 
+                                   onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            cardContainer.insertAdjacentHTML('beforeend', card);
+        });
+    }
+});
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

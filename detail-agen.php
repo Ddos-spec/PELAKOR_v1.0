@@ -45,6 +45,14 @@ $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include "headtags.html"; ?>
     <title><?= htmlspecialchars($agen["nama_laundry"]) ?></title>
+    <style>
+        .profile-img {
+            border-radius: 50%;
+            width: 70%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+        }
+    </style>
 </head>
 
 <body>
@@ -52,7 +60,7 @@ $fixStar = ($i > 0) ? ceil($totalStar / $i) : 0;
     <br><br>
     <div class="row">
         <div class="col s2 offset-s4">
-            <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="circle responsive-img" width="70%" />
+            <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="profile-img" />
             <a id="download-button" class="btn red darken-3" href="pesan-laundry.php?id=<?= $idAgen ?>">PESAN LAUNDRY</a>
         </div>
         <div class="col s6">

@@ -77,6 +77,14 @@ $rating = calculateAgentRating($connect, $idAgen);
     <?php include 'headtags.html'; ?>
     <title>Pemesanan Laundry</title>
     <style>
+        /* Membuat foto profil menjadi bulat sempurna */
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
         .item-selection {
             margin: 20px 0;
         }
@@ -100,12 +108,9 @@ $rating = calculateAgentRating($connect, $idAgen);
 
     <!-- Laundry Information Section -->
     <div class="row">
+        <!-- Foto Profil Agen, tampil sebagai bulat sempurna -->
         <div class="col s2 offset-s4">
-            <img src="img/logo.png" alt="Laundry Logo" class="responsive-img" style="width: 70%">
-            <a href="pesan-laundry.php?id=<?= htmlspecialchars($idAgen) ?>" 
-               class="btn waves-effect waves-light red darken-3">
-                PESAN LAUNDRY
-            </a>
+            <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="profile-img" alt="Laundry Logo">
         </div>
         <div class="col s6">
             <h3><?= htmlspecialchars($agen["nama_laundry"]) ?></h3>

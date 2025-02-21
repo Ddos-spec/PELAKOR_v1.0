@@ -21,7 +21,6 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
                                ORDER BY a.nama_laundry ASC 
                                LIMIT $awalData, $jumlahDataPerHalaman");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +54,10 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
         }
         .pagination {
             margin: 2rem 0;
+        }
+        /* Sembunyikan pesan "no results" secara default */
+        #noResults {
+            display: none;
         }
     </style>
 </head>
@@ -125,8 +128,10 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
         </div>
 
         <!-- No Results Message -->
-        <div id="noResults" class="grey-text center">
-            <h5>Tidak ada hasil yang ditemukan</h5>
+        <div id="noResults" class="row grey-text center">
+            <div class="col s12">
+                <h5>Tidak ada hasil yang ditemukan</h5>
+            </div>
         </div>
 
         <!-- Agent List Container -->

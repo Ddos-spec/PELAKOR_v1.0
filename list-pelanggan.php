@@ -19,19 +19,19 @@ if (isset($_GET["page"])){
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 $pelanggan = mysqli_query($connect,"SELECT * FROM pelanggan ORDER BY id_pelanggan DESC LIMIT $awalData, $jumlahDataPerHalaman");
 
-if (isset($_POST["cari"])) {
-    $keyword = htmlspecialchars($_POST["keyword"]);
-    $query = "SELECT * FROM pelanggan WHERE 
-        nama LIKE '%$keyword%' OR
-        kota LIKE '%$keyword%' OR
-        email LIKE '%$keyword%' OR
-        alamat LIKE '%$keyword%'
-        ORDER BY id_pelanggan DESC
-        LIMIT $awalData, $jumlahDataPerHalaman";
-    $pelanggan = mysqli_query($connect,$query);
-}
+// Jika masih menggunakan pencarian via form POST, kode di bawah tidak lagi dipakai:
+// if (isset($_POST["cari"])) {
+//     $keyword = htmlspecialchars($_POST["keyword"]);
+//     $query = "SELECT * FROM pelanggan WHERE 
+//         nama LIKE '%$keyword%' OR
+//         kota LIKE '%$keyword%' OR
+//         email LIKE '%$keyword%' OR
+//         alamat LIKE '%$keyword%'
+//         ORDER BY id_pelanggan DESC
+//         LIMIT $awalData, $jumlahDataPerHalaman";
+//     $pelanggan = mysqli_query($connect,$query);
+// }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,19 +71,18 @@ if (isset($_POST["cari"])) {
     <div class="container">
         <h3 class="header light center">List Pelanggan</h3>
         
-        <!-- searching -->
+        <!-- Updated Searching -->
         <div class="row">
-            <form class="col s12 center" action="" method="post">
+            <div class="col s12 center">
                 <div class="input-field inline">
-                    <input type="text" size=40 name="keyword" placeholder="Keyword">
-                    <button type="submit" class="btn waves-effect blue darken-2" name="cari">
-                        <i class="material-icons">search</i>
-                    </button>
+                    <input type="text" id="searchPelanggan" placeholder="Cari pelanggan...">
+                    <i class="material-icons prefix">search</i>
                 </div>
-            </form>
+            </div>
         </div>
 
         <!-- Card Container -->
+        <!-- Pastikan container khusus untuk card dipisahkan (misal baris kedua) -->
         <div class="row">
             <?php foreach ($pelanggan as $dataPelanggan) : ?>
             <div class="col s12 m6 l4">
@@ -163,6 +162,65 @@ if (isset($_POST["cari"])) {
     </div>
 
     <?php include "footer.php"; ?>
+
+    <!-- Script JavaScript untuk pencarian -->
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchPelanggan');
+    // Mengasumsikan baris kedua di dalam container adalah card container
+    const cardContainer = document.querySelectorAll('.container .row')[1];
+    
+    searchInput.addEventListener('keyup', function() {
+        const keyword = this.value.trim();
+        searchPelanggan(keyword);
+    });
+
+    function searchPelanggan(keyword) {
+        fetch(`ajax/cari.php?action=searchPelanggan&keyword=${encodeURIComponent(keyword)}`)
+            .then(response => response.json())
+            .then(data => updatePelangganList(data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    function updatePelangganList(customers) {
+        cardContainer.innerHTML = '';
+        
+        if(customers.length === 0) {
+            cardContainer.innerHTML = '<div class="col s12 center"><p>Tidak ada hasil yang ditemukan</p></div>';
+            return;
+        }
+
+        customers.forEach(customer => {
+            // Gunakan template card yang sama seperti sebelumnya
+            const card = `
+                <div class="col s12 m6 l4">
+                    <div class="card">
+                        <div class="card-image" onclick="showDetails(${JSON.stringify(customer)})">
+                            <img src="img/pelanggan/${customer.foto || 'default.jpg'}" alt="${customer.nama}">
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title truncate">${customer.nama}</span>
+                            <div class="card-contact">
+                                <i class="material-icons tiny">phone</i> ${customer.telp}
+                            </div>
+                            <div class="card-action">
+                                <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=${customer.id_pelanggan}&type=pelanggan">
+                                    <i class="material-icons">lock_reset</i>
+                                </a>
+                                <a class="btn red darken-2" href="list-pelanggan.php?hapus=${customer.id_pelanggan}" 
+                                   onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            cardContainer.insertAdjacentHTML('beforeend', card);
+        });
+    }
+});
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

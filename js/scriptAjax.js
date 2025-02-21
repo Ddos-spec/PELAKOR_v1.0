@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('keyword');
-    const agentContainer = document.getElementById('container');
-    const agentList = document.querySelector('.row.card');
+    const agentContainer = document.getElementById('agentContainer');
+    const noResults = document.getElementById('noResults');
     
-    // Initial load
-    loadAgents('');
+    // Sembunyikan pesan "tidak ada hasil" di awal
+    noResults.style.display = 'none';
 
+    // Initial load tidak perlu karena data sudah dimuat dari PHP
+    
     // Real-time search handler
     searchInput.addEventListener('keyup', function(e) {
         const keyword = e.target.value.trim();
@@ -20,38 +22,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateAgentList(agents) {
-        if (!agentList) return;
-        
-        agentList.innerHTML = '';
+        agentContainer.innerHTML = '';
         
         if (agents.length === 0) {
-            agentList.innerHTML = '<div class="col s12 center"><p>Tidak ada hasil yang ditemukan</p></div>';
+            noResults.style.display = 'block';
             return;
         }
+
+        noResults.style.display = 'none';
 
         agents.forEach(agent => {
             const agentCard = `
                 <div class="col s12 m4">
-                    <div class="icon-block center">
-                        <h2 class="center light-blue-text">
+                    <div class="card agent-card">
+                        <div class="card-image">
                             <a href="detail-agen.php?id=${agent.id_agen}">
-                                <img src="img/agen/${agent.foto}" class="circle responsive-img" width="60%" />
+                                <img src="img/agen/${agent.foto}" alt="${agent.nama_laundry}" class="agent-image">
                             </a>
-                        </h2>
-                        <h5 class="center">
-                            <a href="detail-agen.php?id=${agent.id_agen}">${agent.nama_laundry}</a>
-                        </h5>
-                        <div class="rating-container">
-                            ${'★'.repeat(agent.rating)}${'☆'.repeat(5-agent.rating)}
                         </div>
-                        <p class="light">
-                            <i class="material-icons tiny">location_on</i> ${agent.alamat}, ${agent.kota}<br/>
-                            <i class="material-icons tiny">phone</i> ${agent.telp}
-                        </p>
+                        <div class="card-content">
+                            <span class="card-title">${agent.nama_laundry}</span>
+                            <p>
+                                <i class="material-icons tiny">location_on</i> ${agent.alamat}, ${agent.kota}
+                            </p>
+                            <p>
+                                <i class="material-icons tiny">phone</i> ${agent.telp}
+                            </p>
+                        </div>
+                        <div class="card-action">
+                            <div class="rating-stars">
+                                ${'★'.repeat(agent.rating)}${'☆'.repeat(5-agent.rating)}
+                            </div>
+                            <a href="detail-agen.php?id=${agent.id_agen}">Detail</a>
+                        </div>
                     </div>
                 </div>
             `;
-            agentList.insertAdjacentHTML('beforeend', agentCard);
+            agentContainer.insertAdjacentHTML('beforeend', agentCard);
         });
     }
 });
