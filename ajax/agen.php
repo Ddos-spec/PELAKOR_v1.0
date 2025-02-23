@@ -64,8 +64,12 @@ if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
     exit;
 }
 
-// Handle price list request (tetap seperti sebelumnya)
+// Handle price list request
 if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
+    if (!isset($_SESSION['admin_id'])) {
+        echo json_encode(['error' => 'Unauthorized access']);
+        exit();
+    }
     $idAgen = intval($_GET['idAgen']);
     
     // Fetch prices from database

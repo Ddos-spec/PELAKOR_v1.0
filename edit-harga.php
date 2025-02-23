@@ -3,7 +3,11 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-cekAgen();
+// Check if the user is an admin
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: error.php?message=Unauthorized access");
+    exit();
+}
 
 $idAgen = $_SESSION["agen"];
 

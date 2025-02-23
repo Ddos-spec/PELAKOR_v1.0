@@ -4,7 +4,6 @@ require_once 'connect-db.php';
 require_once 'functions/functions.php';
 
 // Tentukan tipe login dan ambil data transaksi yang sudah selesai (payment_status = 'Paid')
-// Lakukan JOIN dengan tabel cucian untuk mendapatkan data order yang lengkap.
 if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     $login = "Admin";
     $query = mysqli_query($connect, "SELECT t.*, c.total_item, c.berat, c.jenis, c.item_type, c.tgl_mulai, c.tgl_selesai 
@@ -30,7 +29,6 @@ if (isset($_SESSION["login-admin"]) && isset($_SESSION["admin"])) {
     exit();
 }
 
-// Simpan data transaksi ke dalam array agar bisa digunakan untuk modal detail
 $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -72,13 +70,9 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                         <?php if ($login === "Agen"): ?>
                             <th>Invoice</th>
                             <th>Detail</th>
-                        <?php elseif ($login === "Admin"): ?>
-                            <th>Rating</th>
-                            <th>Komentar</th>
-                        <?php else: ?>
-                            <th>Rating</th>
-                            <th>Komentar</th>
                         <?php endif; ?>
+                        <th>Rating</th>
+                        <th>Komentar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,85 +106,40 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                 <td>
                                     <button class="btn modal-trigger" data-target="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>">Detail</button>
                                 </td>
-                            <?php elseif ($login === "Admin"): ?>
-                                <td>
-                                    <?php if ($transaksi["rating"] == 0): ?>
-                                        <form action="" method="post" class="review-form">
-                                            <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
-                                            <div class="input-field">
-                                                <select class="browser-default" name="rating" required>
-                                                    <option value="" disabled selected>Pilih Rating</option>
-                                                    <option value="2">1</option>
-                                                    <option value="4">2</option>
-                                                    <option value="6">3</option>
-                                                    <option value="8">4</option>
-                                                    <option value="10">5</option>
-                                                </select>
-                                            </div>
-                                            <div class="input-field">
-                                                <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
-                                            </div>
-                                            <div class="center">
-                                                <button class="btn blue darken-2" type="submit" name="submitReview">
-                                                    Kirim Ulasan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    <?php else: 
-                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $starRow = mysqli_fetch_assoc($starResult);
-                                        $star = $starRow["rating"];
-                                    ?>
-                                        <fieldset class="bintang">
-                                            <span class="starImg star-<?= $star ?>"></span>
-                                        </fieldset>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if ($transaksi["komentar"] != ""): ?>
-                                        <?= htmlspecialchars($transaksi["komentar"]) ?>
-                                    <?php endif; ?>
-                                </td>
-                            <?php else: ?>
-                                <td>
-                                    <?php if ($transaksi["rating"] == 0): ?>
-                                        <form action="" method="post" class="review-form">
-                                            <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
-                                            <div class="input-field">
-                                                <select class="browser-default" name="rating" required>
-                                                    <option value="" disabled selected>Pilih Rating</option>
-                                                    <option value="2">1</option>
-                                                    <option value="4">2</option>
-                                                    <option value="6">3</option>
-                                                    <option value="8">4</option>
-                                                    <option value="10">5</option>
-                                                </select>
-                                            </div>
-                                            <div class="input-field">
-                                                <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
-                                            </div>
-                                            <div class="center">
-                                                <button class="btn blue darken-2" type="submit" name="submitReview">
-                                                    Kirim Ulasan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    <?php else: 
-                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $starRow = mysqli_fetch_assoc($starResult);
-                                        $star = $starRow["rating"];
-                                    ?>
-                                        <fieldset class="bintang">
-                                            <span class="starImg star-<?= $star ?>"></span>
-                                        </fieldset>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if ($transaksi["komentar"] != ""): ?>
-                                        <?= htmlspecialchars($transaksi["komentar"]) ?>
-                                    <?php endif; ?>
-                                </td>
                             <?php endif; ?>
+                            <!-- Form review rating & komentar yang disatukan -->
+                            <td>
+                                <?php if ($transaksi["rating"] == 0): ?>
+                                    <form action="" method="post" class="review-form">
+                                        <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
+                                        <div class="input-field">
+                                            <select class="browser-default" name="rating" required>
+                                                <option value="" disabled selected>Pilih Rating</option>
+                                                <option value="2">1</option>
+                                                <option value="4">2</option>
+                                                <option value="6">3</option>
+                                                <option value="8">4</option>
+                                                <option value="10">5</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-field">
+                                            <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
+                                        </div>
+                                        <div class="center">
+                                            <button class="btn blue darken-2" type="submit" name="submitReview">
+                                                Kirim Ulasan
+                                            </button>
+                                        </div>
+                                    </form>
+                                <?php else: ?>
+                                    <fieldset class="bintang">
+                                        <span class="starImg star-<?= htmlspecialchars($transaksi["rating"]) ?>"></span>
+                                    </fieldset>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?= htmlspecialchars($transaksi["komentar"]) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -198,7 +147,7 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
         </div>
     </div>
     <?php if ($login === "Agen"): ?>
-    <!-- Modals untuk detail order (hanya Agen) -->
+    <!-- Modal Detail Order untuk Agen -->
     <?php foreach ($transactions as $transaksi): ?>
         <div id="modal-<?= htmlspecialchars($transaksi['id_cucian']) ?>" class="modal">
           <div class="modal-content">
@@ -244,36 +193,48 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
     <?php endif; ?>
 
     <script>
-        // Inisialisasi modal menggunakan Materialize (pastikan library Materialize sudah diinclude)
+        // Inisialisasi modal Materialize
         document.addEventListener('DOMContentLoaded', function() {
           var modals = document.querySelectorAll('.modal');
           M.Modal.init(modals);
         });
     </script>
     <?php
-    // Handle review submission
+    // Penanganan pengiriman review
     if (isset($_POST["submitReview"])) {
-        $rating = $_POST["rating"];
-        $komentar = htmlspecialchars($_POST["komentar"]);
         $kodeTransaksiRating = $_POST["kodeTransaksi"];
-    
-        $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
-        mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
         
-        if (mysqli_stmt_execute($updateReview)) {
-            echo "
-                <script>
-                    Swal.fire('Penilaian Berhasil','Ulasan Berhasil Di Tambahkan','success').then(function() {
-                        window.location = 'transaksi.php';
-                    });
-                </script>
-            ";
+        // Cek apakah transaksi sudah direview sebelumnya
+        $checkStmt = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = ?");
+        mysqli_stmt_bind_param($checkStmt, "i", $kodeTransaksiRating);
+        mysqli_stmt_execute($checkStmt);
+        $resultCheck = mysqli_stmt_get_result($checkStmt);
+        $dataReview = mysqli_fetch_assoc($resultCheck);
+        mysqli_stmt_close($checkStmt);
+        
+        if ($dataReview && $dataReview["rating"] != 0) {
+            echo "<script>
+                    Swal.fire('Perhatian','Transaksi ini sudah direview','warning');
+                  </script>";
         } else {
-            echo "
-                <script>
-                    Swal.fire('Error','Gagal menambahkan ulasan','error');
-                </script>
-            ";
+            $rating = $_POST["rating"];
+            $komentar = htmlspecialchars($_POST["komentar"]);
+            
+            $updateReview = mysqli_prepare($connect, "UPDATE transaksi SET rating = ?, komentar = ? WHERE kode_transaksi = ?");
+            mysqli_stmt_bind_param($updateReview, "isi", $rating, $komentar, $kodeTransaksiRating);
+            
+            if (mysqli_stmt_execute($updateReview)) {
+                echo "<script>
+                        Swal.fire('Penilaian Berhasil','Ulasan berhasil ditambahkan','success').then(function() {
+                            window.location = 'transaksi.php';
+                        });
+                      </script>";
+            } else {
+                echo "<script>
+                        Swal.fire('Error','Gagal menambahkan ulasan','error');
+                      </script>";
+            }
+            mysqli_stmt_close($updateReview);
         }
     }
     

@@ -57,7 +57,7 @@ if (!empty($transaction['item_type'])) {
 
 // Calculate totals
 $subtotalItems = array_sum(array_column($items, 'total'));
-$weightPrice = getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect) * $transaction['berat'];
+$weightPrice = isset($_SESSION['admin_id']) ? getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect) * $transaction['berat'] : 0;
 $totalPrice = $subtotalItems + $weightPrice;
 
 ob_start();
