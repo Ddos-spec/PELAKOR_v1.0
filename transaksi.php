@@ -94,9 +94,48 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                             <td><?= htmlspecialchars($transaksi["total_item"]) ?></td>
                             <td><?= htmlspecialchars($transaksi["berat"] ?? '-') ?></td>
                             <td><?= htmlspecialchars($transaksi["jenis"]) ?></td>
-                            <td><?= "Rp " . number_format(getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect), 0, ',', '.') ?></td>
-                            <td><?= "Rp " . number_format(getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect), 0, ',', '.') ?></td>
-                            <td><?= "Rp " . number_format(calculateTotalHarga($transaksi, $connect), 0, ',', '.') ?></td>
+                            <td>
+                                <?php 
+                                try {
+                                    $packagePrice = getHargaPaket($transaksi["jenis"], $transaksi["id_agen"], $connect);
+                                    if ($packagePrice <= 0) {
+                                        throw new Exception("Invalid package price");
+                                    }
+                                    echo "Rp " . number_format($packagePrice, 0, ',', '.');
+                                } catch (Exception $e) {
+                                    error_log("Error getting package price: " . $e->getMessage());
+                                    echo "Rp 0";
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php 
+                                try {
+                                    $itemTotal = getTotalPerItem($transaksi["item_type"] ?? '', $transaksi["id_agen"], $connect);
+                                    if ($itemTotal <= 0) {
+                                        throw new Exception("Invalid item total");
+                                    }
+                                    echo "Rp " . number_format($itemTotal, 0, ',', '.');
+                                } catch (Exception $e) {
+                                    error_log("Error calculating item total: " . $e->getMessage());
+                                    echo "Rp 0";
+                                }
+                                ?>
+                            </td>
+                            <td>
+                                <?php 
+                                try {
+                                    $totalPrice = calculateTotalHarga($transaksi, $connect);
+                                    if ($totalPrice <= 0) {
+                                        throw new Exception("Invalid total price");
+                                    }
+                                    echo "Rp " . number_format($totalPrice, 0, ',', '.');
+                                } catch (Exception $e) {
+                                    error_log("Error calculating total price: " . $e->getMessage());
+                                    echo "Rp 0";
+                                }
+                                ?>
+                            </td>
                             <td><?= htmlspecialchars($transaksi["tgl_mulai"]) ?></td>
                             <td><?= htmlspecialchars($transaksi["tgl_selesai"]) ?></td>
                             <?php if ($login === "Agen"): ?>
@@ -169,8 +208,17 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                     if(preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
                         $itemName = trim($matches[1]);
                         $quantity = (int)$matches[2];
-                        $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen'], $connect);
-                        $total = $price * $quantity;
+                        try {
+                            $price = getPerItemPrice(strtolower($itemName), $transaksi['id_agen'], $connect);
+                            if ($price <= 0) {
+                                throw new Exception("Invalid price for item: $itemName");
+                            }
+                            $total = $price * $quantity;
+                        } catch (Exception $e) {
+                            error_log("Error in modal price calculation: " . $e->getMessage());
+                            $price = 0;
+                            $total = 0;
+                        }
                         ?>
                         <tr>
                             <td><?= htmlspecialchars($itemName) ?></td>

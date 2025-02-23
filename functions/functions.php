@@ -1,4 +1,12 @@
 <?php
+// Fungsi untuk mengecek apakah admin sudah login
+function cekAdmin() {
+    if (!isset($_SESSION['admin'])) {
+        header("Location: login.php");
+        exit();
+    }
+}
+
 // Fungsi untuk menghitung rating agen berdasarkan ID
 function calculateAgentRating($connect, $idAgen) {
     // Check if the review table exists
@@ -91,50 +99,84 @@ function cekLogin() {
 
 // Fungsi untuk mendapatkan harga paket dasar berdasarkan jenis layanan (cuci, setrika, komplit)
 function getHargaPaket($serviceType, $idAgen, $connect) {
-    if (!isset($_SESSION['admin_id'])) {
-        return 0; // Return 0 if the user is not an admin
+    try {
+        cekAdmin();
+        
+        // Log price access
+        error_log("Package price accessed by admin ID: " . $_SESSION['admin']);
+        
+        $query = "SELECT harga FROM harga WHERE id_agen = $idAgen LIMIT 1";
+        $result = mysqli_query($connect, $query);
+        
+        if (!$result) {
+            throw new Exception("Failed to fetch package price");
+        }
+        
+        if ($row = mysqli_fetch_assoc($result)) {
+            return $row['harga'] ? $row['harga'] : 0;
+        }
+        
+        // Default prices if not found
+        $default = [
+            'cuci' => 5000,
+            'setrika' => 3000, 
+            'komplit' => 7000
+        ];
+        
+        return $default[$serviceType] ?? 0;
+        
+    } catch (Exception $e) {
+        error_log("Error in getHargaPaket: " . $e->getMessage());
+        return 0;
     }
-    $query = "SELECT harga FROM harga WHERE id_agen = $idAgen LIMIT 1";
-    $result = mysqli_query($connect, $query);
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row['harga'] ? $row['harga'] : 0;
-    }
-    // Default jika tidak ditemukan
-    $default = ['cuci'=>5000, 'setrika'=>3000, 'komplit'=>7000];
-    return $default[$serviceType] ?? 0;
 }
 
 // Fungsi untuk mendapatkan harga per item berdasarkan jenis pakaian
 function getPerItemPrice($item, $idAgen, $connect) {
-    if (!isset($_SESSION['admin_id'])) {
-        return 0; // Return 0 if the user is not an admin
+    try {
+        cekAdmin();
+        
+        // Log price access
+        error_log("Item price accessed by admin ID: " . $_SESSION['admin']);
+        
+        $column = '';
+        switch(strtolower($item)) {
+            case 'baju':
+                $column = 'harga_baju';
+                break;
+            case 'celana':
+                $column = 'harga_celana';
+                break;
+            case 'jaket':
+                $column = 'harga_jaket';
+                break;
+            case 'karpet':
+                $column = 'harga_karpet';
+                break;
+            case 'pakaian_khusus':
+                $column = 'harga_pakaian_khusus';
+                break;
+            default:
+                return 0;
+        }
+        
+        $query = "SELECT $column FROM harga WHERE id_agen = $idAgen LIMIT 1";
+        $result = mysqli_query($connect, $query);
+        
+        if (!$result) {
+            throw new Exception("Failed to fetch item price");
+        }
+        
+        if ($row = mysqli_fetch_assoc($result)) {
+            return $row[$column] ? $row[$column] : 0;
+        }
+        
+        return 0;
+        
+    } catch (Exception $e) {
+        error_log("Error in getPerItemPrice: " . $e->getMessage());
+        return 0;
     }
-    $column = '';
-    switch(strtolower($item)) {
-        case 'baju':
-            $column = 'harga_baju';
-            break;
-        case 'celana':
-            $column = 'harga_celana';
-            break;
-        case 'jaket':
-            $column = 'harga_jaket';
-            break;
-        case 'karpet':
-            $column = 'harga_karpet';
-            break;
-        case 'pakaian_khusus':
-            $column = 'harga_pakaian_khusus';
-            break;
-        default:
-            return 0;
-    }
-    $query = "SELECT $column FROM harga WHERE id_agen = $idAgen LIMIT 1";
-    $result = mysqli_query($connect, $query);
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row[$column] ? $row[$column] : 0;
-    }
-    return 0;
 }
 
 // Fungsi untuk menghitung total harga per item berdasarkan string item_type (misalnya "Baju (2), Celana (3)")

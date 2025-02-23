@@ -66,14 +66,18 @@ if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
 
 // Handle price list request
 if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
-    if (!isset($_SESSION['admin_id'])) {
+    // Verify admin access
+    try {
+        cekAdmin();
+        error_log("Price list accessed by admin ID: " . $_SESSION['admin']);
+    } catch (Exception $e) {
+        error_log("Unauthorized price list access attempt");
         echo json_encode(['error' => 'Unauthorized access']);
         exit();
     }
-    $idAgen = intval($_GET['idAgen']);
     
-    // Fetch prices from database
-    $query = mysqli_query($connect, "SELECT * FROM harga WHERE id_agen = '$idAgen'");
+    // Fetch global prices from database
+    $query = mysqli_query($connect, "SELECT * FROM harga");
     $prices = [];
     
     while ($row = mysqli_fetch_assoc($query)) {
@@ -114,5 +118,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
 }
 
 // Return error if action not specified
-echo json_encode(['error' => 'Invalid action']);
+error_log("Invalid AJAX action requested");
+echo json_encode([
+    'error' => 'Invalid action',
+    'timestamp' => time()
+]);
 ?>

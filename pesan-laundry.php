@@ -159,16 +159,44 @@ $rating = calculateAgentRating($connect, $idAgen);
 
     function fetchPrices() {
         const idAgen = <?= $idAgen ?>;
-        fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
-            .then(response => response.json())
-            .then(data => {
-                itemPrices = data;
-                calculatePrice();
-            })
-            .catch(error => {
-                console.error('Error fetching prices:', error);
-                M.toast({html: 'Gagal memuat harga', classes: 'red'});
-            });
+        try {
+            fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch prices');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Validate prices
+                    if (!data || Object.keys(data).length === 0) {
+                        throw new Error('No price data received');
+                    }
+                    
+                    // Validate each price
+                    Object.entries(data).forEach(([item, prices]) => {
+                        if (!prices || typeof prices !== 'object') {
+                            throw new Error(`Invalid price structure for ${item}`);
+                        }
+                        Object.entries(prices).forEach(([serviceType, price]) => {
+                            if (isNaN(price) || price <= 0) {
+                                throw new Error(`Invalid price for ${item} - ${serviceType}`);
+                            }
+                        });
+                    });
+
+                    itemPrices = data;
+                    calculatePrice();
+                })
+                .catch(error => {
+                    console.error('Error fetching prices:', error);
+                    M.toast({html: 'Gagal memuat harga: ' + error.message, classes: 'red'});
+                    throw error; // Re-throw to prevent further execution
+                });
+        } catch (error) {
+            console.error('Error in fetchPrices:', error);
+            M.toast({html: 'Terjadi kesalahan saat memuat harga', classes: 'red'});
+        }
     }
 
     function toggleQuantity(itemType) {
@@ -182,19 +210,37 @@ $rating = calculateAgentRating($connect, $idAgen);
     }
 
     function calculatePrice() {
-        const serviceType = document.querySelector('input[name="jenis"]:checked')?.value;
-        if (!serviceType) return;
-
-        let totalPrice = 0;
-        ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
-            const qty = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
-            if (qty > 0 && itemPrices[item]?.[serviceType]) {
-                totalPrice += qty * itemPrices[item][serviceType];
+        try {
+            const serviceType = document.querySelector('input[name="jenis"]:checked')?.value;
+            if (!serviceType) {
+                throw new Error('Jenis layanan belum dipilih');
             }
-        });
 
-        document.getElementById('pricePreview').innerText = 
-            `Rp ${totalPrice.toLocaleString('id-ID')}`;
+            let totalPrice = 0;
+            ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
+                const qty = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
+                if (qty > 0) {
+                    if (!itemPrices[item]?.[serviceType]) {
+                        throw new Error(`Harga untuk ${item} - ${serviceType} tidak ditemukan`);
+                    }
+                    if (isNaN(itemPrices[item][serviceType]) || itemPrices[item][serviceType] <= 0) {
+                        throw new Error(`Harga tidak valid untuk ${item} - ${serviceType}`);
+                    }
+                    totalPrice += qty * itemPrices[item][serviceType];
+                }
+            });
+
+            if (totalPrice <= 0) {
+                throw new Error('Total harga tidak valid');
+            }
+
+            document.getElementById('pricePreview').innerText = 
+                `Rp ${totalPrice.toLocaleString('id-ID')}`;
+        } catch (error) {
+            console.error('Error in calculatePrice:', error);
+            document.getElementById('pricePreview').innerText = 'Rp 0';
+            M.toast({html: 'Gagal menghitung harga: ' + error.message, classes: 'red'});
+        }
     }
 
     // Validasi form: pastikan setidaknya satu item terpilih

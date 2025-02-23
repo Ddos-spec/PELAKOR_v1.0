@@ -3,19 +3,18 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// Check if the user is an admin
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: error.php?message=Unauthorized access");
-    exit();
-}
+// Verify admin access
+cekAdmin();
 
-$idAgen = $_SESSION["agen"];
+// Initialize logging
+$logMessage = "Price update attempt by admin ID: " . $_SESSION['admin'];
+error_log($logMessage);
 
 // Ambil data harga yang sudah tersimpan untuk tiap jenis
 $priceTypes = ['cuci', 'setrika', 'komplit', 'baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'];
 $prices = [];
 foreach ($priceTypes as $jenis) {
-    $query = "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'";
+    $query = "SELECT harga FROM harga WHERE jenis = '$jenis'"; // Removed agent-specific condition
     $result = mysqli_query($connect, $query);
     $row = mysqli_fetch_assoc($result);
     $prices[$jenis] = $row ? $row['harga'] : 1000;
@@ -145,7 +144,7 @@ foreach ($priceTypes as $jenis) {
 <?php
 // Function to update price data using prepared statements
 function ubahHarga($data) {
-    global $connect, $idAgen;
+    global $connect;
     
     $priceKeys = ['cuci', 'setrika', 'komplit', 'baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'];
     $prices = [];
@@ -165,14 +164,14 @@ function ubahHarga($data) {
     mysqli_begin_transaction($connect);
     
     try {
-        $stmt = mysqli_prepare($connect, "UPDATE harga SET harga = ? WHERE id_agen = ? AND jenis = ?");
+        $stmt = mysqli_prepare($connect, "UPDATE harga SET harga = ? WHERE jenis = ?"); // Removed agent-specific condition
         if (!$stmt) {
             throw new Exception(mysqli_error($connect));
         }
         
         $successCount = 0;
         foreach ($prices as $jenis => $harga) {
-            mysqli_stmt_bind_param($stmt, "iis", $harga, $idAgen, $jenis);
+            mysqli_stmt_bind_param($stmt, "is", $harga, $jenis);
             if (mysqli_stmt_execute($stmt)) {
                 $successCount++;
             } else {
@@ -199,33 +198,59 @@ function ubahHarga($data) {
 }
 
 if (isset($_POST["simpan"])) {
-    $result = ubahHarga($_POST);
-    if ($result['status']) {
-        echo "
-            <script>
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Prices updated successfully',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(function() {
-                    window.location = 'edit-harga.php';
-                });
-            </script>
-        ";
-    } else {
-        $errorMsg = $result['message'] ?? "Failed to update prices. Please try again.";
-        echo "
-            <script>
-                Swal.fire({
-                    title: 'Error',
-                    text: '$errorMsg',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            </script>
-        ";
-        error_log("Database error: " . mysqli_error($connect));
+    // Add confirmation dialog
+    echo "
+        <script>
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Apakah Anda yakin ingin mengubah harga?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Ubah',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with form submission
+                    document.getElementById('editPriceForm').submit();
+                }
+            });
+        </script>
+    ";
+    
+    // Process the form if confirmed
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $result = ubahHarga($_POST);
+        if ($result['status']) {
+            // Log successful update
+            error_log("Prices successfully updated by admin ID: " . $_SESSION['admin']);
+            
+            echo "
+                <script>
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: 'Harga berhasil diperbarui',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(function() {
+                        window.location = 'edit-harga.php';
+                    });
+                </script>
+            ";
+        } else {
+            $errorMsg = $result['message'] ?? "Gagal memperbarui harga. Silakan coba lagi.";
+            error_log("Price update failed: " . $errorMsg);
+            
+            echo "
+                <script>
+                    Swal.fire({
+                        title: 'Error',
+                        text: '$errorMsg',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                </script>
+            ";
+        }
     }
 }
 ?>

@@ -35,6 +35,7 @@ $admin = mysqli_fetch_assoc($data);
                     <li><button type="submit" class="waves-effect blue darken-2 btn" size=40 name="simpan">Simpan Data</button></li>
                     <br>
                     <li><a class="btn waves-effect waves-light red darken-3" id="download-button"  href="ganti-kata-sandi.php">Ganti Kata Sandi</a></li>
+                    <li><a class="btn waves-effect waves-light green darken-3" id="edit-price-button" href="edit-harga.php">Edit Harga</a></li>
                 </ul>
             </div>
         </form>
