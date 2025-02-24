@@ -12,7 +12,7 @@
 
             </div>
             <div class="col l3 s12">
-            <h5 class="white-text">Laundryku</h5>
+            <h5 class="white-text">Pelakorku</h5>
             <ul>
                 <li><a class="white-text" href="index.php">Home</a></li>
                 <li><a class="white-text" href="term.php">Term and Condition</a></li>
