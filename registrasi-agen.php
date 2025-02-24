@@ -198,7 +198,7 @@ if (isset($_POST["daftar"])) {
         
         echo "
             <script>
-                Swal.fire('Pendaftaran Agen Berhasil','Silahkan Mengisi Data Harga Cucian','success').then(function(){
+                Swal.fire('Pendaftaran Agen Berhasil','Silahkan Menunggu verifikasi admin','success').then(function(){
                     window.location = 'registrasi-agen2.php';
                 });
             </script>
