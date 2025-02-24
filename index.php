@@ -156,7 +156,12 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
                         </div>
                         <div class="card-action">
                             <div class="rating-stars">
-                                <?= str_repeat('★', round($dataAgen['rating'])) . str_repeat('☆', 5 - round($dataAgen['rating'])) ?>
+                                <?php
+                                $rating = round($dataAgen['rating']);
+                                // Ensure rating is between 0 and 5
+                                $rating = max(0, min(5, $rating));
+                                echo str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
+                                ?>
                             </div>
                             <a href="detail-agen.php?id=<?= $dataAgen['id_agen'] ?>">Detail</a>
                         </div>

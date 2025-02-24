@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="card-action">
                             <div class="rating-stars">
-                                ${'★'.repeat(agent.rating)}${'☆'.repeat(5 - agent.rating)}
+                                ${'★'.repeat(Math.max(0, Math.min(5, agent.rating)))}${'☆'.repeat(Math.max(0, 5 - Math.max(0, Math.min(5, agent.rating))))}
                             </div>
                             <a href="detail-agen.php?id=${agent.id_agen}">Detail</a>
                         </div>
