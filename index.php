@@ -7,6 +7,7 @@ $jumlahDataPerHalaman = 3;
 $query = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating 
                                 FROM agen a 
                                 LEFT JOIN transaksi t ON a.id_agen = t.id_agen 
+                                WHERE a.status = 'approved' 
                                 GROUP BY a.id_agen");
 $jumlahData = mysqli_num_rows($query);
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
@@ -17,6 +18,7 @@ $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
 $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0) as rating 
                                FROM agen a 
                                LEFT JOIN transaksi t ON a.id_agen = t.id_agen 
+                               WHERE a.status = 'approved' 
                                GROUP BY a.id_agen 
                                ORDER BY a.nama_laundry ASC 
                                LIMIT $awalData, $jumlahDataPerHalaman");
@@ -136,7 +138,6 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
 
         <!-- Agent List Container -->
         <div class="row" id="agentContainer">
-            <!-- Data awal server-side -->
             <?php foreach($agen as $dataAgen): ?>
                 <div class="col s12 m4">
                     <div class="card agent-card">
@@ -158,7 +159,6 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
                             <div class="rating-stars">
                                 <?php
                                 $rating = round($dataAgen['rating']);
-                                // Ensure rating is between 0 and 5
                                 $rating = max(0, min(5, $rating));
                                 echo str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
                                 ?>
@@ -170,7 +170,7 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
             <?php endforeach; ?>
         </div>
 
-        <!-- Pagination (server-side, sudah dimodifikasi untuk AJAX) -->
+        <!-- Pagination (Server-side default, sudah dimodifikasi untuk AJAX) -->
         <div class="row center">
             <ul class="pagination">
                 <?php if($halamanAktif > 1) : ?>
@@ -194,7 +194,7 @@ $agen = mysqli_query($connect, "SELECT a.*, COALESCE(AVG(NULLIF(t.rating, 0)), 0
         </div>
     </div>
 
-    <?php include "footer.php"; ?>
+    <?php include 'footer.php'; ?>
 
     <script src="materialize/js/materialize.min.js"></script>
     <script src="js/script.js"></script>

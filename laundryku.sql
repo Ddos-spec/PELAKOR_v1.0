@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 21 Feb 2025 pada 19.28
+-- Waktu pembuatan: 24 Feb 2025 pada 16.00
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -56,20 +56,21 @@ CREATE TABLE `agen` (
   `alamat` varchar(100) DEFAULT NULL,
   `plat_driver` varchar(12) DEFAULT NULL,
   `foto` text NOT NULL,
-  `password` varchar(255) DEFAULT NULL
+  `password` varchar(255) DEFAULT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `agen`
 --
 
-INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`) VALUES
-(16, 'Pelakor Bersih', 'Ahmad', '081234567890', 'bersih@gmail.com', 'Jakarta', 'Jl. Kebersihan No. 1, Jakarta', 'B1234CD', '67b883f47548b.jpg', '$2y$10$6eJezSxANaQMbZQzxmhKFuKcul.QxFcyeROVpYTqaMdBWags2w2w.'),
-(17, 'Pelakor Cepat', 'Budi', '081234567891', 'cepat@gmail.com', 'Bandung', 'Jl. Kecepatan No. 2, Bandung', 'B1234CE', '67b8837071f57.jpg', '$2y$10$wJ1XrUtyIi5hdfxLH0OlYeba0qX0kJXA5eD8H62EQ2JHp1fQzSxUm'),
-(18, 'Pelakor Kuat', 'Citra', '081234567892', 'kuat@gmail.com', 'Surabaya', 'Jl. Kekuatan No. 3, Surabaya', 'B1234KU', '67b883507f2d6.jpg', '$2y$10$6JVY/WIjyuq4tgEFbvLTMOsxvQ2Ag3Go01NJ0H0R.Wbbb9hUI/19e'),
-(19, 'Pelakor Terpercaya', 'Dewi', '081234567893', 'terpercaya@gmail.com', 'Medan', 'Jl. Kepercayaan No. 4, Medan', 'B1234TR', '67b8833220a8b.jpg', '$2y$10$Zx6CnEShkTeglAtuLurO3eQkPlNSBsBYoAhXch59jhfZtlVh6hCRm'),
-(20, 'Pelakor Ramah', 'Eko', '081234567894', 'ramah@gmail.com', 'Makassar', 'Jl. Keramahan No. 5, Makassar', 'B1234RA', '67b8831432911.jpg', '$2y$10$WrM4PZVf6lx7VtMgZJTgAeuSxWOZJIPnziE4swChnK1bJBX61nRqy'),
-(21, 'Pelakor Jago', 'Fajar', '081234567895', 'jago@gmail.com', 'Semarang', 'Jl. Kejagoan No. 6, Semarang', 'B1234JA', '67b882e086d4f.jpg', '$2y$10$fQFO0B9sYBJVYWRKecOyUuXFtR9Ug9B9q9M2L4R.KMES97eEhVBmi');
+INSERT INTO `agen` (`id_agen`, `nama_laundry`, `nama_pemilik`, `telp`, `email`, `kota`, `alamat`, `plat_driver`, `foto`, `password`, `status`) VALUES
+(16, 'Pelakor Bersih', 'Ahmad', '081234567890', 'bersih@gmail.com', 'Jakarta', 'Jl. Kebersihan No. 1, Jakarta', 'B1234CD', '67b883f47548b.jpg', '$2y$10$6eJezSxANaQMbZQzxmhKFuKcul.QxFcyeROVpYTqaMdBWags2w2w.', 'approved'),
+(17, 'Pelakor Cepat', 'Budi', '081234567891', 'cepat@gmail.com', 'Bandung', 'Jl. Kecepatan No. 2, Bandung', 'B1234CE', '67b8837071f57.jpg', '$2y$10$wJ1XrUtyIi5hdfxLH0OlYeba0qX0kJXA5eD8H62EQ2JHp1fQzSxUm', 'approved'),
+(18, 'Pelakor Kuat', 'Citra', '081234567892', 'kuat@gmail.com', 'Surabaya', 'Jl. Kekuatan No. 3, Surabaya', 'B1234KU', '67b883507f2d6.jpg', '$2y$10$6JVY/WIjyuq4tgEFbvLTMOsxvQ2Ag3Go01NJ0H0R.Wbbb9hUI/19e', 'approved'),
+(19, 'Pelakor Terpercaya', 'Dewi', '081234567893', 'terpercaya@gmail.com', 'Medan', 'Jl. Kepercayaan No. 4, Medan', 'B1234TR', '67b8833220a8b.jpg', '$2y$10$Zx6CnEShkTeglAtuLurO3eQkPlNSBsBYoAhXch59jhfZtlVh6hCRm', 'approved'),
+(20, 'Pelakor Ramah', 'Eko', '081234567894', 'ramah@gmail.com', 'Makassar', 'Jl. Keramahan No. 5, Makassar', 'B1234RA', '67b8831432911.jpg', '$2y$10$WrM4PZVf6lx7VtMgZJTgAeuSxWOZJIPnziE4swChnK1bJBX61nRqy', 'approved'),
+(21, 'Pelakor Jago', 'Fajar', '081234567895', 'jago@gmail.com', 'Semarang', 'Jl. Kejagoan No. 6, Semarang', 'B1234JA', '67b882e086d4f.jpg', '$2y$10$fQFO0B9sYBJVYWRKecOyUuXFtR9Ug9B9q9M2L4R.KMES97eEhVBmi', 'approved');
 
 -- --------------------------------------------------------
 
@@ -93,6 +94,15 @@ CREATE TABLE `cucian` (
   `status_cucian` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `cucian`
+--
+
+INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `item_type`, `total_item`, `preview_price`, `berat`, `alamat`, `catatan`, `status_cucian`) VALUES
+(45, 16, 17, '2025-02-24', '2025-02-24', 'cuci', 'Baju (3)', 3, NULL, 5, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai'),
+(46, 16, 17, '2025-02-24', '2025-02-24', 'komplit', 'Baju (1)', 1, NULL, 50, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai'),
+(47, 17, 17, '2025-02-24', '2025-02-24', 'komplit', 'Baju (2), Celana (1), Jaket (4', 7, NULL, 10, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai');
+
 -- --------------------------------------------------------
 
 --
@@ -109,7 +119,61 @@ CREATE TABLE `harga` (
   `harga_jaket` int(11) DEFAULT NULL,
   `harga_karpet` int(11) DEFAULT NULL,
   `harga_pakaian_khusus` int(11) DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `harga`
+--
+
+INSERT INTO `harga` (`id_harga`, `jenis`, `id_agen`, `harga`, `harga_baju`, `harga_celana`, `harga_jaket`, `harga_karpet`, `harga_pakaian_khusus`) VALUES
+(1, 'cuci', 16, 2000, NULL, NULL, NULL, NULL, NULL),
+(2, 'setrika', 16, 3000, NULL, NULL, NULL, NULL, NULL),
+(3, 'komplit', 16, 5000, NULL, NULL, NULL, NULL, NULL),
+(4, 'baju', 16, 2000, NULL, NULL, NULL, NULL, NULL),
+(5, 'celana', 16, 3000, NULL, NULL, NULL, NULL, NULL),
+(6, 'jaket', 16, 4000, NULL, NULL, NULL, NULL, NULL),
+(7, 'karpet', 16, 5000, NULL, NULL, NULL, NULL, NULL),
+(8, 'pakaian_khusus', 16, 6000, NULL, NULL, NULL, NULL, NULL),
+(9, 'cuci', 17, 5000, NULL, NULL, NULL, NULL, NULL),
+(10, 'setrika', 17, 6000, NULL, NULL, NULL, NULL, NULL),
+(11, 'komplit', 17, 7000, NULL, NULL, NULL, NULL, NULL),
+(12, 'baju', 17, 1000, NULL, NULL, NULL, NULL, NULL),
+(13, 'celana', 17, 2000, NULL, NULL, NULL, NULL, NULL),
+(14, 'jaket', 17, 3000, NULL, NULL, NULL, NULL, NULL),
+(15, 'karpet', 17, 4000, NULL, NULL, NULL, NULL, NULL),
+(16, 'pakaian_khusus', 17, 5000, NULL, NULL, NULL, NULL, NULL),
+(17, 'cuci', 21, 4000, NULL, NULL, NULL, NULL, NULL),
+(18, 'setrika', 21, 5000, NULL, NULL, NULL, NULL, NULL),
+(19, 'komplit', 21, 6000, NULL, NULL, NULL, NULL, NULL),
+(20, 'baju', 21, 2000, NULL, NULL, NULL, NULL, NULL),
+(21, 'celana', 21, 3000, NULL, NULL, NULL, NULL, NULL),
+(22, 'jaket', 21, 4000, NULL, NULL, NULL, NULL, NULL),
+(23, 'karpet', 21, 5000, NULL, NULL, NULL, NULL, NULL),
+(24, 'pakaian_khusus', 21, 7000, NULL, NULL, NULL, NULL, NULL),
+(25, 'cuci', 18, 4000, NULL, NULL, NULL, NULL, NULL),
+(26, 'setrika', 18, 5000, NULL, NULL, NULL, NULL, NULL),
+(27, 'komplit', 18, 6000, NULL, NULL, NULL, NULL, NULL),
+(28, 'baju', 18, 3000, NULL, NULL, NULL, NULL, NULL),
+(29, 'celana', 18, 4000, NULL, NULL, NULL, NULL, NULL),
+(30, 'jaket', 18, 5000, NULL, NULL, NULL, NULL, NULL),
+(31, 'karpet', 18, 6000, NULL, NULL, NULL, NULL, NULL),
+(32, 'pakaian_khusus', 18, 7000, NULL, NULL, NULL, NULL, NULL),
+(33, 'cuci', 20, 5000, NULL, NULL, NULL, NULL, NULL),
+(34, 'setrika', 20, 6000, NULL, NULL, NULL, NULL, NULL),
+(35, 'komplit', 20, 7000, NULL, NULL, NULL, NULL, NULL),
+(36, 'baju', 20, 4000, NULL, NULL, NULL, NULL, NULL),
+(37, 'celana', 20, 5000, NULL, NULL, NULL, NULL, NULL),
+(38, 'jaket', 20, 6000, NULL, NULL, NULL, NULL, NULL),
+(39, 'karpet', 20, 7000, NULL, NULL, NULL, NULL, NULL),
+(40, 'pakaian_khusus', 20, 8000, NULL, NULL, NULL, NULL, NULL),
+(41, 'cuci', 19, 6000, NULL, NULL, NULL, NULL, NULL),
+(42, 'setrika', 19, 7000, NULL, NULL, NULL, NULL, NULL),
+(43, 'komplit', 19, 8000, NULL, NULL, NULL, NULL, NULL),
+(44, 'baju', 19, 3000, NULL, NULL, NULL, NULL, NULL),
+(45, 'celana', 19, 4000, NULL, NULL, NULL, NULL, NULL),
+(46, 'jaket', 19, 5000, NULL, NULL, NULL, NULL, NULL),
+(47, 'karpet', 19, 6000, NULL, NULL, NULL, NULL, NULL),
+(48, 'pakaian_khusus', 19, 7000, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -161,6 +225,15 @@ CREATE TABLE `transaksi` (
   `rating` int(11) DEFAULT NULL,
   `komentar` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `transaksi`
+--
+
+INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `payment_status`, `rating`, `komentar`) VALUES
+(46, 45, 16, 17, '2025-02-24', '2025-02-24', 16000, '', NULL, ''),
+(47, 46, 16, 17, '2025-02-24', '2025-02-24', 252000, 'Paid', 10, 'mantap jiwa\r\n'),
+(48, 47, 17, 17, '2025-02-24', '2025-02-24', 74000, 'Paid', NULL, '');
 
 --
 -- Indexes for dumped tables
@@ -222,13 +295,13 @@ ALTER TABLE `agen`
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
 --
 ALTER TABLE `harga`
-  MODIFY `id_harga` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_harga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT untuk tabel `pelanggan`
@@ -240,7 +313,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

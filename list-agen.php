@@ -6,20 +6,42 @@ include 'functions/functions.php';
 // Validasi login admin
 cekAdmin();
 
-// Konfigurasi pagination (server-side default)
+// Proses approve dan delete agen
+if (isset($_GET["approve"])) {
+    $idAgen = $_GET["approve"];
+    mysqli_query($connect, "UPDATE agen SET status = 'approved' WHERE id_agen = '$idAgen'");
+    header("Location: list-agen.php");
+    exit;
+} elseif (isset($_GET["hapus"])) {
+    $idAgen = $_GET["hapus"];
+    $result = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
+    // Check if the deletion was successful
+    if ($result) {
+        echo "<script>alert('Agen berhasil dihapus.');</script>";
+    } else {
+        echo "<script>alert('Gagal menghapus agen.');</script>";
+    }
+    header("Location: list-agen.php");
+    exit;
+}
+
+// Konfigurasi pagination untuk agen yang sudah di-approve
 $jumlahDataPerHalaman = 6; // 3 card per row, 2 rows
-$query = mysqli_query($connect,"SELECT * FROM agen");
-$jumlahData = mysqli_num_rows($query);
+$queryApproved = mysqli_query($connect, "SELECT * FROM agen WHERE status = 'approved'");
+$jumlahData = mysqli_num_rows($queryApproved);
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 
-if (isset($_GET["page"])){
+if (isset($_GET["page"])) {
     $halamanAktif = $_GET["page"];
 } else {
     $halamanAktif = 1;
 }
 
 $awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
-$agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
+$approvedAgents = mysqli_query($connect, "SELECT * FROM agen WHERE status = 'approved' ORDER BY id_agen DESC LIMIT $awalData, $jumlahDataPerHalaman");
+
+// Ambil data agen yang pending (menunggu approval)
+$pendingAgents = mysqli_query($connect, "SELECT * FROM agen WHERE status = 'pending'");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,17 +92,44 @@ $agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $a
         <div class="row">
             <div class="col s12 center">
                 <div class="input-field inline">
-                    <!-- Name "keyword" agar kita bisa tangkap di JS -->
                     <input type="text" name="keyword" placeholder="Cari agen...">
                     <i class="material-icons prefix">search</i>
                 </div>
             </div>
         </div>
 
-        <!-- Card Container -->
-        <!-- Gunakan class khusus agar mudah di-update lewat JS -->
+        <!-- Pending Agents Section -->
+        <h4 class="header light center">Pending Approvals</h4>
+        <div class="row pending-container">
+            <?php while ($pending = mysqli_fetch_assoc($pendingAgents)) : ?>
+            <div class="col s12 m6 l4">
+                <div class="card">
+                    <div class="card-image" onclick="showDetails(<?= htmlspecialchars(json_encode($pending)) ?>)">
+                        <img src="img/agen/<?= !empty($pending['foto']) ? $pending['foto'] : 'default.jpg' ?>" 
+                             alt="<?= $pending["nama_laundry"] ?>">
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title truncate"><?= $pending["nama_laundry"] ?></span>
+                        <div class="card-action">
+                            <a class="btn green" href="list-agen.php?approve=<?= $pending['id_agen'] ?>" 
+                               onclick="return confirm('Approve this agent?')">
+                                <i class="material-icons">check</i>
+                            </a>
+                            <a class="btn red" href="list-agen.php?hapus=<?= $pending['id_agen'] ?>" 
+                               onclick="return confirm('Reject this agent?')">
+                                <i class="material-icons">close</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endwhile; ?>
+        </div>
+
+        <!-- Approved Agents Section -->
+        <h4 class="header light center">Approved Agents</h4>
         <div class="row card-container">
-            <?php foreach ($agen as $dataAgen) : ?>
+            <?php while ($dataAgen = mysqli_fetch_assoc($approvedAgents)) : ?>
             <div class="col s12 m6 l4">
                 <div class="card">
                     <div class="card-image" onclick="showDetails(<?= htmlspecialchars(json_encode($dataAgen)) ?>)">
@@ -96,18 +145,18 @@ $agen = mysqli_query($connect,"SELECT * FROM agen ORDER BY id_agen DESC LIMIT $a
                     <div class="card-content">
                         <span class="card-title truncate"><?= $dataAgen["nama_laundry"] ?></span>
                         <div class="card-action">
-                            <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=<?= $dataAgen['id_agen'] ?>&type=agen">
+                            <a class="btn blue darken-2" href="ganti-kata-sandi.php?id=<?= $dataAgen['id_agen'] ?>&type=agen" onclick="return confirm('Reset password untuk agen ini?')">
                                 <i class="material-icons">lock_reset</i>
                             </a>
                             <a class="btn red darken-2" href="list-agen.php?hapus=<?= $dataAgen['id_agen'] ?>" 
-                               onclick="return confirm('Apakah anda yakin ingin menghapus data ?')">
+                               onclick="return confirm('Apakah anda yakin ingin menghapus data agen ini?')">
                                 <i class="material-icons">delete</i>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-            <?php endforeach ?>
+            <?php endwhile; ?>
         </div>
 
         <!-- Pagination (Server-side default) -->
@@ -176,7 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let timeoutId = null;
 
     // Hilangkan pagination default saat AJAX dipakai
-    // (Opsional: bisa ditampilkan hanya saat tidak ada pencarian)
     paginationDefault.style.display = 'none';
 
     // Event listener untuk input pencarian (debounce 300ms)
@@ -211,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         items.forEach(item => {
-            const rating = parseInt(item.rating) || 0; // Jika ada kolom rating
+            const rating = parseInt(item.rating) || 0;
             const card = `
                 <div class="col s12 m6 l4">
                     <div class="card">
@@ -241,14 +289,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePagination(totalPages, currentPage, keyword) {
-        // Buat pagination baru di bawah container
-        // Hapus dulu pagination default (atau sembunyikan)
         paginationDefault.innerHTML = '';
-        paginationDefault.style.display = 'block'; // Tampilkan pagination versi AJAX
+        paginationDefault.style.display = 'block';
 
         let paginationHTML = '';
 
-        // Tombol previous
         if(currentPage > 1) {
             paginationHTML += `
                 <li class="waves-effect">
@@ -259,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        // Nomor halaman
         for(let i = 1; i <= totalPages; i++) {
             paginationHTML += `
                 <li class="waves-effect ${i === currentPage ? 'active blue darken-2' : ''}">
@@ -268,7 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        // Tombol next
         if(currentPage < totalPages) {
             paginationHTML += `
                 <li class="waves-effect">
@@ -281,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         paginationDefault.innerHTML = paginationHTML;
 
-        // Event click pada pagination
         document.querySelectorAll('.pagination-default a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -306,21 +348,3 @@ function showDetails(data) {
     </script>
 </body>
 </html>
-
-<?php
-// Proses hapus data agen
-if (isset($_GET["hapus"])){
-    $idAgen = $_GET["hapus"];
-    $query = mysqli_query($connect, "DELETE FROM agen WHERE id_agen = '$idAgen'");
-    
-    if (mysqli_affected_rows($connect) > 0){
-        echo "
-            <script>
-                Swal.fire('Data Agen Berhasil Di Hapus','','success').then(function(){
-                    window.location = 'list-agen.php';
-                });
-            </script>
-        ";
-    }
-}
-?>

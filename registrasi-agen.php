@@ -173,7 +173,8 @@ function registrasi($agen){
         '$alamat',
         '$platDriver',
         'default.png',
-        '$password'
+        '$password',
+        'pending'
     )";
 
     mysqli_query($connect, $query);
@@ -211,3 +212,4 @@ if (isset($_POST["daftar"])) {
 }
 
 ?>
+</create_file>
