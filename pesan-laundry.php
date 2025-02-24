@@ -76,7 +76,6 @@ $idPelanggan = $_SESSION["pelanggan"];
 $agen = getAgentData($connect, $idAgen);
 $pelanggan = getCustomerData($connect, $idPelanggan);
 $rating = calculateAgentRating($connect, $idAgen);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
