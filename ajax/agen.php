@@ -2,6 +2,10 @@
 session_start();
 include '../connect-db.php';
 
+// Add cache control headers
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 header('Content-Type: application/json');
 
 // Handle agent list request dengan rating + pagination
@@ -64,63 +68,70 @@ if (isset($_GET['action']) && $_GET['action'] == 'getAgents') {
     exit;
 }
 
-// Handle price list request
+// Handle price list request (tetap seperti sebelumnya)
 if (isset($_GET['action']) && $_GET['action'] == 'getPrices') {
-    // Verify admin access
     try {
-        cekAdmin();
-        error_log("Price list accessed by admin ID: " . $_SESSION['admin']);
+        $idAgen = intval($_GET['idAgen']);
+        if ($idAgen <= 0) {
+            throw new Exception("Invalid agent ID");
+        }
+        
+        // Fetch prices with error handling
+        $query = mysqli_query($connect, 
+            "SELECT * FROM harga WHERE id_agen = '$idAgen'"
+        );
+        
+        if (!$query) {
+            throw new Exception(mysqli_error($connect));
+        }
+        
+        $prices = [];
+        while ($row = mysqli_fetch_assoc($query)) {
+            $prices[$row['jenis']] = $row['harga'];
+        }
+        
+        // Return prices with success status
+        echo json_encode([
+            'status' => true,
+            'prices' => [
+                'baju' => [
+                    'cuci' => $prices['cuci'] ?? 5000,
+                    'setrika' => $prices['setrika'] ?? 3000,
+                    'komplit' => $prices['komplit'] ?? 7000
+                ],
+                'celana' => [
+                    'cuci' => $prices['cuci'] ?? 4000,
+                    'setrika' => $prices['setrika'] ?? 2500,
+                    'komplit' => $prices['komplit'] ?? 6000
+                ],
+                'jaket' => [
+                    'cuci' => $prices['cuci'] ?? 6000,
+                    'setrika' => $prices['setrika'] ?? 4000,
+                    'komplit' => $prices['komplit'] ?? 9000
+                ],
+                'karpet' => [
+                    'cuci' => $prices['cuci'] ?? 8000,
+                    'setrika' => $prices['setrika'] ?? 5000,
+                    'komplit' => $prices['komplit'] ?? 10000
+                ],
+                'pakaian_khusus' => [
+                    'cuci' => $prices['cuci'] ?? 10000,
+                    'setrika' => $prices['setrika'] ?? 6000,
+                    'komplit' => $prices['komplit'] ?? 12000
+                ]
+            ]
+        ]);
+        
     } catch (Exception $e) {
-        error_log("Unauthorized price list access attempt");
-        echo json_encode(['error' => 'Unauthorized access']);
-        exit();
+        error_log("Error in getPrices: " . $e->getMessage());
+        echo json_encode([
+            'status' => false,
+            'error' => $e->getMessage()
+        ]);
     }
-    
-    // Fetch global prices from database
-    $query = mysqli_query($connect, "SELECT * FROM harga");
-    $prices = [];
-    
-    while ($row = mysqli_fetch_assoc($query)) {
-        $prices[$row['jenis']] = $row['harga'];
-    }
-    
-    // Default price structure
-    $defaultPrices = [
-        'baju' => [
-            'cuci' => $prices['cuci'] ?? 5000,
-            'setrika' => $prices['setrika'] ?? 3000,
-            'komplit' => $prices['komplit'] ?? 7000
-        ],
-        'celana' => [
-            'cuci' => $prices['cuci'] ?? 4000,
-            'setrika' => $prices['setrika'] ?? 2500,
-            'komplit' => $prices['komplit'] ?? 6000
-        ],
-        'jaket' => [
-            'cuci' => $prices['cuci'] ?? 6000,
-            'setrika' => $prices['setrika'] ?? 4000,
-            'komplit' => $prices['komplit'] ?? 9000
-        ],
-        'karpet' => [
-            'cuci' => $prices['cuci'] ?? 8000,
-            'setrika' => $prices['setrika'] ?? 5000,
-            'komplit' => $prices['komplit'] ?? 10000
-        ],
-        'pakaian_khusus' => [
-            'cuci' => $prices['cuci'] ?? 10000,
-            'setrika' => $prices['setrika'] ?? 6000,
-            'komplit' => $prices['komplit'] ?? 12000
-        ]
-    ];
-    
-    echo json_encode($defaultPrices);
     exit;
 }
 
 // Return error if action not specified
-error_log("Invalid AJAX action requested");
-echo json_encode([
-    'error' => 'Invalid action',
-    'timestamp' => time()
-]);
+echo json_encode(['error' => 'Invalid action']);
 ?>

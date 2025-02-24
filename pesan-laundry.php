@@ -3,19 +3,80 @@ session_start();
 require_once 'connect-db.php';
 require_once 'functions/functions.php';
 
-// Fungsi helper (misalnya cek login pelanggan) di sini...
+// Authentication check
 cekPelanggan();
 
-// ... kode fungsi getAgentData(), getCustomerData(), calculateAgentRating() tetap sama
+// Database helper functions
+function getAgentData($connect, $agentId) {
+    $stmt = mysqli_prepare($connect, "SELECT * FROM agen WHERE id_agen = ?");
+    mysqli_stmt_bind_param($stmt, "i", $agentId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $data = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $data;
+}
 
-// Ambil parameter request
+function getCustomerData($connect, $customerId) {
+    $stmt = mysqli_prepare($connect, "SELECT * FROM pelanggan WHERE id_pelanggan = ?");
+    mysqli_stmt_bind_param($stmt, "i", $customerId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $data = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $data;
+}
+
+function calculateAgentRating($connect, $agentId) {
+    $stmt = mysqli_prepare($connect, "SELECT rating FROM transaksi WHERE id_agen = ? AND rating > 0");
+    mysqli_stmt_bind_param($stmt, "i", $agentId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    $totalStars = 0;
+    $count = 0;
+    
+    while ($rating = mysqli_fetch_assoc($result)) {
+        $totalStars += $rating["rating"]; 
+        $count++;
+    }
+    mysqli_stmt_close($stmt);
+    
+    return $count > 0 ? ceil($totalStars / $count) : 0;
+}
+
+function createOrder($connect, $orderData) {
+    $stmt = mysqli_prepare($connect, 
+        "INSERT INTO cucian (id_agen, id_pelanggan, tgl_mulai, jenis, item_type, total_item, alamat, catatan, status_cucian) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Penjemputan')"
+    );
+    
+    mysqli_stmt_bind_param($stmt, "iisssiss",
+        $orderData['id_agen'],
+        $orderData['id_pelanggan'],
+        $orderData['tgl_mulai'],
+        $orderData['jenis'],
+        $orderData['item_type'],
+        $orderData['total_item'],
+        $orderData['alamat'],
+        $orderData['catatan']
+    );
+    
+    $result = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $result;
+}
+
+// Get request parameters
 $idAgen = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 $jenis = filter_input(INPUT_GET, 'jenis', FILTER_SANITIZE_STRING);
 $idPelanggan = $_SESSION["pelanggan"];
 
+// Fetch data
 $agen = getAgentData($connect, $idAgen);
 $pelanggan = getCustomerData($connect, $idPelanggan);
 $rating = calculateAgentRating($connect, $idAgen);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,23 +86,54 @@ $rating = calculateAgentRating($connect, $idAgen);
     <?php include 'headtags.html'; ?>
     <title>Pemesanan Laundry</title>
     <style>
-        /* CSS seperti sebelumnya */
-        .profile-img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd; }
-        .agent-info-container { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
-        .agent-details h3 { margin: 0; }
-        .agent-details ul { list-style-type: none; padding: 0; margin: 0; }
-        .item-selection { margin: 20px 0; }
-        .item-selection label { display: flex; align-items: center; margin: 10px 0; }
-        .item-quantity { width: 60px !important; margin-left: 10px !important; }
-        .price-preview { margin: 20px 0; font-weight: bold; }
+        /* Membuat foto profil menjadi bulat sempurna */
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+        /* Flex container untuk menyatukan foto & detail agen dalam satu baris */
+        .agent-info-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .agent-details h3 {
+            margin: 0;
+        }
+        .agent-details ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .item-selection {
+            margin: 20px 0;
+        }
+        .item-selection label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .item-quantity {
+            width: 60px !important;
+            margin-left: 10px !important;
+        }
+        .price-preview {
+            margin: 20px 0;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
 
-    <!-- Informasi Laundry -->
+    <!-- Laundry Information Section -->
     <div class="container">
         <div class="row">
+            <!-- Agent info container: foto & detail dalam satu baris -->
             <div class="agent-info-container col s12">
                 <div>
                     <img src="img/agen/<?= htmlspecialchars($agen['foto']) ?>" class="profile-img" alt="Laundry Logo">
@@ -62,12 +154,11 @@ $rating = calculateAgentRating($connect, $idAgen);
         </div>
     </div>
 
-    <!-- Form Pemesanan -->
+    <!-- Order Form Section -->
     <div class="row">
         <div class="col s10 offset-s1">
-            <!-- Tambahkan onsubmit untuk validasi -->
-            <form action="" method="post" id="orderForm" onsubmit="return validateOrderForm();">
-                <!-- Data Diri Pelanggan -->
+            <form action="" method="post" id="orderForm">
+                <!-- Customer Information -->
                 <div class="col s5">
                     <h3 class="header light center">Data Diri</h3>
                     <div class="input-field">
@@ -84,9 +175,11 @@ $rating = calculateAgentRating($connect, $idAgen);
                     </div>
                 </div>
 
-                <!-- Informasi Paket Laundry -->
+                <!-- Laundry Package Information -->
                 <div class="col s5 offset-s1">
                     <h3 class="header light center">Info Paket Laundry</h3>
+                    
+                    <!-- Item Selection -->
                     <div class="input-field">
                         <h5>Pilih Jenis Pakaian:</h5>
                         <?php
@@ -108,7 +201,7 @@ $rating = calculateAgentRating($connect, $idAgen);
                         <?php endforeach; ?>
                     </div>
 
-                    <!-- Pilihan Jenis Layanan -->
+                    <!-- Service Type Selection -->
                     <div class="input-field">
                         <h5>Jenis Paket:</h5>
                         <div class="row">
@@ -134,7 +227,7 @@ $rating = calculateAgentRating($connect, $idAgen);
                         </div>
                     </div>
 
-                    <!-- Catatan Tambahan -->
+                    <!-- Additional Information -->
                     <div class="input-field">
                         <textarea class="materialize-textarea" name="catatan" id="catatan"></textarea>
                         <label for="catatan">Catatan</label>
@@ -159,44 +252,16 @@ $rating = calculateAgentRating($connect, $idAgen);
 
     function fetchPrices() {
         const idAgen = <?= $idAgen ?>;
-        try {
-            fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch prices');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Validate prices
-                    if (!data || Object.keys(data).length === 0) {
-                        throw new Error('No price data received');
-                    }
-                    
-                    // Validate each price
-                    Object.entries(data).forEach(([item, prices]) => {
-                        if (!prices || typeof prices !== 'object') {
-                            throw new Error(`Invalid price structure for ${item}`);
-                        }
-                        Object.entries(prices).forEach(([serviceType, price]) => {
-                            if (isNaN(price) || price <= 0) {
-                                throw new Error(`Invalid price for ${item} - ${serviceType}`);
-                            }
-                        });
-                    });
-
-                    itemPrices = data;
-                    calculatePrice();
-                })
-                .catch(error => {
-                    console.error('Error fetching prices:', error);
-                    M.toast({html: 'Gagal memuat harga: ' + error.message, classes: 'red'});
-                    throw error; // Re-throw to prevent further execution
-                });
-        } catch (error) {
-            console.error('Error in fetchPrices:', error);
-            M.toast({html: 'Terjadi kesalahan saat memuat harga', classes: 'red'});
-        }
+        fetch(`ajax/agen.php?action=getPrices&idAgen=${idAgen}`)
+            .then(response => response.json())
+            .then(data => {
+                itemPrices = data;
+                calculatePrice();
+            })
+            .catch(error => {
+                console.error('Error fetching prices:', error);
+                M.toast({html: 'Gagal memuat harga', classes: 'red'});
+            });
     }
 
     function toggleQuantity(itemType) {
@@ -210,57 +275,19 @@ $rating = calculateAgentRating($connect, $idAgen);
     }
 
     function calculatePrice() {
-        try {
-            const serviceType = document.querySelector('input[name="jenis"]:checked')?.value;
-            if (!serviceType) {
-                throw new Error('Jenis layanan belum dipilih');
-            }
+        const serviceType = document.querySelector('input[name="jenis"]:checked')?.value;
+        if (!serviceType) return;
 
-            let totalPrice = 0;
-            ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
-                const qty = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
-                if (qty > 0) {
-                    if (!itemPrices[item]?.[serviceType]) {
-                        throw new Error(`Harga untuk ${item} - ${serviceType} tidak ditemukan`);
-                    }
-                    if (isNaN(itemPrices[item][serviceType]) || itemPrices[item][serviceType] <= 0) {
-                        throw new Error(`Harga tidak valid untuk ${item} - ${serviceType}`);
-                    }
-                    totalPrice += qty * itemPrices[item][serviceType];
-                }
-            });
-
-            if (totalPrice <= 0) {
-                throw new Error('Total harga tidak valid');
-            }
-
-            document.getElementById('pricePreview').innerText = 
-                `Rp ${totalPrice.toLocaleString('id-ID')}`;
-        } catch (error) {
-            console.error('Error in calculatePrice:', error);
-            document.getElementById('pricePreview').innerText = 'Rp 0';
-            M.toast({html: 'Gagal menghitung harga: ' + error.message, classes: 'red'});
-        }
-    }
-
-    // Validasi form: pastikan setidaknya satu item terpilih
-    function validateOrderForm() {
-        const checkboxes = document.querySelectorAll('.item-checkbox');
-        let checked = false;
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                checked = true;
+        let totalPrice = 0;
+        ['baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'].forEach(item => {
+            const qty = parseInt(document.getElementById(`quantity-${item}`).value) || 0;
+            if (qty > 0 && itemPrices[item]?.[serviceType]) {
+                totalPrice += qty * itemPrices[item][serviceType];
             }
         });
-        if (!checked) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Pilih minimal satu item',
-                icon: 'error'
-            });
-            return false;
-        }
-        return true;
+
+        document.getElementById('pricePreview').innerText = 
+            `Rp ${totalPrice.toLocaleString('id-ID')}`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -272,7 +299,7 @@ $rating = calculateAgentRating($connect, $idAgen);
     </script>
 
     <?php
-    // Proses pembuatan pesanan
+    // Order Processing
     if (isset($_POST["pesan"])) {
         $orderData = [
             'id_agen' => $idAgen,
@@ -283,7 +310,7 @@ $rating = calculateAgentRating($connect, $idAgen);
             'catatan' => filter_input(INPUT_POST, 'catatan', FILTER_SANITIZE_STRING),
         ];
 
-        // Proses item yang dipilih
+        // Process item selections
         $items = $_POST['items'] ?? [];
         $quantities = $_POST['quantities'] ?? [];
         $totalItems = 0;
@@ -297,6 +324,7 @@ $rating = calculateAgentRating($connect, $idAgen);
             }
         }
 
+        // Cek apakah ada item yang dipilih
         if ($totalItems <= 0) {
             echo "<script>
                 Swal.fire({
@@ -310,8 +338,6 @@ $rating = calculateAgentRating($connect, $idAgen);
             $orderData['total_item'] = $totalItems;
 
             if (createOrder($connect, $orderData)) {
-                // Simpan id pesanan baru dalam session agar diproses di status.php
-                $_SESSION['new_order_id'] = mysqli_insert_id($connect);
                 echo "<script>
                     Swal.fire({
                         title: 'Pesanan Berhasil Dibuat',

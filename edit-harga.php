@@ -3,21 +3,29 @@ session_start();
 include 'connect-db.php';
 include 'functions/functions.php';
 
-// Verify admin access
-cekAdmin();
+// Add cache control headers
+header("Cache-Control: no-cache, must-revalidate");
 
-// Initialize logging
-$logMessage = "Price update attempt by admin ID: " . $_SESSION['admin'];
-error_log($logMessage);
+cekAgen();
 
-// Ambil data harga yang sudah tersimpan untuk tiap jenis
+$idAgen = $_SESSION["agen"];
+
+// Get existing prices with error handling
 $priceTypes = ['cuci', 'setrika', 'komplit', 'baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'];
 $prices = [];
 foreach ($priceTypes as $jenis) {
-    $query = "SELECT harga FROM harga WHERE jenis = '$jenis'"; // Removed agent-specific condition
-    $result = mysqli_query($connect, $query);
-    $row = mysqli_fetch_assoc($result);
-    $prices[$jenis] = $row ? $row['harga'] : 1000;
+    try {
+        $query = "SELECT harga FROM harga WHERE id_agen = $idAgen AND jenis = '$jenis'";
+        $result = mysqli_query($connect, $query);
+        if (!$result) {
+            throw new Exception(mysqli_error($connect));
+        }
+        $row = mysqli_fetch_assoc($result);
+        $prices[$jenis] = $row ? $row['harga'] : 1000;
+    } catch (Exception $e) {
+        error_log("Error fetching price for $jenis: " . $e->getMessage());
+        $prices[$jenis] = 1000; // Default value on error
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -142,51 +150,61 @@ foreach ($priceTypes as $jenis) {
 </html>
 
 <?php
-// Function to update price data using prepared statements
+// Enhanced function to update price data with better validation and logging
 function ubahHarga($data) {
-    global $connect;
+    global $connect, $idAgen;
     
     $priceKeys = ['cuci', 'setrika', 'komplit', 'baju', 'celana', 'jaket', 'karpet', 'pakaian_khusus'];
     $prices = [];
     $minPrice = 1000;
+    $maxPrice = 1000000; // Add maximum price limit
     
+    // Enhanced validation
     foreach ($priceKeys as $key) {
         $price = filter_var($data[$key], FILTER_SANITIZE_NUMBER_INT);
-        if ($price < $minPrice) {
+        if ($price < $minPrice || $price > $maxPrice) {
             return [
                 'status' => false,
-                'message' => "Harga minimum untuk $key adalah Rp. " . number_format($minPrice)
+                'message' => "Harga untuk $key harus antara Rp " . 
+                            number_format($minPrice) . " - Rp " . 
+                            number_format($maxPrice)
             ];
         }
         $prices[$key] = $price;
     }
     
+    // Start transaction
     mysqli_begin_transaction($connect);
     
     try {
-        $stmt = mysqli_prepare($connect, "UPDATE harga SET harga = ? WHERE jenis = ?"); // Removed agent-specific condition
+        // Use INSERT ... ON DUPLICATE KEY UPDATE for better handling
+        $stmt = mysqli_prepare($connect, 
+            "INSERT INTO harga (id_agen, jenis, harga) 
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE harga = VALUES(harga)"
+        );
+        
         if (!$stmt) {
             throw new Exception(mysqli_error($connect));
         }
         
-        $successCount = 0;
+        // Execute updates with logging
         foreach ($prices as $jenis => $harga) {
-            mysqli_stmt_bind_param($stmt, "is", $harga, $jenis);
-            if (mysqli_stmt_execute($stmt)) {
-                $successCount++;
-            } else {
+            mysqli_stmt_bind_param($stmt, "isi", $idAgen, $jenis, $harga);
+            if (!mysqli_stmt_execute($stmt)) {
                 throw new Exception("Gagal mengupdate harga untuk $jenis");
             }
+            
+            // Log price changes
+            $logMessage = "Harga $jenis diubah menjadi Rp " . number_format($harga);
+            error_log("Price Change: $logMessage");
         }
         
         mysqli_stmt_close($stmt);
+        mysqli_commit($connect);
         
-        if ($successCount == count($priceKeys)) {
-            mysqli_commit($connect);
-            return ['status' => true];
-        } else {
-            throw new Exception("Gagal mengupdate semua harga");
-        }
+        return ['status' => true];
+        
     } catch (Exception $e) {
         mysqli_rollback($connect);
         error_log("Error in ubahHarga: " . $e->getMessage());
@@ -198,59 +216,33 @@ function ubahHarga($data) {
 }
 
 if (isset($_POST["simpan"])) {
-    // Add confirmation dialog
-    echo "
-        <script>
-            Swal.fire({
-                title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin mengubah harga?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Ubah',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Proceed with form submission
-                    document.getElementById('editPriceForm').submit();
-                }
-            });
-        </script>
-    ";
-    
-    // Process the form if confirmed
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $result = ubahHarga($_POST);
-        if ($result['status']) {
-            // Log successful update
-            error_log("Prices successfully updated by admin ID: " . $_SESSION['admin']);
-            
-            echo "
-                <script>
-                    Swal.fire({
-                        title: 'Berhasil',
-                        text: 'Harga berhasil diperbarui',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(function() {
-                        window.location = 'edit-harga.php';
-                    });
-                </script>
-            ";
-        } else {
-            $errorMsg = $result['message'] ?? "Gagal memperbarui harga. Silakan coba lagi.";
-            error_log("Price update failed: " . $errorMsg);
-            
-            echo "
-                <script>
-                    Swal.fire({
-                        title: 'Error',
-                        text: '$errorMsg',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                </script>
-            ";
-        }
+    $result = ubahHarga($_POST);
+    if ($result['status']) {
+        echo "
+            <script>
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Prices updated successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    window.location = 'edit-harga.php';
+                });
+            </script>
+        ";
+    } else {
+        $errorMsg = $result['message'] ?? "Failed to update prices. Please try again.";
+        echo "
+            <script>
+                Swal.fire({
+                    title: 'Error',
+                    text: '$errorMsg',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            </script>
+        ";
+        error_log("Database error: " . mysqli_error($connect));
     }
 }
 ?>

@@ -76,60 +76,121 @@ function handleStatusUpdate($connect) {
     $status = $_POST["status_cucian"];
     $inputBerat = isset($_POST['berat']) ? $_POST['berat'] : null;
     
-    // Update status di tabel cucian
-    $stmt = mysqli_prepare($connect, "UPDATE cucian SET status_cucian = ? WHERE id_cucian = ?");
-    mysqli_stmt_bind_param($stmt, "si", $status, $id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
+    // Start transaction
+    mysqli_begin_transaction($connect);
     
-    if($status === "Selesai"){
-       $orderQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $id");
-       $order = mysqli_fetch_assoc($orderQuery);
-       if($order) {
-          // Update berat jika kosong dan ada input berat
-          if(empty($order['berat']) && !empty($inputBerat)) {
-              $updateBerat = mysqli_prepare($connect, "UPDATE cucian SET berat = ? WHERE id_cucian = ?");
-              mysqli_stmt_bind_param($updateBerat, "di", $inputBerat, $id);
-              mysqli_stmt_execute($updateBerat);
-              mysqli_stmt_close($updateBerat);
-              $order['berat'] = $inputBerat;
-          }
-          $tgl_selesai = $order['tgl_selesai'];
-          if ($tgl_selesai == '0000-00-00') {
-              $tgl_selesai = date("Y-m-d");
-              mysqli_query($connect, "UPDATE cucian SET tgl_selesai = '$tgl_selesai' WHERE id_cucian = $id");
-          }
-          
-          // Hitung total bayar (harga paket + total per item)
-          $total_bayar = calculateTotalHarga($order, $connect);
-          $payment_status = 'Paid';
-          $rating = NULL;
-          $komentar = '';
-          
-          // Insert ke tabel transaksi
-          $stmt2 = mysqli_prepare($connect, 
-              "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, payment_status, rating, komentar)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-          );
-          mysqli_stmt_bind_param($stmt2, "iiissdiss",
-              $order['id_cucian'],
-              $order['id_agen'],
-              $order['id_pelanggan'],
-              $order['tgl_mulai'],
-              $tgl_selesai,
-              $total_bayar,
-              $payment_status,
-              $rating,
-              $komentar
-          );
-          mysqli_stmt_execute($stmt2);
-          mysqli_stmt_close($stmt2);
-       }
-       header("Location: transaksi.php");
-    } else {
-       header("Location: status.php");
+    try {
+        // Update status in cucian table
+        $stmt = mysqli_prepare($connect, "UPDATE cucian SET status_cucian = ? WHERE id_cucian = ?");
+        if (!$stmt) {
+            throw new Exception("Failed to prepare status update statement");
+        }
+        mysqli_stmt_bind_param($stmt, "si", $status, $id);
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception("Failed to update status");
+        }
+        mysqli_stmt_close($stmt);
+        
+        if($status === "Selesai") {
+            // Get order details
+            $orderQuery = mysqli_query($connect, "SELECT * FROM cucian WHERE id_cucian = $id");
+            if (!$orderQuery) {
+                throw new Exception("Failed to fetch order details");
+            }
+            $order = mysqli_fetch_assoc($orderQuery);
+            
+            if (!$order) {
+                throw new Exception("Order not found");
+            }
+            
+            // Update weight if empty and input weight is provided
+            if(empty($order['berat']) && !empty($inputBerat)) {
+                $updateBerat = mysqli_prepare($connect, "UPDATE cucian SET berat = ? WHERE id_cucian = ?");
+                if (!$updateBerat) {
+                    throw new Exception("Failed to prepare weight update statement");
+                }
+                mysqli_stmt_bind_param($updateBerat, "di", $inputBerat, $id);
+                if (!mysqli_stmt_execute($updateBerat)) {
+                    throw new Exception("Failed to update weight");
+                }
+                mysqli_stmt_close($updateBerat);
+                $order['berat'] = $inputBerat;
+            }
+            
+            // Set completion date if not set
+            $tgl_selesai = $order['tgl_selesai'];
+            if ($tgl_selesai == '0000-00-00') {
+                $tgl_selesai = date("Y-m-d");
+                $updateDate = mysqli_query($connect, "UPDATE cucian SET tgl_selesai = '$tgl_selesai' WHERE id_cucian = $id");
+                if (!$updateDate) {
+                    throw new Exception("Failed to update completion date");
+                }
+            }
+            
+            // Calculate total payment
+            $total_bayar = calculateTotalHarga($order, $connect);
+            if (!$total_bayar) {
+                throw new Exception("Failed to calculate total payment");
+            }
+            
+            // Insert into transactions table
+            $stmt2 = mysqli_prepare($connect, 
+                "INSERT INTO transaksi (id_cucian, id_agen, id_pelanggan, tgl_mulai, tgl_selesai, total_bayar, payment_status, rating, komentar)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            if (!$stmt2) {
+                throw new Exception("Failed to prepare transaction insert statement");
+            }
+            // Convert NULL and empty string to proper types for binding
+            $payment_status = 'Paid';
+            $rating = null;
+            $komentar = '';
+            
+            mysqli_stmt_bind_param($stmt2, "iiissdsss",
+                $order['id_cucian'],
+                $order['id_agen'],
+                $order['id_pelanggan'],
+                $order['tgl_mulai'],
+                $tgl_selesai,
+                $total_bayar,
+                $payment_status,
+                $rating,
+                $komentar
+            );
+            if (!mysqli_stmt_execute($stmt2)) {
+                throw new Exception("Failed to insert transaction");
+            }
+            mysqli_stmt_close($stmt2);
+            
+            // Commit transaction
+            mysqli_commit($connect);
+            
+            // Log successful transaction
+            error_log("Transaction created for order ID: {$order['id_cucian']}");
+            
+            header("Location: transaksi.php");
+            exit();
+        }
+        
+        // Commit transaction for non-completed status updates
+        mysqli_commit($connect);
+        header("Location: status.php");
+        exit();
+        
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        mysqli_rollback($connect);
+        error_log("Error in handleStatusUpdate: " . $e->getMessage());
+        
+        // Show error message to user
+        echo "<script>
+            Swal.fire({
+                title: 'Error',
+                text: '".addslashes($e->getMessage())."',
+                icon: 'error'
+            });
+        </script>";
     }
-    exit();
 }
 
 // Jalankan form handlers

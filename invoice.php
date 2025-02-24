@@ -39,53 +39,26 @@ $transaction = mysqli_fetch_assoc($query);
 // Parse items and calculate prices
 $items = [];
 if (!empty($transaction['item_type'])) {
-    try {
-        $itemTypes = explode(', ', $transaction['item_type']);
-        foreach ($itemTypes as $item) {
-            if (preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
-                $itemName = trim($matches[1]);
-                $quantity = (int)$matches[2];
-                $pricePerItem = getHargaPaket(strtolower($itemName), $transaction['id_agen'], $connect);
-                
-                if ($pricePerItem <= 0) {
-                    throw new Exception("Invalid price for item: $itemName");
-                }
-                
-                $items[] = [
-                    'name' => $itemName,
-                    'quantity' => $quantity,
-                    'price' => $pricePerItem,
-                    'total' => $pricePerItem * $quantity
-                ];
-            }
+    $itemTypes = explode(', ', $transaction['item_type']);
+    foreach ($itemTypes as $item) {
+        if (preg_match('/([^(]+)\((\d+)\)/', $item, $matches)) {
+            $itemName = trim($matches[1]);
+            $quantity = (int)$matches[2];
+            $pricePerItem = getHargaPaket(strtolower($itemName), $transaction['id_agen'], $connect);
+            $items[] = [
+                'name' => $itemName,
+                'quantity' => $quantity,
+                'price' => $pricePerItem,
+                'total' => $pricePerItem * $quantity
+            ];
         }
-        
-        // Log price calculation
-        error_log("Invoice prices calculated for transaction #$transactionId by agent #$agentId");
-        
-    } catch (Exception $e) {
-        error_log("Error calculating invoice prices: " . $e->getMessage());
-        header("Location: transaksi.php?error=price_calculation");
-        exit();
     }
 }
 
 // Calculate totals
-try {
-    $subtotalItems = array_sum(array_column($items, 'total'));
-    $weightPrice = getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect) * $transaction['berat'];
-    
-    if ($weightPrice <= 0) {
-        throw new Exception("Invalid weight price calculation");
-    }
-    
-    $totalPrice = $subtotalItems + $weightPrice;
-    
-} catch (Exception $e) {
-    error_log("Error in total calculation: " . $e->getMessage());
-    header("Location: transaksi.php?error=total_calculation");
-    exit();
-}
+$subtotalItems = array_sum(array_column($items, 'total'));
+$weightPrice = getHargaPaket($transaction['jenis'], $transaction['id_agen'], $connect) * $transaction['berat'];
+$totalPrice = $subtotalItems + $weightPrice;
 
 ob_start();
 ?>
