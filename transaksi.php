@@ -114,44 +114,22 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                 </td>
                             <?php elseif ($login === "Admin"): ?>
                                 <td>
-                                    <?php if ($transaksi["rating"] == 0): ?>
-                                        <form action="" method="post" class="review-form">
-                                            <input type="hidden" value="<?= $transaksi['kode_transaksi'] ?>" name="kodeTransaksi">
-                                            <div class="input-field">
-                                                <select class="browser-default" name="rating" required>
-                                                    <option value="" disabled selected>Pilih Rating</option>
-                                                    <option value="2">1</option>
-                                                    <option value="4">2</option>
-                                                    <option value="6">3</option>
-                                                    <option value="8">4</option>
-                                                    <option value="10">5</option>
-                                                </select>
-                                            </div>
-                                            <div class="input-field">
-                                                <textarea name="komentar" class="materialize-textarea" placeholder="Masukkan Komentar" required></textarea>
-                                            </div>
-                                            <div class="center">
-                                                <button class="btn blue darken-2" type="submit" name="submitReview">
-                                                    Kirim Ulasan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    <?php else: 
-                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $starRow = mysqli_fetch_assoc($starResult);
-                                        $star = $starRow["rating"];
-                                    ?>
+                                    <?php if ($transaksi["rating"] > 0): ?>
                                         <fieldset class="bintang">
-                                            <span class="starImg star-<?= $star ?>"></span>
+                                            <span class="starImg star-<?= htmlspecialchars($transaksi["rating"]) ?>"></span>
                                         </fieldset>
+                                    <?php else: ?>
+                                        N/A
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if ($transaksi["komentar"] != ""): ?>
+                                    <?php if (!empty($transaksi["komentar"])): ?>
                                         <?= htmlspecialchars($transaksi["komentar"]) ?>
+                                    <?php else: ?>
+                                        N/A
                                     <?php endif; ?>
                                 </td>
-                            <?php else: ?>
+                            <?php else: // Pelanggan ?>
                                 <td>
                                     <?php if ($transaksi["rating"] == 0): ?>
                                         <form action="" method="post" class="review-form">
@@ -175,18 +153,14 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                                 </button>
                                             </div>
                                         </form>
-                                    <?php else: 
-                                        $starResult = mysqli_query($connect, "SELECT rating FROM transaksi WHERE kode_transaksi = " . $transaksi['kode_transaksi']);
-                                        $starRow = mysqli_fetch_assoc($starResult);
-                                        $star = $starRow["rating"];
-                                    ?>
+                                    <?php else: ?>
                                         <fieldset class="bintang">
-                                            <span class="starImg star-<?= $star ?>"></span>
+                                            <span class="starImg star-<?= htmlspecialchars($transaksi["rating"]) ?>"></span>
                                         </fieldset>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if ($transaksi["komentar"] != ""): ?>
+                                    <?php if (!empty($transaksi["komentar"])): ?>
                                         <?= htmlspecialchars($transaksi["komentar"]) ?>
                                     <?php endif; ?>
                                 </td>
@@ -251,8 +225,13 @@ $transactions = mysqli_fetch_all($query, MYSQLI_ASSOC);
         });
     </script>
     <?php
-    // Handle review submission
+    // Handle review submission (hanya pelanggan yang boleh submit ulasan)
     if (isset($_POST["submitReview"])) {
+        if (!isset($_SESSION["login-pelanggan"])) {
+            echo "<script>Swal.fire('Error','Hanya pelanggan yang dapat mengirim ulasan','error');</script>";
+            exit;
+        }
+        
         $rating = $_POST["rating"];
         $komentar = htmlspecialchars($_POST["komentar"]);
         $kodeTransaksiRating = $_POST["kodeTransaksi"];

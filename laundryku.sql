@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 24 Feb 2025 pada 16.00
+-- Waktu pembuatan: 25 Feb 2025 pada 01.33
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -101,7 +101,11 @@ CREATE TABLE `cucian` (
 INSERT INTO `cucian` (`id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `jenis`, `item_type`, `total_item`, `preview_price`, `berat`, `alamat`, `catatan`, `status_cucian`) VALUES
 (45, 16, 17, '2025-02-24', '2025-02-24', 'cuci', 'Baju (3)', 3, NULL, 5, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai'),
 (46, 16, 17, '2025-02-24', '2025-02-24', 'komplit', 'Baju (1)', 1, NULL, 50, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai'),
-(47, 17, 17, '2025-02-24', '2025-02-24', 'komplit', 'Baju (2), Celana (1), Jaket (4', 7, NULL, 10, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai');
+(47, 17, 17, '2025-02-24', '2025-02-24', 'komplit', 'Baju (2), Celana (1), Jaket (4', 7, NULL, 10, 'Jl. Sudirman No. 2, Bandung, Bandung', '', 'Selesai'),
+(48, 21, 16, '2025-02-24', '0000-00-00', 'cuci', 'Baju (1)', 1, NULL, NULL, 'Jl. Merdeka No. 1, Jakarta, Jakarta', '', 'Penjemputan'),
+(49, 21, 16, '2025-02-24', '0000-00-00', 'cuci', 'Baju (4)', 4, NULL, NULL, 'Jl. Merdeka No. 1, Jakarta, Jakarta', '', 'Penjemputan'),
+(50, 18, 16, '2025-02-24', '2025-02-24', 'cuci', 'Jaket (3), Karpet (2), Pakaian', 6, NULL, 50, 'Jl. Merdeka No. 1, Jakarta, Jakarta', '', 'Selesai'),
+(51, 18, 16, '2025-02-24', '0000-00-00', 'cuci', 'Jaket (3), Karpet (2)', 5, NULL, NULL, 'Jl. Merdeka No. 1, Jakarta, Jakarta', '', 'Penjemputan');
 
 -- --------------------------------------------------------
 
@@ -233,7 +237,8 @@ CREATE TABLE `transaksi` (
 INSERT INTO `transaksi` (`kode_transaksi`, `id_cucian`, `id_agen`, `id_pelanggan`, `tgl_mulai`, `tgl_selesai`, `total_bayar`, `payment_status`, `rating`, `komentar`) VALUES
 (46, 45, 16, 17, '2025-02-24', '2025-02-24', 16000, '', NULL, ''),
 (47, 46, 16, 17, '2025-02-24', '2025-02-24', 252000, 'Paid', 10, 'mantap jiwa\r\n'),
-(48, 47, 17, 17, '2025-02-24', '2025-02-24', 74000, 'Paid', NULL, '');
+(48, 47, 17, 17, '2025-02-24', '2025-02-24', 74000, 'Paid', NULL, ''),
+(49, 50, 18, 16, '2025-02-24', '2025-02-24', 227000, 'Paid', 8, 'sip');
 
 --
 -- Indexes for dumped tables
@@ -289,13 +294,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT untuk tabel `agen`
 --
 ALTER TABLE `agen`
-  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_agen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT untuk tabel `cucian`
 --
 ALTER TABLE `cucian`
-  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id_cucian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT untuk tabel `harga`
@@ -313,7 +318,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `kode_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
