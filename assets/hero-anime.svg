@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1050" role="img" aria-labelledby="title desc">
+<title id="title">Laundryku anime-inspired laundromat illustration</title><desc id="desc">Original stylized character carrying a laundry basket inside a neon laundromat.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#081b39"/><stop offset=".48" stop-color="#0b5ed7"/><stop offset="1" stop-color="#70d5ff"/></linearGradient>
+  <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#18233b"/><stop offset="1" stop-color="#0a1020"/></linearGradient>
+  <linearGradient id="shirt" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#cde9ff"/></linearGradient>
+  <linearGradient id="basket" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffcf70"/><stop offset="1" stop-color="#ff8f68"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#fff" stroke-opacity=".08"/></pattern>
+</defs>
+<rect width="900" height="1050" rx="64" fill="url(#bg)"/>
+<rect width="900" height="1050" rx="64" fill="url(#grid)"/>
+<circle cx="740" cy="176" r="150" fill="#9fe3ff" opacity=".18" filter="url(#glow)"/>
+<circle cx="130" cy="830" r="190" fill="#ff9ac6" opacity=".13" filter="url(#glow)"/>
+<g opacity=".95">
+  <rect x="85" y="142" width="222" height="330" rx="30" fill="#f8fbff"/>
+  <circle cx="196" cy="263" r="76" fill="#dbe8f5" stroke="#1a6bc7" stroke-width="12"/>
+  <circle cx="196" cy="263" r="51" fill="#9ad9ff" opacity=".8"/>
+  <path d="M153 261c29-27 55-30 88-5 12 9 18 20 18 20-22 28-50 42-85 29-27-10-41-33-41-33s5-5 20-11Z" fill="#fff" opacity=".84"/>
+  <rect x="122" y="374" width="148" height="18" rx="9" fill="#d5dfeb"/>
+  <rect x="122" y="410" width="92" height="12" rx="6" fill="#d5dfeb"/>
+</g>
+<g opacity=".72"><path d="M55 588H338" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M72 614H267" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/><path d="M622 90h182" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M662 116h109" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/></g>
+<g transform="translate(255 184)">
+  <path d="M158 119c7-78 66-128 145-117 89 12 142 89 115 183-19 64-72 97-132 95-79-3-139-70-128-161Z" fill="url(#hair)"/>
+  <path d="M206 112c10-61 56-92 105-86 64 8 97 62 78 123-13 43-47 68-92 68-58 0-101-48-91-105Z" fill="#ffd9c7"/>
+  <path d="M213 92c27-55 87-72 136-45 28 15 44 39 50 67-29-2-62-18-79-43-23 26-64 44-107 47 0-9-1-17 0-26Z" fill="url(#hair)"/>
+  <path d="M205 157c-26-29-37-4-27 19 8 19 26 24 36 6" fill="#ffd9c7"/>
+  <path d="M391 158c24-26 35-2 26 19-8 18-24 22-35 6" fill="#ffd9c7"/>
+  <ellipse cx="266" cy="137" rx="8" ry="11" fill="#18233b"/><ellipse cx="342" cy="137" rx="8" ry="11" fill="#18233b"/>
+  <path d="M294 176c12 9 26 9 38 0" fill="none" stroke="#c66b72" stroke-width="4" stroke-linecap="round"/>
+  <path d="M256 122c12-6 25-6 37-2M329 120c11-5 22-4 33 1" fill="none" stroke="#18233b" stroke-width="5" stroke-linecap="round"/>
+  <path d="M229 236c36-28 124-29 160 0l27 209H198l31-209Z" fill="url(#shirt)"/>
+  <path d="M231 240c17 49 36 77 70 96 37-16 62-51 83-98" fill="none" stroke="#71bff2" stroke-width="12" opacity=".8"/>
+  <path d="M196 279c-33 35-49 91-55 153l51 9 42-116M410 282c31 34 50 89 59 151l-50 11-43-117" fill="#ffd9c7"/>
+  <path d="M226 347c-39 12-64 49-56 91 7 39 38 65 82 67h119c45-1 75-27 81-67 7-43-20-79-57-91H226Z" fill="url(#basket)" stroke="#fff" stroke-opacity=".7" stroke-width="6"/>
+  <path d="M226 347c16-46 49-69 86-69 39 0 73 24 87 69" fill="none" stroke="#ffe6ab" stroke-width="13" stroke-linecap="round"/>
+  <path d="M211 402h198M226 447h168" stroke="#d96d5b" stroke-width="8" opacity=".45"/>
+  <path d="M259 364c28 22 82 22 108 0" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" opacity=".9"/>
+  <path d="M218 506c18 73 20 132 9 222h94l-8-167 12 167h96c-12-91-10-149 9-222H218Z" fill="#14284b"/>
+  <path d="M227 728c-8 62-17 108-31 151h84l32-151M421 728c8 61 16 107 31 151h-84l-34-151" fill="#ffd9c7"/>
+  <path d="M189 879h102c14 0 24 11 24 24v10H172v-12c0-12 7-22 17-22ZM358 879h105c11 0 20 10 20 22v12H337v-10c0-13 9-24 21-24Z" fill="#eef8ff"/>
+</g>
+<g font-family="Arial, sans-serif" fill="#fff"><text x="78" y="920" font-size="29" font-weight="700" opacity=".96">PICKUP. WASH. DONE.</text><text x="80" y="954" font-size="14" letter-spacing="6" opacity=".68">LAUNDRYKU / 2026</text></g>
+<g transform="translate(618 692) rotate(-7)"><rect width="208" height="122" rx="20" fill="#fff" opacity=".96"/><text x="26" y="42" font-family="Arial" font-size="13" font-weight="700" fill="#0b5ed7" letter-spacing="2">NEXT PICKUP</text><text x="26" y="81" font-family="Arial" font-size="31" font-weight="800" fill="#142033">16:30</text><circle cx="168" cy="70" r="20" fill="#eaf3ff"/><path d="m160 70 6 6 12-14" fill="none" stroke="#0b5ed7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>
