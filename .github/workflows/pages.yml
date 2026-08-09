@@ -23,12 +23,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Prepare static bundle
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site/img/agen
+          cp index.html login.html signup.html dashboard.html features.html .nojekyll _site/
+          cp -R assets _site/assets
+          cp img/banner.png img/laundryku.ico _site/img/
+          cp img/agen/laundry1.jpg img/agen/laundry2.jpg img/agen/laundry3.jpg img/agen/laundry4.jpg img/agen/laundry5.jpg _site/img/agen/
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
