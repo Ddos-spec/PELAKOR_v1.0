@@ -1,3 +1,4 @@
+const refreshStyle=document.createElement('link');refreshStyle.rel='stylesheet';refreshStyle.href='assets/refresh.css';document.head.appendChild(refreshStyle);
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY='laundryku_state_v2';
