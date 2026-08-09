@@ -4,9 +4,9 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const KEY='laundryku_state_v2';
 const seed={
   users:[
-    {name:'Raka Pratama',email:'raka@laundryku.id',password:'laundry123',role:'customer'},
-    {name:'Nadia Putri',email:'nadia@laundryku.id',password:'laundry123',role:'agent'},
-    {name:'Admin Laundryku',email:'admin@laundryku.id',password:'laundry123',role:'admin'}
+    {name:'Raka Pratama',email:'raka@pelakorku.id',password:'laundry123',role:'customer'},
+    {name:'Nadia Putri',email:'nadia@pelakorku.id',password:'laundry123',role:'agent'},
+    {name:'Admin Pelakorku',email:'admin@pelakorku.id',password:'laundry123',role:'admin'}
   ],
   session:null,
   orders:[
@@ -18,11 +18,90 @@ const seed={
 };
 
 function cloneSeed(){return JSON.parse(JSON.stringify(seed))}
-function getState(){try{return JSON.parse(localStorage.getItem(KEY))||cloneSeed()}catch{return cloneSeed()}}
-function saveState(s){localStorage.setItem(KEY,JSON.stringify(s))}
+function migrateState(s){
+  if(!s||typeof s!=='object')return cloneSeed();
+  if(Array.isArray(s.users))s.users.forEach(u=>{
+    if(typeof u.name==='string')u.name=u.name.replace(/Laundryku/gi,'Pelakorku');
+    if(typeof u.email==='string')u.email=u.email.replace(/@laundryku\.id$/i,'@pelakorku.id');
+  });
+  if(s.session){
+    if(typeof s.session.name==='string')s.session.name=s.session.name.replace(/Laundryku/gi,'Pelakorku');
+    if(typeof s.session.email==='string')s.session.email=s.session.email.replace(/@laundryku\.id$/i,'@pelakorku.id');
+  }
+  return s;
+}
+function getState(){try{return migrateState(JSON.parse(localStorage.getItem(KEY))||cloneSeed())}catch{return cloneSeed()}}
+function saveState(s){localStorage.setItem(KEY,JSON.stringify(migrateState(s)))}
 function money(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n)}
 function roleLabel(r){return r==='admin'?'Administrator':r==='agent'?'Mitra Laundry':'Pelanggan'}
 function statusClass(s){return s==='Selesai'?'done':s==='Dijemput'?'pickup':'process'}
+
+const flowIcons=[
+  `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="21" cy="21" r="11"></circle><path d="m29 29 9 9"></path><path d="M17 21h8M21 17v8"></path></svg>`,
+  `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 16h24l-2 22H14l-2-22Z"></path><path d="M18 16c0-4 2.5-7 6-7s6 3 6 7"></path><path d="M19 25h10M19 31h7"></path></svg>`,
+  `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30h24V15H8v15Z"></path><path d="M32 21h5l4 5v4h-9"></path><circle cx="16" cy="34" r="4"></circle><circle cx="35" cy="34" r="4"></circle><path d="M20 34h11"></path></svg>`,
+  `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16"></circle><path d="m16 24 6 6 11-13"></path><path d="M24 4v5M44 24h-5M24 44v-5M4 24h5"></path></svg>`
+];
+
+function applyPelakorkuIdentity(){
+  document.title=document.title.replace(/Laundryku/gi,'Pelakorku');
+  const description=document.querySelector('meta[name="description"]');
+  if(description)description.content=description.content.replace(/Laundryku/gi,'Pelakorku');
+
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  const textNodes=[];
+  while(walker.nextNode())textNodes.push(walker.currentNode);
+  textNodes.forEach(node=>{
+    if(/laundryku/i.test(node.nodeValue||''))node.nodeValue=node.nodeValue.replace(/LAUNDRYKU/g,'PELAKORKU').replace(/Laundryku/gi,'Pelakorku');
+  });
+  $$('img[alt]').forEach(img=>{if(/laundryku/i.test(img.alt))img.alt=img.alt.replace(/Laundryku/gi,'Pelakorku')});
+
+  $$('.v3-brand').forEach(brand=>{
+    brand.setAttribute('aria-label','Pelakorku home');
+    brand.innerHTML='<img class="pelakorku-logo" src="img/banner.png" alt="Pelakorku">';
+  });
+
+  $$('.v3-flow-grid article').forEach((card,index)=>{
+    if(index>3||card.querySelector('.v3-flow-icon'))return;
+    const icon=document.createElement('div');
+    icon.className='v3-flow-icon';
+    icon.innerHTML=flowIcons[index];
+    const number=card.querySelector(':scope > span');
+    if(number)number.insertAdjacentElement('afterend',icon);else card.prepend(icon);
+  });
+
+  if(!document.getElementById('pelakorku-brand-patch')){
+    const style=document.createElement('style');
+    style.id='pelakorku-brand-patch';
+    style.textContent=`
+      .v3-brand{min-width:170px;height:72px;display:flex;align-items:center;margin-right:auto}
+      .v3-brand .pelakorku-logo{display:block!important;height:68px!important;width:auto!important;max-width:170px!important;object-fit:contain!important;object-position:left center!important}
+      .v3-brand-footer{height:auto!important;min-height:76px}
+      .v3-brand-footer .pelakorku-logo{height:74px!important;max-width:185px!important}
+      .v3-flow-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+      .v3-flow-grid article{position:relative!important;min-height:340px!important;padding:26px 26px 30px!important;border:1px solid #dbe2ec!important;border-radius:24px!important;background:#fff!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+      .v3-flow-grid article:hover{transform:translateY(-5px)!important;border-color:#b7c8df!important;box-shadow:0 22px 48px rgba(24,42,72,.09)!important}
+      .v3-flow-grid article:nth-child(2){background:#fff9d8!important}
+      .v3-flow-grid article:nth-child(3){background:#eaf2ff!important}
+      .v3-flow-grid article:nth-child(4){background:#101827!important;color:#fff!important;border-color:#101827!important}
+      .v3-flow-grid article>span:first-child{font-size:.64rem!important;font-weight:900!important;letter-spacing:.16em!important;color:#748197!important}
+      .v3-flow-grid article:nth-child(4)>span:first-child{color:#8fa0b8!important}
+      .v3-flow-icon{width:76px;height:76px;border-radius:23px;display:grid;place-items:center;margin:34px 0 42px;background:#eff4ff;color:#125dff;border:1px solid rgba(18,93,255,.1);position:relative}
+      .v3-flow-icon:after{content:"";position:absolute;inset:8px;border:1px solid currentColor;border-radius:17px;opacity:.12}
+      .v3-flow-icon svg{width:38px;height:38px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+      .v3-flow-grid article:nth-child(2) .v3-flow-icon{background:#fff0a5;color:#8a6500;border-color:rgba(138,101,0,.1)}
+      .v3-flow-grid article:nth-child(3) .v3-flow-icon{background:#d8e8ff;color:#125dff}
+      .v3-flow-grid article:nth-child(4) .v3-flow-icon{background:#1c2a41;color:#83bdff;border-color:#2b405f}
+      .v3-flow-grid article>div:last-child{margin-top:auto}
+      .v3-flow-grid h3{font-size:1.55rem!important;letter-spacing:-.045em!important;margin:0 0 9px!important}
+      .v3-flow-grid p{font-size:.86rem!important;line-height:1.65!important;margin:0!important;color:#718096!important;max-width:24ch}
+      .v3-flow-grid article:nth-child(4) p{color:#9facbe!important}
+      @media(max-width:980px){.v3-flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.v3-brand .pelakorku-logo{height:62px!important;max-width:155px!important}}
+      @media(max-width:680px){.v3-flow-grid{grid-template-columns:1fr!important}.v3-flow-grid article{min-height:300px!important}.v3-flow-icon{margin:28px 0 34px}.v3-brand{min-width:112px;height:64px}.v3-brand .pelakorku-logo{height:55px!important;max-width:120px!important}}
+    `;
+    document.head.appendChild(style);
+  }
+}
 
 function toast(msg){
   let el=$('.toast');
@@ -37,7 +116,10 @@ function initPublicNav(){
   if(!nav)return;
   const state=getState();
   if(state.session){
-    nav.innerHTML=`<a class="btn btn-ghost" href="dashboard.html">${state.session.name.split(' ')[0]}</a><a class="btn btn-primary" href="dashboard.html">Dashboard</a>`;
+    const isV3=document.body.classList.contains('v3-page');
+    nav.innerHTML=isV3
+      ?`<a class="v3-btn v3-btn-quiet" href="dashboard.html">${state.session.name.split(' ')[0]}</a><a class="v3-btn v3-btn-dark" href="dashboard.html">Dashboard <span>↗</span></a>`
+      :`<a class="btn btn-ghost" href="dashboard.html">${state.session.name.split(' ')[0]}</a><a class="btn btn-primary" href="dashboard.html">Dashboard</a>`;
   }
 }
 
@@ -96,7 +178,7 @@ function initLogin(){
     setTimeout(()=>location.href='dashboard.html',250);
   });
   $$('[data-login]').forEach(b=>b.addEventListener('click',()=>{
-    const map={customer:'raka@laundryku.id',agent:'nadia@laundryku.id',admin:'admin@laundryku.id'};
+    const map={customer:'raka@pelakorku.id',agent:'nadia@pelakorku.id',admin:'admin@pelakorku.id'};
     $('#email').value=map[b.dataset.login];
     $('#password').value='laundry123';
     f.requestSubmit();
@@ -126,6 +208,7 @@ function initSignup(){
 function initDashboard(){
   const state=getState();
   if(!state.session){location.replace('login.html');return}
+  saveState(state);
   const user=state.session;
   $('#userName').textContent=user.name;
   $('#userRole').textContent=roleLabel(user.role);
@@ -176,6 +259,7 @@ function renderHistory(orders){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  applyPelakorkuIdentity();
   const page=document.body.dataset.page;
   if(page==='home')initHome();
   else if(page==='features')initFeatures();
