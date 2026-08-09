@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b5ed7">
+  <meta name="description" content="Jelajahi fitur Laundryku untuk pelanggan, mitra laundry, dan administrator.">
+  <title>Fitur Laundryku — Dari Pickup Sampai Selesai</title>
+  <link rel="icon" href="img/laundryku.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body data-page="features">
+<header class="site-header">
+  <div class="container nav-shell">
+    <a class="brand" href="index.html"><img src="img/banner.png" alt="Laundryku"></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a class="active-link" href="features.html">Fitur</a>
+      <a href="index.html#mitra">Mitra</a>
+      <a href="index.html#cara-kerja">Cara Kerja</a>
+    </nav>
+    <div class="nav-actions" id="navActions">
+      <a class="btn btn-ghost" href="login.html">Masuk</a>
+      <a class="btn btn-primary" href="signup.html">Daftar</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="feature-hero">
+    <div class="container feature-hero-grid">
+      <div>
+        <div class="eyebrow"><span></span> PRODUCT SYSTEM / 洗濯体験</div>
+        <h1>Satu alur. Tiga sisi aplikasi.</h1>
+        <p>Laundryku menghubungkan pelanggan, mitra laundry, dan admin dalam satu pengalaman yang sederhana: pesan, proses, pantau, selesai.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="#customer">Lihat alur pelanggan ↓</a>
+          <a class="btn btn-light btn-lg" href="login.html">Masuk ke aplikasi ↗</a>
+        </div>
+      </div>
+      <div class="feature-poster">
+        <span>LAUNDRYKU / SYSTEM MAP</span>
+        <strong>01</strong>
+        <div class="poster-stack">
+          <div><b>Pelanggan</b><small>Order · Tracking · Riwayat</small></div>
+          <div><b>Mitra</b><small>Order masuk · Status · Pendapatan</small></div>
+          <div><b>Admin</b><small>User · Mitra · Monitoring</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section feature-overview">
+    <div class="container">
+      <div class="section-head">
+        <div><span class="section-kicker">Core Features</span><h2>Apa yang sebenarnya bisa dilakukan?</h2></div>
+        <p>Bukan sekadar halaman login. Ini adalah gambaran fungsi utama aplikasi dari awal sampai transaksi selesai.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card"><span>01</span><h3>Cari laundry</h3><p>Jelajahi mitra berdasarkan area, layanan, harga, dan rating.</p><b>Search & discovery</b></article>
+        <article class="feature-card"><span>02</span><h3>Buat pesanan</h3><p>Pilih mitra, layanan, berat cucian, lalu buat order dalam beberapa langkah.</p><b>Order flow</b></article>
+        <article class="feature-card"><span>03</span><h3>Pickup & tracking</h3><p>Status berubah dari dijemput, dicuci, disetrika, sampai selesai.</p><b>Live status</b></article>
+        <article class="feature-card"><span>04</span><h3>Riwayat transaksi</h3><p>Semua order terdokumentasi bersama nominal, tanggal, dan status.</p><b>Transaction history</b></article>
+        <article class="feature-card"><span>05</span><h3>Workspace mitra</h3><p>Mitra melihat order masuk, total nilai pesanan, dan progres kerja.</p><b>Partner dashboard</b></article>
+        <article class="feature-card"><span>06</span><h3>Kontrol admin</h3><p>Admin melihat jumlah pengguna, mitra aktif, order, dan ringkasan sistem.</p><b>Admin overview</b></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="role-section" id="customer">
+    <div class="container role-grid">
+      <div class="role-copy">
+        <span class="section-kicker">Pelanggan / 01</span>
+        <h2>Dari keranjang cucian ke status selesai.</h2>
+        <p>Pelanggan bisa mencari laundry, membuat pesanan, melihat status pengerjaan, lalu kembali ke riwayat transaksi kapan saja.</p>
+        <div class="role-points">
+          <div><b>01</b><span>Pilih laundry & layanan</span></div>
+          <div><b>02</b><span>Masukkan estimasi berat</span></div>
+          <div><b>03</b><span>Pantau status proses</span></div>
+          <div><b>04</b><span>Lihat histori transaksi</span></div>
+        </div>
+        <a class="btn btn-primary" href="login.html">Masuk sebagai pelanggan ↗</a>
+      </div>
+      <div class="ui-window blue-window">
+        <div class="ui-window-top"><i></i><i></i><i></i><span>customer / dashboard</span></div>
+        <div class="ui-dashboard-preview">
+          <div class="preview-head"><div><small>Halo, Raka</small><h3>Laundry kamu hari ini.</h3></div><span class="badge process">Disetrika</span></div>
+          <div class="preview-stats"><div><b>1</b><span>Pesanan aktif</span></div><div><b>2</b><span>Total order</span></div><div><b>4.9</b><span>Rating</span></div></div>
+          <div class="preview-order"><div><strong>Fresh Wash</strong><small>LDY-2408 · Cuci + Setrika</small></div><b>4,2 kg</b><span>Rp 42.000</span></div>
+          <div class="status-line"><i class="done"></i><i class="done"></i><i class="active"></i><i></i></div>
+          <div class="status-label"><span>Dijemput</span><span>Dicuci</span><span>Disetrika</span><span>Selesai</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="role-section dark-role" id="partner">
+    <div class="container role-grid reverse">
+      <div class="ui-window dark-window">
+        <div class="ui-window-top"><i></i><i></i><i></i><span>partner / workspace</span></div>
+        <div class="ui-dashboard-preview">
+          <div class="preview-head"><div><small>Fresh Wash</small><h3>Order masuk hari ini.</h3></div><strong>Rp 172K</strong></div>
+          <div class="partner-orders"><div><b>LDY-2381</b><span>Alya · Express</span><small>Dicuci</small></div><div><b>LDY-2408</b><span>Raka · Cuci + Setrika</span><small>Disetrika</small></div><div><b>LDY-2374</b><span>Bimo · Cuci + Setrika</span><small>Dijemput</small></div></div>
+        </div>
+      </div>
+      <div class="role-copy">
+        <span class="section-kicker">Mitra Laundry / 02</span>
+        <h2>Satu workspace untuk mengelola order.</h2>
+        <p>Mitra tidak perlu melihat alur pelanggan. Fokusnya adalah order yang masuk, status pengerjaan, dan total nilai pekerjaan.</p>
+        <div class="role-points"><div><b>01</b><span>Daftar order masuk</span></div><div><b>02</b><span>Status proses laundry</span></div><div><b>03</b><span>Nilai order</span></div><div><b>04</b><span>Riwayat pekerjaan</span></div></div>
+        <a class="btn btn-white" href="login.html">Masuk sebagai mitra ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="role-section" id="admin">
+    <div class="container role-grid">
+      <div class="role-copy">
+        <span class="section-kicker">Administrator / 03</span>
+        <h2>Melihat sistem dari atas.</h2>
+        <p>Admin mendapat ringkasan menyeluruh mengenai pengguna, mitra aktif, transaksi, dan aktivitas order.</p>
+        <div class="role-points"><div><b>01</b><span>Total pengguna</span></div><div><b>02</b><span>Mitra aktif</span></div><div><b>03</b><span>Daftar transaksi</span></div><div><b>04</b><span>Monitoring order</span></div></div>
+        <a class="btn btn-primary" href="login.html">Masuk sebagai admin ↗</a>
+      </div>
+      <div class="admin-board">
+        <div class="admin-stat"><span>USERS</span><strong>24</strong><small>+8 bulan ini</small></div>
+        <div class="admin-stat pink"><span>MITRA</span><strong>5</strong><small>Semua aktif</small></div>
+        <div class="admin-stat yellow"><span>ORDERS</span><strong>38</strong><small>12 aktif</small></div>
+        <div class="admin-stat dark"><span>VALUE</span><strong>1.8M</strong><small>Total transaksi</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container cta-box">
+      <div><span>LAUNDRYKU / OPEN APP</span><h2>Sekarang lihat alurnya langsung.</h2><p>Login dengan salah satu role dan masuk ke dashboard masing-masing.</p></div>
+      <a class="btn btn-white btn-lg" href="login.html">Buka aplikasi ↗</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-shell"><div><img src="img/banner.png" alt="Laundryku"><p>Laundry praktis, transparan, dan mudah dipantau.</p></div><div><strong>Explore</strong><a href="index.html">Home</a><a href="features.html">Fitur</a><a href="index.html#mitra">Mitra</a></div><div><strong>Account</strong><a href="login.html">Masuk</a><a href="signup.html">Daftar</a></div></div>
+  <div class="container footer-bottom">© 2026 Laundryku — clean routine system.</div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
