@@ -3,140 +3,222 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#0b5ed7">
-  <meta name="description" content="Laundryku membantu menemukan laundry terdekat, memesan layanan, dan memantau status cucian dari satu tempat.">
-  <title>Laundryku — Laundry Praktis dari Rumah</title>
+  <meta name="theme-color" content="#f3f5fb">
+  <meta name="description" content="Laundryku — pesan laundry, pilih mitra, pantau proses, dan kelola semuanya dalam satu pengalaman digital.">
+  <title>Laundryku — Clean Routine System</title>
   <link rel="icon" href="img/laundryku.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/app.css">
+  <link rel="stylesheet" href="assets/v3.css">
 </head>
-<body data-page="home">
-<header class="site-header">
-  <div class="container nav-shell">
-    <a class="brand" href="index.html"><img src="img/banner.png" alt="Laundryku"></a>
-    <nav class="nav-links">
-      <a href="#layanan">Layanan</a>
+<body data-page="home" class="v3-page">
+<header class="v3-header">
+  <div class="v3-container v3-nav">
+    <a class="v3-brand" href="index.html" aria-label="Laundryku home">
+      <span class="v3-brand-mark">L</span>
+      <span class="v3-brand-copy"><strong>LAUNDRYKU</strong><small>CLEAN ROUTINE SYSTEM</small></span>
+    </a>
+    <nav class="v3-links" aria-label="Navigasi utama">
+      <a href="#product">Produk</a>
       <a href="features.html">Fitur</a>
       <a href="#mitra">Mitra</a>
-      <a href="#cara-kerja">Cara Kerja</a>
+      <a href="#flow">Alur</a>
     </nav>
-    <div class="nav-actions" id="navActions">
-      <a class="btn btn-ghost" href="login.html">Masuk</a>
-      <a class="btn btn-primary" href="signup.html">Daftar</a>
+    <div class="v3-actions" id="navActions">
+      <a class="v3-btn v3-btn-quiet" href="login.html">Masuk</a>
+      <a class="v3-btn v3-btn-dark" href="signup.html">Daftar <span>↗</span></a>
     </div>
   </div>
 </header>
 
 <main>
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <div class="eyebrow"><span></span> CLEAN ROUTINE / 毎日をもっと軽く</div>
-        <h1>Laundry day, but make it <em>effortless.</em></h1>
-        <p>Temukan laundry terpercaya, buat pesanan, atur pickup, dan pantau proses cucian dari satu tempat. Satu pengalaman untuk pelanggan, mitra laundry, dan admin.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary btn-lg" href="features.html">Jelajahi fitur ↗</a>
-          <a class="btn btn-light btn-lg" href="#mitra">Cari laundry</a>
+  <section class="v3-hero">
+    <div class="v3-container v3-hero-grid">
+      <div class="v3-hero-copy">
+        <div class="v3-kicker"><span>NEW ROUTINE / 洗濯</span><i></i><span>01</span></div>
+        <h1>Laundry yang terasa seperti <em>tidak mengurus laundry.</em></h1>
+        <p class="v3-lead">Cari mitra, pilih layanan, buat pesanan, lalu pantau progresnya. Semua dibuat supaya rutinitas laundry hilang dari daftar hal yang harus kamu pikirkan.</p>
+        <div class="v3-hero-actions">
+          <a class="v3-btn v3-btn-blue v3-btn-lg" href="features.html">Explore the system <span>↗</span></a>
+          <a class="v3-text-link" href="#mitra">Lihat mitra <span>↓</span></a>
         </div>
-        <div class="trust-row">
-          <div><strong>3 role</strong><span>Customer · Mitra · Admin</span></div>
-          <div><strong>5+</strong><span>Mitra laundry</span></div>
-          <div><strong>4.8/5</strong><span>Service score</span></div>
-        </div>
-        <div class="anime-note"><i></i> PICKUP · WASH · TRACK · DONE</div>
-      </div>
-      <div class="anime-stage">
-        <div class="anime-frame">
-          <img src="assets/hero-anime.svg" width="900" height="1050" alt="Ilustrasi Laundryku">
-          <div class="anime-stamp">YOUR<br>CLEAN<br>ROUTINE</div>
-          <div class="anime-caption">LAUNDRY ARC // 01</div>
+        <div class="v3-metrics">
+          <div><strong>03</strong><span>Role terhubung</span></div>
+          <div><strong>05+</strong><span>Mitra pilihan</span></div>
+          <div><strong>4.8</strong><span>Avg. service score</span></div>
         </div>
       </div>
+
+      <div class="v3-hero-art" aria-label="Visual Laundryku">
+        <div class="v3-art-label">LAUNDRY ARC / 001</div>
+        <div class="v3-art-frame">
+          <img src="assets/hero-anime.svg" width="900" height="1050" alt="Ilustrasi karakter di laundromat">
+        </div>
+        <div class="v3-float-card v3-float-status">
+          <small>ORDER STATUS</small>
+          <strong>Disetrika</strong>
+          <div class="v3-mini-progress"><i></i><i></i><i class="active"></i><i></i></div>
+        </div>
+        <div class="v3-float-card v3-float-rating"><span>★</span><strong>4.9</strong><small>Fresh Wash</small></div>
+        <div class="v3-stamp">PICKUP<br>WASH<br>DONE</div>
+      </div>
     </div>
-    <span class="hero-scroll">SCROLL TO EXPLORE ↓</span>
+    <div class="v3-rail" aria-hidden="true"><span>LAUNDRYKU</span><b>✦</b><span>PICKUP</span><b>✦</b><span>TRACKING</span><b>✦</b><span>DELIVERY</span><b>✦</b><span>EVERYDAY CLEAN ROUTINE</span></div>
   </section>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>LAUNDRYKU ✦ PICKUP</span><span>洗濯 ✦ TRACKING</span><span>CLEAN ROUTINE ✦ DELIVERY</span>
-      <span>LAUNDRYKU ✦ PICKUP</span><span>洗濯 ✦ TRACKING</span><span>CLEAN ROUTINE ✦ DELIVERY</span>
-    </div>
-  </div>
-
-  <section class="section product-map" id="fitur">
-    <div class="container">
-      <div class="section-head">
-        <div><span class="section-kicker">Inside Laundryku</span><h2>Bukan cuma login. Ini satu sistem laundry.</h2></div>
-        <p>Aplikasi dibagi menjadi tiga ruang kerja sesuai kebutuhan pengguna. Semua saling terhubung lewat alur pesanan yang sama.</p>
-      </div>
-      <div class="role-preview-grid">
-        <a class="role-preview customer-card" href="features.html#customer"><span>01 / CUSTOMER</span><h3>Pesan & pantau cucian.</h3><p>Cari laundry, pilih layanan, buat order, tracking status, dan lihat transaksi.</p><b>Explore customer flow →</b></a>
-        <a class="role-preview partner-card" href="features.html#partner"><span>02 / PARTNER</span><h3>Kelola order masuk.</h3><p>Mitra melihat pekerjaan, progres laundry, nilai order, dan riwayat.</p><b>Explore partner flow →</b></a>
-        <a class="role-preview admin-card" href="features.html#admin"><span>03 / ADMIN</span><h3>Lihat sistem dari atas.</h3><p>Monitoring user, mitra, order, dan ringkasan aktivitas platform.</p><b>Explore admin flow →</b></a>
-      </div>
-      <div class="feature-link-row"><a class="btn btn-primary btn-lg" href="features.html">Lihat semua fitur Laundryku ↗</a></div>
-    </div>
-  </section>
-
-  <section class="section soft" id="layanan">
-    <div class="container">
-      <div class="section-head">
-        <div><span class="section-kicker">Layanan</span><h2>Built for every laundry mood.</h2></div>
-        <p>Mulai dari cucian harian sampai express, tinggal pilih layanan sesuai kebutuhan.</p>
-      </div>
-      <div class="service-grid">
-        <article class="service-card" data-no="01"><div class="service-icon">◌</div><h3>Cuci Kering</h3><p>Cuci bersih dan kering untuk pakaian harian.</p><strong>Mulai Rp 7.000/kg</strong></article>
-        <article class="service-card" data-no="02"><div class="service-icon">⌁</div><h3>Cuci + Setrika</h3><p>Pakaian bersih, rapi, dan siap dipakai kembali.</p><strong>Mulai Rp 10.000/kg</strong></article>
-        <article class="service-card" data-no="03"><div class="service-icon">⚡</div><h3>Express</h3><p>Prioritas pengerjaan untuk kebutuhan yang lebih cepat.</p><strong>Mulai Rp 18.000/kg</strong></article>
-        <article class="service-card" data-no="04"><div class="service-icon">▣</div><h3>Special Care</h3><p>Bed cover, sepatu, dan item dengan penanganan khusus.</p><strong>Mulai Rp 25.000</strong></article>
+  <section class="v3-manifesto" id="product">
+    <div class="v3-container v3-manifesto-grid">
+      <div class="v3-section-label">WHY LAUNDRYKU / 02</div>
+      <div>
+        <p class="v3-manifesto-line">Laundry seharusnya sesederhana <span>pilih, titip, pantau, selesai.</span></p>
+        <div class="v3-manifesto-bottom">
+          <p>Karena yang dibutuhkan bukan aplikasi yang ramai, tapi sistem yang membuat pelanggan, mitra laundry, dan admin bergerak di alur yang sama tanpa saling mengganggu.</p>
+          <a class="v3-circle-link" href="features.html"><span>SEE<br>FEATURES</span><b>↗</b></a>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="mitra">
-    <div class="container">
-      <div class="section-head">
-        <div><span class="section-kicker">Mitra Laundry</span><h2>Your neighborhood clean crew.</h2></div>
-        <div class="search-inline"><input id="agentSearch" type="search" placeholder="Cari nama atau area..."><span>⌕</span></div>
+  <section class="v3-bento-section">
+    <div class="v3-container">
+      <div class="v3-section-head">
+        <div><span class="v3-section-label">PRODUCT SYSTEM / 03</span><h2>Satu produk. Banyak momen kecil yang dibikin gampang.</h2></div>
+        <p>Setiap fitur dibangun mengikuti perjalanan laundry nyata—bukan sekadar menambah menu.</p>
       </div>
-      <div class="agent-grid" id="agentGrid">
-        <article class="agent-card" data-search="bersih kilat jakarta selatan"><img loading="lazy" src="img/agen/laundry1.jpg" alt="Bersih Kilat"><div class="agent-body"><div class="agent-meta"><span>Jakarta Selatan</span><strong>★ 4.9</strong></div><h3>Bersih Kilat Laundry</h3><p>Cuci kiloan, express, pickup & delivery.</p><div class="agent-footer"><span>Mulai Rp 8.000/kg</span><a href="login.html">Pesan →</a></div></div></article>
-        <article class="agent-card" data-search="laundry corner tangerang"><img loading="lazy" src="img/agen/laundry2.jpg" alt="Laundry Corner"><div class="agent-body"><div class="agent-meta"><span>Tangerang</span><strong>★ 4.8</strong></div><h3>Laundry Corner</h3><p>Cuci setrika, bed cover, dan sepatu.</p><div class="agent-footer"><span>Mulai Rp 9.000/kg</span><a href="login.html">Pesan →</a></div></div></article>
-        <article class="agent-card" data-search="daily wash depok"><img loading="lazy" src="img/agen/laundry3.jpg" alt="Daily Wash"><div class="agent-body"><div class="agent-meta"><span>Depok</span><strong>★ 4.7</strong></div><h3>Daily Wash</h3><p>Laundry harian dengan opsi same-day service.</p><div class="agent-footer"><span>Mulai Rp 7.500/kg</span><a href="login.html">Pesan →</a></div></div></article>
-        <article class="agent-card" data-search="fresh wash ciputat tangerang selatan"><img loading="lazy" src="img/agen/laundry4.jpg" alt="Fresh Wash"><div class="agent-body"><div class="agent-meta"><span>Ciputat</span><strong>★ 4.9</strong></div><h3>Fresh Wash</h3><p>Pickup cepat dan tracking status pesanan.</p><div class="agent-footer"><span>Mulai Rp 10.000/kg</span><a href="login.html">Pesan →</a></div></div></article>
-        <article class="agent-card" data-search="clean point pamulang"><img loading="lazy" src="img/agen/laundry5.jpg" alt="Clean Point"><div class="agent-body"><div class="agent-meta"><span>Pamulang</span><strong>★ 4.8</strong></div><h3>Clean Point</h3><p>Cuci premium untuk pakaian dan household.</p><div class="agent-footer"><span>Mulai Rp 11.000/kg</span><a href="login.html">Pesan →</a></div></div></article>
+
+      <div class="v3-bento">
+        <article class="v3-bento-card v3-bento-search">
+          <span class="v3-card-no">01</span>
+          <div class="v3-card-icon">⌕</div>
+          <h3>Find your clean crew.</h3>
+          <p>Cari laundry berdasarkan area, rating, layanan, dan harga tanpa pindah-pindah halaman.</p>
+          <div class="v3-search-ui"><span>⌕</span><b>Ciputat</b><small>5 laundry nearby</small></div>
+        </article>
+
+        <article class="v3-bento-card v3-bento-order">
+          <span class="v3-card-no">02</span>
+          <div class="v3-order-ticket">
+            <small>NEW ORDER</small>
+            <strong>Fresh Wash</strong>
+            <span>Cuci + Setrika · 4.2 kg</span>
+            <div><b>Rp 42.000</b><i>CONFIRMED</i></div>
+          </div>
+          <h3>Order tanpa drama.</h3>
+          <p>Pilih mitra, layanan, dan estimasi berat. Selesai dalam satu flow.</p>
+        </article>
+
+        <article class="v3-bento-card v3-bento-track">
+          <div class="v3-track-top"><span class="v3-card-no">03</span><small>LIVE ROUTINE</small></div>
+          <h3>Selalu tahu cucianmu ada di tahap mana.</h3>
+          <p>Dari pickup sampai selesai, status ditampilkan sebagai timeline yang gampang dibaca.</p>
+          <div class="v3-track-ui">
+            <div class="done"><i>✓</i><span>Dijemput</span><small>09:10</small></div>
+            <div class="done"><i>✓</i><span>Dicuci</span><small>10:25</small></div>
+            <div class="now"><i>03</i><span>Disetrika</span><small>12:40</small></div>
+            <div><i>04</i><span>Selesai</span><small>Next</small></div>
+          </div>
+        </article>
+
+        <article class="v3-bento-card v3-bento-role">
+          <span class="v3-card-no">04</span>
+          <h3>Three views.<br>One system.</h3>
+          <div class="v3-role-stack">
+            <div><b>CUSTOMER</b><span>Order & tracking</span></div>
+            <div><b>PARTNER</b><span>Incoming jobs</span></div>
+            <div><b>ADMIN</b><span>System overview</span></div>
+          </div>
+        </article>
+
+        <article class="v3-bento-card v3-bento-history">
+          <span class="v3-card-no">05</span>
+          <h3>Riwayat yang benar-benar berguna.</h3>
+          <p>Semua transaksi tersimpan dengan status, berat, layanan, tanggal, dan nilai pesanan.</p>
+          <div class="v3-history-lines"><i></i><i></i><i></i></div>
+        </article>
+      </div>
+      <div class="v3-center-link"><a href="features.html">Open full feature map <span>↗</span></a></div>
+    </div>
+  </section>
+
+  <section class="v3-story-section">
+    <div class="v3-container">
+      <div class="v3-section-head v3-section-head-light">
+        <div><span class="v3-section-label">THE EXPERIENCE / 04</span><h2>Feels less like software.<br>More like a routine.</h2></div>
+        <p>Dari discovery sampai cucian kembali, seluruh perjalanan dibuat terasa satu cerita.</p>
+      </div>
+      <div class="v3-story-grid">
+        <figure class="v3-story-main"><img loading="lazy" src="img/agen/laundry4.jpg" alt="Laundry bernuansa anime"><figcaption><span>CHAPTER 01</span><strong>Drop the mental load.</strong></figcaption></figure>
+        <div class="v3-story-copy">
+          <span>01 — DISCOVER</span><h3>Pilih laundry yang cocok, bukan yang kebetulan ketemu.</h3><p>Bandingkan area, rating, layanan, dan harga. Tidak perlu mulai dari chat satu per satu.</p>
+          <div class="v3-story-tags"><b>LOCATION</b><b>RATING</b><b>PRICE</b><b>SERVICE</b></div>
+        </div>
+        <figure class="v3-story-side"><img loading="lazy" src="img/agen/laundry5.jpg" alt="Laundry aesthetic"><figcaption>02 / PROCESS</figcaption></figure>
+        <div class="v3-story-quote"><span>“</span><p>Yang penting bukan banyak fitur. Yang penting pengguna selalu tahu harus melakukan apa berikutnya.</p><small>LAUNDRYKU PRODUCT PRINCIPLE</small></div>
       </div>
     </div>
   </section>
 
-  <section class="section soft" id="cara-kerja">
-    <div class="container">
-      <div class="section-head center"><div><span class="section-kicker">How it works</span><h2>Three scenes. Clean ending.</h2></div></div>
-      <div class="steps-grid">
-        <article><span>01</span><h3>Pilih laundry</h3><p>Cari mitra berdasarkan lokasi, rating, dan layanan yang dibutuhkan.</p></article>
-        <article><span>02</span><h3>Atur pesanan</h3><p>Pilih layanan, estimasi berat, dan mitra yang akan menangani cucian.</p></article>
-        <article><span>03</span><h3>Pantau proses</h3><p>Lihat progres dari pickup sampai cucian selesai.</p></article>
+  <section class="v3-partners" id="mitra">
+    <div class="v3-container">
+      <div class="v3-section-head">
+        <div><span class="v3-section-label">NEARBY PARTNERS / 05</span><h2>Meet your neighborhood clean crew.</h2></div>
+        <div class="v3-search"><span>⌕</span><input id="agentSearch" type="search" placeholder="Cari nama atau area…" aria-label="Cari mitra laundry"></div>
+      </div>
+
+      <div class="agent-grid v3-agent-grid" id="agentGrid">
+        <article class="agent-card v3-laundry-card" data-search="bersih kilat jakarta selatan">
+          <div class="v3-card-image"><img loading="lazy" src="img/agen/laundry1.jpg" alt="Bersih Kilat Laundry"><span>OPEN</span></div>
+          <div class="v3-laundry-body"><div class="v3-laundry-meta"><span>JAKARTA SELATAN</span><b>★ 4.9</b></div><h3>Bersih Kilat Laundry</h3><p>Kiloan · Express · Pickup & Delivery</p><div class="v3-laundry-foot"><strong>Rp 8.000<small>/kg</small></strong><a href="login.html">Pesan ↗</a></div></div>
+        </article>
+        <article class="agent-card v3-laundry-card" data-search="laundry corner tangerang">
+          <div class="v3-card-image"><img loading="lazy" src="img/agen/laundry2.jpg" alt="Laundry Corner"><span>OPEN</span></div>
+          <div class="v3-laundry-body"><div class="v3-laundry-meta"><span>TANGERANG</span><b>★ 4.8</b></div><h3>Laundry Corner</h3><p>Setrika · Bed Cover · Shoes Care</p><div class="v3-laundry-foot"><strong>Rp 9.000<small>/kg</small></strong><a href="login.html">Pesan ↗</a></div></div>
+        </article>
+        <article class="agent-card v3-laundry-card" data-search="daily wash depok">
+          <div class="v3-card-image"><img loading="lazy" src="img/agen/laundry3.jpg" alt="Daily Wash"><span>OPEN</span></div>
+          <div class="v3-laundry-body"><div class="v3-laundry-meta"><span>DEPOK</span><b>★ 4.7</b></div><h3>Daily Wash</h3><p>Daily Laundry · Same-day Service</p><div class="v3-laundry-foot"><strong>Rp 7.500<small>/kg</small></strong><a href="login.html">Pesan ↗</a></div></div>
+        </article>
+        <article class="agent-card v3-laundry-card" data-search="fresh wash ciputat tangerang selatan">
+          <div class="v3-card-image"><img loading="lazy" src="img/agen/laundry4.jpg" alt="Fresh Wash"><span>OPEN</span></div>
+          <div class="v3-laundry-body"><div class="v3-laundry-meta"><span>CIPUTAT</span><b>★ 4.9</b></div><h3>Fresh Wash</h3><p>Fast Pickup · Status Tracking</p><div class="v3-laundry-foot"><strong>Rp 10.000<small>/kg</small></strong><a href="login.html">Pesan ↗</a></div></div>
+        </article>
+        <article class="agent-card v3-laundry-card" data-search="clean point pamulang">
+          <div class="v3-card-image"><img loading="lazy" src="img/agen/laundry5.jpg" alt="Clean Point"><span>OPEN</span></div>
+          <div class="v3-laundry-body"><div class="v3-laundry-meta"><span>PAMULANG</span><b>★ 4.8</b></div><h3>Clean Point</h3><p>Premium Care · Household Laundry</p><div class="v3-laundry-foot"><strong>Rp 11.000<small>/kg</small></strong><a href="login.html">Pesan ↗</a></div></div>
+        </article>
       </div>
     </div>
   </section>
 
-  <section class="cta-section">
-    <div class="container cta-box">
-      <div><span>LAUNDRYKU / OPEN APP</span><h2>Explore the whole laundry flow.</h2><p>Lihat fitur dulu atau langsung masuk ke dashboard.</p></div>
-      <div class="cta-actions"><a class="btn btn-white btn-lg" href="features.html">Lihat fitur</a><a class="btn btn-white-outline btn-lg" href="login.html">Masuk ↗</a></div>
+  <section class="v3-flow" id="flow">
+    <div class="v3-container">
+      <div class="v3-flow-head"><span class="v3-section-label">HOW IT MOVES / 06</span><h2>Four steps. One clean ending.</h2></div>
+      <div class="v3-flow-grid">
+        <article><span>01</span><div><h3>Discover</h3><p>Temukan mitra berdasarkan kebutuhanmu.</p></div></article>
+        <article><span>02</span><div><h3>Order</h3><p>Pilih layanan dan buat pesanan.</p></div></article>
+        <article><span>03</span><div><h3>Track</h3><p>Pantau progres cucian secara jelas.</p></div></article>
+        <article><span>04</span><div><h3>Done</h3><p>Cucian selesai, histori tetap tersimpan.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="v3-cta">
+    <div class="v3-container v3-cta-box">
+      <div><span>OPEN THE APP / 07</span><h2>Less laundry.<br>More life.</h2><p>Masuk ke salah satu role dan lihat seluruh alurnya berjalan.</p></div>
+      <div class="v3-cta-actions"><a class="v3-btn v3-btn-white v3-btn-lg" href="login.html">Masuk sekarang <span>↗</span></a><a class="v3-btn v3-btn-outline v3-btn-lg" href="features.html">Lihat fitur</a></div>
     </div>
   </section>
 </main>
 
-<footer class="site-footer">
-  <div class="container footer-shell">
-    <div><img src="img/banner.png" alt="Laundryku"><p>Laundry praktis, transparan, dan mudah dipantau.</p></div>
-    <div><strong>Explore</strong><a href="features.html">Fitur</a><a href="#layanan">Layanan</a><a href="#mitra">Mitra Laundry</a></div>
-    <div><strong>Account</strong><a href="login.html">Masuk</a><a href="signup.html">Daftar</a><a href="dashboard.html">Dashboard</a></div>
+<footer class="v3-footer">
+  <div class="v3-container v3-footer-grid">
+    <a class="v3-brand v3-brand-footer" href="index.html"><span class="v3-brand-mark">L</span><span class="v3-brand-copy"><strong>LAUNDRYKU</strong><small>CLEAN ROUTINE SYSTEM</small></span></a>
+    <p>Digital laundry experience untuk pelanggan, mitra, dan admin.</p>
+    <div><a href="features.html">Fitur</a><a href="#mitra">Mitra</a><a href="login.html">Masuk</a><a href="signup.html">Daftar</a></div>
   </div>
-  <div class="container footer-bottom">© 2026 Laundryku — clean routine system.</div>
+  <div class="v3-container v3-footer-bottom"><span>© 2026 Laundryku</span><span>MADE FOR CLEANER ROUTINES / 洗濯</span></div>
 </footer>
 <script src="assets/app.js"></script>
 </body>
